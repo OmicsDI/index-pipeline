@@ -9,6 +9,8 @@ import uk.ac.ebi.ddi.pipeline.indexer.exception.DDIException;
 import uk.ac.ebi.ddi.pipeline.indexer.model.DataSource;
 
 
+import javax.naming.NamingException;
+import javax.xml.crypto.Data;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
@@ -96,13 +98,28 @@ public class ConfigurationFileBootstrap {
         return dataSources;
     }
 
+    /**
+     * The current file support YES or TRUE as possible options for
+     * @param singleFile
+     * @return
+     */
     private static boolean parseSingleFile(String singleFile) {
         boolean single = false;
-        if(singleFile != null && (singleFile.equalsIgnoreCase("yes") || Boolean.parseBoolean(singleFile)))
+        if(singleFile != null && (singleFile.equalsIgnoreCase("yes") || singleFile.equalsIgnoreCase("true")))
             single = true;
-        return single;
 
+        return single;
     }
 
-
+    /**
+     * Retrieve all the possible sources names to be use in command lines options
+     * @param config the original config object
+     * @return A list of all databases or sources to be use
+     */
+    public static List<String> getSourceNames(XMLConfiguration config) {
+        List<String> sources = new ArrayList<String>();
+        for(DataSource source: getDataSources(config))
+            sources.add(source.getName());
+        return sources;
+    }
 }

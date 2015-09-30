@@ -1,0 +1,57 @@
+<assembly>
+    <id>deployment</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>${assembly.dir}/lib</outputDirectory>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/target</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <outputDirectory>${assembly.dir}</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>${assembly.dir}/log</outputDirectory>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.basedir}/data</directory>
+            <outputDirectory>${assembly.dir}/data</outputDirectory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.basedir}/config</directory>
+            <outputDirectory>${assembly.dir}/config</outputDirectory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/scripts</directory>
+            <outputDirectory>${assembly.dir}/scripts</outputDirectory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

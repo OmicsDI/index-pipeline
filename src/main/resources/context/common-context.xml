@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!--job launcher-->
+    <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+        <property name="jobRepository" ref="jobRepository"/>
+    </bean>
+
+    <!--enable step scope for late binding-->
+    <bean class="org.springframework.batch.core.scope.StepScope"/>
+
+    <!--listener promotes throwables from step level to job level-->
+    <bean id="throwablePromotionListener"
+          class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.ExecutionContextThrowablePromotionListener"/>
+
+    <!-- listener logs the start and stop time of a step -->
+    <bean id="stepExecutionPeriodListener" class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.StepExecutionPeriodListener"/>
+
+    <!--listen to the job execution status-->
+    <bean id="jobListener" class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.PipelineJobStatusListener"/>
+
+    <!--
+        There should be one persister per submission/dataset, which should be defined by the submission ticket number ('submission.ticket').
+        Known keys to store data in validation part
+    -->
+    <bean id="fileSystemPersisterFactory2" class="uk.ac.ebi.pride.io.FileSystemPersisterFactory">
+        <constructor-arg name="locationPrefix" value="file:${spring.batch.tmp.persistence.dir}"/>
+    </bean>
+
+    <!--load property files-->
+    <context:property-placeholder location="classpath:prop/common.properties, classpath:prop/accession.properties"
+                                  ignore-unresolvable="true" order="1"/>
+
+</beans>

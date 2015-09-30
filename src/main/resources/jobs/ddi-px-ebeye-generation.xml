@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:bean="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <description>
+        This job generated and submits a new SampleTab file for a (PRIDE or PX) project to the BioSamples Database.
+    </description>
+
+    <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
+
+        <!-- EB-eye XML generation for public project -->
+        <batch:step id="genEbEyeXmlStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">
+                    <bean:property name="projectRepository" ref="projectRepository"/>
+                    <bean:property name="outputDirectory" value="${ddi.px.url}"/>
+                    <bean:property name=""
+                    <bean:property name="submissionFile" value="file:${pride.repo.data.base.dir}/#{jobExecutionContext['public.path.fragment']}/internal/${submission.file.name}"/>
+                    <bean:property name="proteinIdentificationSearchService" ref="proteinIdentificationSearchService"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <batch:step id="parentStep" abstract="true">
+        <batch:listeners>
+            <batch:listener ref="executionContextPromotionListener"/>
+            <batch:listener ref="throwablePromotionListener"/>
+        </batch:listeners>
+    </batch:step>
+
+    <!--listener for promoting properties in step execution context to job execution context-->
+    <bean:bean id="executionContextPromotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+        <bean:property name="keys">
+            <bean:array>
+                <bean:value>public.path.fragment</bean:value>
+                <!-- added by getAndStoreOrigPublicationDateTaskletStep; used by genPublicSearchParamsStep -->
+            </bean:array>
+        </bean:property>
+        <bean:property name="strict" value="false"/>
+    </bean:bean>
+
+    <!--load property files-->
+    <context:property-placeholder location="classpath:prop/common.properties"
+                                  ignore-unresolvable="true" order="1"/>
+
+
+
+</beans>

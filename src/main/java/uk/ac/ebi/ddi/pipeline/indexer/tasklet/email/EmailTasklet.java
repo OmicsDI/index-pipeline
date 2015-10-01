@@ -10,12 +10,12 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.email.EmailContentGenerator;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.pride.email.EmailContentGenerator;
-import uk.ac.ebi.pride.tasklet.util.AbstractTasklet;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
 
 /**
  * Tasklet to send an email

@@ -8,11 +8,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.reader.GeneratePxEbeFiles;
-import uk.ac.ebi.ddi.reader.utils.ReadProperties;
-
-
-import java.io.File;
-
 
 /**
  * Generate all the files from pX submission by crawling the ProteomeXchange Page and parsing the XML files
@@ -25,7 +20,13 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
 
     public static final Logger logger = LoggerFactory.getLogger(GenerateEBeyePxXMLTasklet.class);
 
-    String pxURL;
+    private String pxURL;
+
+    private String pxPrefix;
+
+    private String endPoint;
+
+    private String loopGap;
 
     private String outputDirectory;
 
@@ -33,21 +34,18 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        String pxPrefix = ReadProperties.getInstance().getProperty("pxPrefix");
+        GeneratePxEbeFiles.searchFilesWeb(Integer.valueOf(loopGap),Integer.valueOf(endPoint),pxPrefix,pxURL,outputDirectory);
 
-        Integer endPoint   = Integer.valueOf(ReadProperties.getInstance().getProperty("pxEnd"));
-
-        Integer loopGap = Integer.valueOf(ReadProperties.getInstance().getProperty("loopGap"));
-
-        GeneratePxEbeFiles.searchFilesWeb(loopGap,endPoint,pxPrefix,pxURL,outputDirectory);
+        return RepeatStatus.FINISHED;
 
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(submissionFile, "Summary PX file cannot be null.");
-        Assert.notNull(projectAccession, "PX accession cannot be null.");
-        Assert.notNull(projectRepository, "Proj repo cannot be null.");
         Assert.notNull(outputDirectory, "Output directory cannot be null.");
+        Assert.notNull(pxURL, "pxURL can't be null.");
+        Assert.notNull(pxPrefix, "pxPrefix can't be null.");
+        Assert.notNull(endPoint, "endPoint can't be null.");
+        Assert.notNull(loopGap,"loopGap can't be null.");
     }
 }

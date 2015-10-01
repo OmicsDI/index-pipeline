@@ -18,11 +18,11 @@
         <batch:step id="genEbEyeXmlStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">
-                    <bean:property name="projectRepository" ref="projectRepository"/>
-                    <bean:property name="outputDirectory" value="${ddi.px.url}"/>
-                    <bean:property name=""
-                    <bean:property name="submissionFile" value="file:${pride.repo.data.base.dir}/#{jobExecutionContext['public.path.fragment']}/internal/${submission.file.name}"/>
-                    <bean:property name="proteinIdentificationSearchService" ref="proteinIdentificationSearchService"/>
+                    <bean:property name="pxURL" value="${ddi.common.px.url}"/>
+                    <bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>
+                    <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
+                    <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
+                    <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

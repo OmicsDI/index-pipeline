@@ -27,12 +27,12 @@
         There should be one persister per submission/dataset, which should be defined by the submission ticket number ('submission.ticket').
         Known keys to store data in validation part
     -->
-    <bean id="fileSystemPersisterFactory2" class="uk.ac.ebi.pride.io.FileSystemPersisterFactory">
-        <constructor-arg name="locationPrefix" value="file:${spring.batch.tmp.persistence.dir}"/>
-    </bean>
+    <!--<bean id="fileSystemPersisterFactory2" class="uk.ac.ebi.pride.io.FileSystemPersisterFactory">-->
+        <!--<constructor-arg name="locationPrefix" value="file:${spring.batch.tmp.persistence.dir}"/>-->
+    <!--</bean>-->
 
     <!--load property files-->
-    <context:property-placeholder location="classpath:prop/common.properties, classpath:prop/accession.properties"
-                                  ignore-unresolvable="true" order="1"/>
+    <!--<context:property-placeholder location="classpath:prop/common.properties, classpath:prop/accession.properties"-->
+                                  <!--ignore-unresolvable="true" order="1"/>-->
 
 </beans>

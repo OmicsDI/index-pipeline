@@ -48,4 +48,44 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
         Assert.notNull(endPoint, "endPoint can't be null.");
         Assert.notNull(loopGap,"loopGap can't be null.");
     }
+
+    public String getPxURL() {
+        return pxURL;
+    }
+
+    public void setPxURL(String pxURL) {
+        this.pxURL = pxURL;
+    }
+
+    public String getPxPrefix() {
+        return pxPrefix;
+    }
+
+    public void setPxPrefix(String pxPrefix) {
+        this.pxPrefix = pxPrefix;
+    }
+
+    public String getEndPoint() {
+        return endPoint;
+    }
+
+    public void setEndPoint(String endPoint) {
+        this.endPoint = endPoint;
+    }
+
+    public String getLoopGap() {
+        return loopGap;
+    }
+
+    public void setLoopGap(String loopGap) {
+        this.loopGap = loopGap;
+    }
+
+    public String getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    public void setOutputDirectory(String outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
 }

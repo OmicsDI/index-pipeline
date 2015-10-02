@@ -26,6 +26,7 @@
         <commons.io.version>2.4</commons.io.version>
         <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
         <java.mail.version>1.4.4</java.mail.version>
+        <subethasmtp.wiser.version>1.2</subethasmtp.wiser.version>
 
         <ddi.px.reader.version>1.0-SNAPSHOT</ddi.px.reader.version>
         <ddi.xml.validator.version>0.0.1-SNAPSHOT</ddi.xml.validator.version>
@@ -157,6 +158,14 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!--email unit testing-->
+        <dependency>
+            <groupId>org.subethamail</groupId>
+            <artifactId>subethasmtp-wiser</artifactId>
+            <version>${subethasmtp.wiser.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -176,6 +185,22 @@
                 </excludes>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>prop/*.properties</include>
+                </includes>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>prop/*.properties</exclude>
+                </excludes>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

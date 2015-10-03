@@ -10,7 +10,8 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.reader.GeneratePxEbeFiles;
 
 /**
- * Generate all the files from pX submission by crawling the ProteomeXchange Page and parsing the XML files
+ * Generate all the files from pX submission by crawling the ProteomeXchange Page
+ * and parsing the XML files. For every Dataset a file is created in the defined folder.
  *
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 29/09/15

@@ -49,12 +49,6 @@
 
     <!-- This objects are needed for the metabolome workbench reader -->
 
-    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.reader.extws.mw.config.MWWsConfigProd"/>
-    <bean id="taxWsConfig" class="uk.ac.ebi.ddi.reader.extws.entrez.config.TaxWsConfigProd"/>
-
-
-
-
-
-
-        </beans>
+    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.mw.extws.mw.config.MWWsConfigProd"/>
+    <bean id="taxWsConfig" class="uk.ac.ebi.ddi.mw.extws.entrez.config.TaxWsConfigProd"/>
+</beans>

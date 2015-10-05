@@ -7,9 +7,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.ddi.reader.GenerateMWEbeFiles;
-import uk.ac.ebi.ddi.reader.extws.entrez.config.TaxWsConfigProd;
-import uk.ac.ebi.ddi.reader.extws.mw.config.MWWsConfigProd;
+import uk.ac.ebi.ddi.mw.GenerateMWEbeFiles;
+import uk.ac.ebi.ddi.mw.extws.entrez.config.TaxWsConfigProd;
+import uk.ac.ebi.ddi.mw.extws.mw.config.MWWsConfigProd;
 
 /**
  * Generate all the files from pX submission by crawling the ProteomeXchange Page

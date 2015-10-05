@@ -7,7 +7,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.ddi.reader.GeneratePxEbeFiles;
+import uk.ac.ebi.ddi.px.GeneratePxEbeFiles;
 
 /**
  * Generate all the files from pX submission by crawling the ProteomeXchange Page

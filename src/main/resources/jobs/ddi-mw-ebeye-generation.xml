@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>
-        This job generate the XML for a MEtabolome Workbench to be submitted to OmicsDI system.
+        This job generate the XML for a Metabolome Workbench to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">

@@ -18,7 +18,7 @@
         <batch:step id="genEbEyeXmlStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw.GenerateEBeyeMwXMLTasklet">
-                    <bean:property name="outputDirectory" value="${ddi.common.wm.original.directory}"/>
+                    <bean:property name="outputDirectory" value="${ddi.common.mw.original.directory}"/>
                     <bean:property name="configProd" ref="mwWsConfig"/>
                     <bean:property name="taxWsConfigProd" ref="taxWsConfig"/>
                 </bean:bean>

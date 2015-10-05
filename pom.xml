@@ -45,6 +45,12 @@
             <artifactId>ddi-validator</artifactId>
             <version>${ddi.xml.validator.version}</version>
         </dependency>
+        <dependency>
+            <groupId>uk.ac.ebi.ddi</groupId>
+            <artifactId>ddi-mw-reader</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- End of the reader importers -->
 
         <!-- Email -->

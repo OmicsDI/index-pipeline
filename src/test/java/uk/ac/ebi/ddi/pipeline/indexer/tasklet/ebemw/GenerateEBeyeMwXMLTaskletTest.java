@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,8 +13,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-ebepx-context.xml"})
-public class GenerateEBeyePxXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-ebemw-context.xml"})
+public class GenerateEBeyeMwXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

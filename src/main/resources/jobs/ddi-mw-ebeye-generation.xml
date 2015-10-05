@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>
-        This job generated EBE XML file for PX submission, Massive and PeptideAlas
+        This job generate the XML for a MEtabolome Workbench to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
@@ -17,12 +17,10 @@
         <!-- EB-eye XML generation for public project -->
         <batch:step id="genEbEyeXmlStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">
-                    <bean:property name="pxURL" value="${ddi.common.px.url}"/>
-                    <bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>
-                    <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
-                    <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
-                    <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
+                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw.GenerateEBeyeMwXMLTasklet">
+                    <bean:property name="outputDirectory" value="${ddi.common.wm.original.directory}"/>
+                    <bean:property name="configProd" ref="mwWsConfig"/>
+                    <bean:property name="taxWsConfigProd" ref="taxWsConfig"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

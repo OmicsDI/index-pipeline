@@ -14,8 +14,7 @@
     <bean class="org.springframework.batch.core.scope.StepScope"/>
 
     <!--listener promotes throwables from step level to job level-->
-    <bean id="throwablePromotionListener"
-          class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.ExecutionContextThrowablePromotionListener"/>
+    <bean id="throwablePromotionListener" class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.ExecutionContextThrowablePromotionListener"/>
 
     <!-- listener logs the start and stop time of a step -->
     <bean id="stepExecutionPeriodListener" class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.StepExecutionPeriodListener"/>
@@ -47,6 +46,14 @@
     <bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"
           lazy-init="true">
     </bean>
+
+    <!-- This objects are needed for the metabolome workbench reader -->
+
+    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.reader.extws.mw.config.MWWsConfigProd"/>
+    <bean id="taxWsConfig" class="uk.ac.ebi.ddi.reader.extws.entrez.config.TaxWsConfigProd"/>
+
+
+
 
 
 

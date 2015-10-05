@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * This function provides a way validate all the files in a directory and detect possible errors and
+ * inconsistencies in the files.
+ *
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 01/10/15
  */
@@ -23,14 +26,12 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
 
     private String directory;
 
-    private String validationReportFile;
-
     private String reportName;
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(directory, "The directory can't be null");
-        Assert.notNull(validationReportFile, "The report File can't be null");
+        Assert.notNull(reportName, "The report name can't be null");
     }
 
     @Override
@@ -64,5 +65,21 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
             }
         }
         return RepeatStatus.FINISHED;
+    }
+
+    public String getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
+    }
+
+    public String getReportName() {
+        return reportName;
+    }
+
+    public void setReportName(String reportName) {
+        this.reportName = reportName;
     }
 }

@@ -15,12 +15,21 @@
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
         <!-- EB-eye XML generation for public project -->
-        <batch:step id="genEbEyeXmlStep" parent="parentStep">
+        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw.GenerateEBeyeMwXMLTasklet">
                     <bean:property name="outputDirectory" value="${ddi.common.mw.original.directory}"/>
                     <bean:property name="configProd" ref="mwWsConfig"/>
                     <bean:property name="taxWsConfigProd" ref="taxWsConfig"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="validateXMLStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
+                    <bean:property name="directory" value="${ddi.common.mw.original.directory}"/>
+                    <bean:property name="reportName" value="${ddi.common.mw.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

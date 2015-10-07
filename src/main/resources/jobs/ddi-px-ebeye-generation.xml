@@ -27,11 +27,20 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="validationXML" parent="parentStep">
+        <batch:step id="validationXML" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
                 <bean:bean id="validationXMLTaklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
                     <bean:property name="directory" value="${ddi.common.px.original.directory}" />
                     <bean:property name="reportName" value="${ddi.common.mw.original.report.name}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="copyFilesToData" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
+                    <bean:property name="sourceDirectory" value="${ddi.common.px.original.directory}" />
+                    <bean:property name="targetDirectory" value="${ddi.common.px.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

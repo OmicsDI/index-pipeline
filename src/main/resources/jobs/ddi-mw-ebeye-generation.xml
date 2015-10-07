@@ -37,8 +37,8 @@
         <batch:step id="copyFilesToData" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="${ddi.common.mw.original.directory}" />
-                    <bean:property name="targetDirectory" value="${ddi.common.mw.data.directory}" />
+                    <bean:property name="sourceDirectory" value="file:${ddi.common.mw.original.directory}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.mw.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

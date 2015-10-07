@@ -15,17 +15,17 @@
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
         <!-- EB-eye XML generation for public project -->
-        <!--<batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">-->
-            <!--<batch:tasklet>-->
-                <!--<bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">-->
-                    <!--<bean:property name="pxURL" value="${ddi.common.px.url}"/>-->
-                    <!--<bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>-->
-                    <!--<bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>-->
-                    <!--<bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>-->
-                    <!--<bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>-->
-                <!--</bean:bean>-->
-            <!--</batch:tasklet>-->
-        <!--</batch:step>-->
+        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">
+            <batch:tasklet>
+                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">
+                    <bean:property name="pxURL" value="${ddi.common.px.url}"/>
+                    <bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>
+                    <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
+                    <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
+                    <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
         <batch:step id="validationXML" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>

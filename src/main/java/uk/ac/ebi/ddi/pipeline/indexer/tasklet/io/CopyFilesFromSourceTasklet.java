@@ -42,10 +42,13 @@ public class CopyFilesFromSourceTasklet extends AbstractTasklet {
             File target = targetDirectory.getFile();
 
             for (File sourceFile : sourceFiles) {
-                Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
-                logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
+                if(sourceFile.isFile()){
+                    Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
+                    logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
 
-                FileUtils.copyFileToDirectory(sourceFile, target);
+                    FileUtils.copyFileToDirectory(sourceFile, target);
+                }
+
             }
         }
 

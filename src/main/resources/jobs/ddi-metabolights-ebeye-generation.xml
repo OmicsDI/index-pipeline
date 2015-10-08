@@ -14,15 +14,16 @@
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <!-- EB-eye XML generation for public project -->
-
-
-        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validateXMLStep">
+        <batch:step id="downloadFilesStep" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
-                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw.GenerateEBeyeMwXMLTasklet">
-                    <bean:property name="outputDirectory" value="${ddi.common.mw.original.directory}"/>
-                    <bean:property name="configProd" ref="mwWsConfig"/>
-                    <bean:property name="taxWsConfigProd" ref="taxWsConfig"/>
+                <bean:bean id="downloadFilesTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilesFromFTPTasklet">
+                    <bean:property name="server" value="${ddi.common.metabolights.ftp.server}" />
+                    <bean:property name="user" value="${ddi.common.metabolights.ftp.user}" />
+                    <bean:property name="password" value="${ddi.common.metabolights.ftp.password}" />
+                    <bean:property name="port" value="${ddi.common.metabolights.ftp.port}" />
+                    <bean:property name="pattern" value="${ddi.common.metabolights.ftp.pattern}" />
+                    <bean:property name="sourceDirectory" value="${ddi.common.metabolights.ftp.folder}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.metabolights.original.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -30,8 +31,8 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.mw.original.directory}"/>
-                    <bean:property name="reportName" value="${ddi.common.mw.original.report.name}"/>
+                    <bean:property name="directory" value="${ddi.common.metabolights.original.directory}"/>
+                    <bean:property name="reportName" value="${ddi.common.metabolights.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -39,8 +40,8 @@
         <batch:step id="copyFilesToData" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.mw.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.mw.data.directory}" />
+                    <bean:property name="sourceDirectory" value="file:${ddi.common.metabolights.original.directory}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.metabolights.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

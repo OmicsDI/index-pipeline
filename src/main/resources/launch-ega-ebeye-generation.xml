@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <description>Use this xml file to launch px EBE-eye params job , see jobs/ddi-px-ebe-generation.xml for details
+    </description>
+
+    <import resource="context/common-context.xml"/>
+    <import resource="context/db-job-repository.xml"/>
+    <import resource="jobs/ddi-ega-ebeye-generation.xml"/>
+
+</beans>

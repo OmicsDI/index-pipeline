@@ -9,28 +9,24 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>
-        This job generated EBE XML file for PX submission, Massive and PeptideAlas
+        This job generate the XML for a Metabolome Workbench to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <!-- EB-eye XML generation for public project -->
-        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">
+        <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
-                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTasklet">
-                    <bean:property name="pxURL" value="${ddi.common.px.url}"/>
-                    <bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>
-                    <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
-                    <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
-                    <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
+                <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFileToDirectoryTasklet">
+                    <bean:property name="sourceFile" value="file:${ddi.common.ega.source.directory}"/>
+                    <bean:property name="targetDirectory" value="file:${ddi.common.ega.original.directory}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="validationXML" parent="parentStep" next="copyFilesToData">
+        <batch:step id="validateXMLStep" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
-                <bean:bean id="validationXMLTaklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.px.original.directory}" />
+                <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
+                    <bean:property name="directory" value="${ddi.common.ega.original.directory}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -39,8 +35,8 @@
         <batch:step id="copyFilesToData" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.px.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.px.data.directory}" />
+                    <bean:property name="sourceDirectory" value="file:${ddi.common.ega.original.directory}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.ega.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -70,7 +66,5 @@
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
-
-
 
 </beans>

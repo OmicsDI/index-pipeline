@@ -9,7 +9,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>
-        This job generate the XML for a Metabolome Workbench to be submitted to OmicsDI system.
+        This job generate the XML for a Metabolights to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
@@ -32,7 +32,7 @@
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
                     <bean:property name="directory" value="${ddi.common.metabolights.original.directory}"/>
-                    <bean:property name="reportName" value="${ddi.common.metabolights.original.report.name}"/>
+                    <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

@@ -12,7 +12,7 @@
         This job generated EBE XML file for PX submission, Massive and PeptideAlas
     </description>
 
-    <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
+    <batch:job id="ddiPxXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
         <!-- EB-eye XML generation for public project -->
         <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">

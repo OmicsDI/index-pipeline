@@ -47,11 +47,16 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>${project.basedir}</directory>
+            <outputDirectory>log</outputDirectory>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <directory>${project.basedir}/scripts</directory>
-            <outputDirectory>${assembly.dir}/scripts</outputDirectory>
-            <includes>
-                <include>**/**</include>
-            </includes>
+            <!--<outputDirectory>${assembly.dir}</outputDirectory>-->
+            <outputDirectory>${assembly.dir}/</outputDirectory>
             <filtered>true</filtered>
         </fileSet>
     </fileSets>

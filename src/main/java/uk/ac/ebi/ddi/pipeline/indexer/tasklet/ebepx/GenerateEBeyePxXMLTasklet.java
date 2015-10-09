@@ -9,6 +9,8 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.px.GeneratePxEbeFiles;
 
+import java.util.List;
+
 /**
  * Generate all the files from pX submission by crawling the ProteomeXchange Page
  * and parsing the XML files. For every Dataset a file is created in the defined folder.
@@ -31,11 +33,13 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
 
     private String outputDirectory;
 
+    private List<String> databases;
+
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        GeneratePxEbeFiles.searchFilesWeb(Integer.valueOf(loopGap),Integer.valueOf(endPoint),pxPrefix,pxURL,outputDirectory);
+        GeneratePxEbeFiles.searchFilesWeb(Integer.valueOf(loopGap),Integer.valueOf(endPoint),pxPrefix,pxURL,outputDirectory, databases);
 
         return RepeatStatus.FINISHED;
 
@@ -88,5 +92,13 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
 
     public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
+    }
+
+    public List<String> getDatabases() {
+        return databases;
+    }
+
+    public void setDatabases(List<String> databases) {
+        this.databases = databases;
     }
 }

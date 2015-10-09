@@ -56,10 +56,10 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
                 errors.put(file, error);
             }
             if(!errors.isEmpty()){
-                PrintStream reportFile = new PrintStream(new File(reportName));
+                PrintStream reportFile = new PrintStream(new File(directory + "/" + reportName));
                 for(File file: errors.keySet()){
                     for (Tuple error: errors.get(file))
-                        reportFile.println(file.getAbsolutePath() + "\t" + error.getKey() + "\t" + error.getValue());
+                        reportFile.println(file.getAbsolutePath() + "|" + error.getKey() + "|" + error.getValue());
                 }
                 reportFile.close();
             }

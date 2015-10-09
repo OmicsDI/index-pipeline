@@ -23,6 +23,7 @@
                     <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
                     <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
                     <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
+                    <bean:property name="databases" ref="pxdatabases" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

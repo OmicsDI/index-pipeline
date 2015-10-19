@@ -38,6 +38,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
             for(File file: inputDirectory.getFile().listFiles()){
                 OmicsXMLFile reader = new OmicsXMLFile(file);
                 for(String id: reader.getEntryIds()){
+                    logger.info(id);
                     Entry dataset = reader.getEntryById(id);
                     DatasetTobeEnriched datasetTobeEnriched = new DatasetTobeEnriched(dataset.getAcc(),dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()),
                             dataset.getName().getValue(), dataset.getDescription(), dataset.getAdditionalFieldValue(Field.SAMPLE.getName()),

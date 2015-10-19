@@ -31,6 +31,7 @@
 
         <ddi.px.reader.version>1.0-SNAPSHOT</ddi.px.reader.version>
         <ddi.xml.validator.version>0.0.1-SNAPSHOT</ddi.xml.validator.version>
+        <ddi.annotation.version>0.0.1-SNAPSHOT</ddi.annotation.version>
     </properties>
     <dependencies>
 
@@ -53,6 +54,14 @@
         </dependency>
 
         <!-- End of the reader importers -->
+
+        <!-- Annotation Library -->
+        <dependency>
+            <groupId>uk.ac.ebi.ddi</groupId>
+            <artifactId>ddi-annotation</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
 
         <!-- Email -->
         <dependency>

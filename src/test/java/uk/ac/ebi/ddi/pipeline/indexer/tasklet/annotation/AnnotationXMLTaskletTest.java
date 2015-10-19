@@ -1,5 +1,6 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +14,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-ebemw-context.xml"})
-public class GenerateEBeyeMwXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-pride-annotation-context.xml"})
+public class AnnotationXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
@@ -47,7 +48,7 @@ public class GenerateEBeyeMwXMLTaskletTest {
 
     @Test
     public void testLaunchJobWithJobLauncher() throws Exception {
-                JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+        JobExecution jobExecution = jobLauncher.run(job, jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
 }

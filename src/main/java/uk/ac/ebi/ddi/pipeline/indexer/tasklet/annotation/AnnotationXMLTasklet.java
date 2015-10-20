@@ -10,10 +10,13 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.model.DatasetTobeEnriched;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
+import uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService;
+import uk.ac.ebi.ddi.annotation.utils.DataType;
 import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
+import uk.ac.ebi.ddi.xml.validator.parser.model.Reference;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.io.File;
@@ -38,6 +41,10 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     String prefixFile;
 
+    DataType dataType;
+
+    private DDIExpDataImportService ddiExpDataImportService;
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         List<Entry> listToPrint = new ArrayList<>();
@@ -53,6 +60,10 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
                             dataset.getName().getValue(), dataset.getDescription(), dataset.getAdditionalFieldValue(Field.SAMPLE.getName()),
                             dataset.getAdditionalFieldValue(Field.DATA.getName()));
                     EnrichedDataset enrichedDataset1 = annotationService.enrichment(datasetTobeEnriched);
+
+                    String entryId = dataset.getId();
+                    List<Reference> refs = dataset.getCrossReferences().getRef();
+                    ddiExpDataImportService.importDataset(dataType.getName(), entryId, refs);
 
                     dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), enrichedDataset1.getEnrichedTitle());
                     dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), enrichedDataset1.getEnrichedAbstractDescription());
@@ -127,5 +138,21 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     public void setPrefixFile(String prefixFile) {
         this.prefixFile = prefixFile;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public DDIExpDataImportService getDdiExpDataImportService() {
+        return ddiExpDataImportService;
+    }
+
+    public void setDdiExpDataImportService(DDIExpDataImportService ddiExpDataImportService) {
+        this.ddiExpDataImportService = ddiExpDataImportService;
     }
 }

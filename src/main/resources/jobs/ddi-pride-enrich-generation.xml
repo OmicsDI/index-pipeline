@@ -22,6 +22,10 @@
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
                     <bean:property name="prefixFile"      value="${ddi.common.pride.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

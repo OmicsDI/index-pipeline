@@ -1,6 +1,6 @@
 package uk.ac.ebi.ddi.pipeline.indexer.io;
 
-import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
+
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.marshaller.OmicsDataMarshaller;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Database;

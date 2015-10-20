@@ -70,11 +70,13 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
                         listToPrint.clear();
                         counterFiles++;
                     }
-
-
                 }
-
-
+                // This must be printed before leave because it contains the end members of the list.
+                if(!listToPrint.isEmpty()){
+                    DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
+                    listToPrint.clear();
+                    counterFiles++;
+                }
             }
         }
         return RepeatStatus.FINISHED;

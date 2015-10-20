@@ -18,7 +18,9 @@
             <batch:tasklet>
                 <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.pride.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.prod.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.prod.directory}"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
+                    <bean:property name="prefixFile"      value="${ddi.common.pride.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                 </bean:bean>
             </batch:tasklet>

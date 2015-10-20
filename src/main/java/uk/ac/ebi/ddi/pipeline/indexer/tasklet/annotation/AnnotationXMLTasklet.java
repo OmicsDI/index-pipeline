@@ -10,12 +10,15 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.model.DatasetTobeEnriched;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -31,24 +34,43 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     DDIAnnotationService annotationService;
 
+    int numberEntries;
+
+    String prefixFile;
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        List<Entry> listToPrint = new ArrayList<>();
+        int counterFiles = 1;
 
         if(inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()){
             for(File file: inputDirectory.getFile().listFiles()){
                 OmicsXMLFile reader = new OmicsXMLFile(file);
                 for(String id: reader.getEntryIds()){
-                    logger.info(id);
+                    logger.info("The ID: " + id + " will be enriched!!");
                     Entry dataset = reader.getEntryById(id);
                     DatasetTobeEnriched datasetTobeEnriched = new DatasetTobeEnriched(dataset.getAcc(),dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()),
                             dataset.getName().getValue(), dataset.getDescription(), dataset.getAdditionalFieldValue(Field.SAMPLE.getName()),
                             dataset.getAdditionalFieldValue(Field.DATA.getName()));
                     EnrichedDataset enrichedDataset1 = annotationService.enrichment(datasetTobeEnriched);
 
-                    logger.info(enrichedDataset1.getEnrichedTitle());
-                    logger.info(enrichedDataset1.getEnrichedAbstractDescription());
-                    logger.info(enrichedDataset1.getEnrichedSampleProtocol());
-                    logger.info(enrichedDataset1.getEnrichedDataProtocol());
+                    dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), enrichedDataset1.getEnrichedTitle());
+                    dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), enrichedDataset1.getEnrichedAbstractDescription());
+                    dataset.addAdditionalField(Field.ENRICH_SAMPLE.getName(), enrichedDataset1.getEnrichedSampleProtocol());
+                    dataset.addAdditionalField(Field.ENRICH_DATA.getName(), enrichedDataset1.getEnrichedDataProtocol());
+                    logger.debug(enrichedDataset1.getEnrichedTitle());
+                    logger.debug(enrichedDataset1.getEnrichedAbstractDescription());
+                    logger.debug(enrichedDataset1.getEnrichedSampleProtocol());
+                    logger.debug(enrichedDataset1.getEnrichedDataProtocol());
+
+                    listToPrint.add(dataset);
+
+                    if(listToPrint.size() == numberEntries){
+                        DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
+                        listToPrint.clear();
+                        counterFiles++;
+                    }
+
 
                 }
 
@@ -87,5 +109,21 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     public void setAnnotationService(DDIAnnotationService annotationService) {
         this.annotationService = annotationService;
+    }
+
+    public int getNumberEntries() {
+        return numberEntries;
+    }
+
+    public void setNumberEntries(int numberEntries) {
+        this.numberEntries = numberEntries;
+    }
+
+    public String getPrefixFile() {
+        return prefixFile;
+    }
+
+    public void setPrefixFile(String prefixFile) {
+        this.prefixFile = prefixFile;
     }
 }

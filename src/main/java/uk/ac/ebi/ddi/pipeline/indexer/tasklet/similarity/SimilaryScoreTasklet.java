@@ -40,11 +40,9 @@ public class SimilaryScoreTasklet extends AbstractTasklet{
 
     DDIDatasetSimilarityService ddiExpDataProcessService;
 
-
     ExpOutputDatasetService expOutputDatasetService;
 
     DDIExpDataImportService ddiExpDataImportService;
-
 
     MongoTemplate mongoTemplate;
 

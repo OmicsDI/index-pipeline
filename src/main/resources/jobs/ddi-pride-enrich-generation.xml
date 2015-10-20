@@ -28,7 +28,7 @@
 
         <batch:step id="similarityStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="similarityScore" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
                     <bean:property name="typeOfData">
                         <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
                     </bean:property>

@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:bean="http://www.springframework.org/schema/beans"
+       xmlns:bean="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
@@ -37,11 +37,42 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyFilesToData" parent="parentStep">
+        <batch:step id="copyFilesToData" parent="parentStep" next="enrichFiles">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
                     <bean:property name="sourceDirectory" value="file:${ddi.common.metabolights.original.directory}" />
                     <bean:property name="targetDirectory" value="file:${ddi.common.metabolights.data.directory}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichFiles" parent="parentStep" next="similarityStep">
+            <batch:tasklet>
+                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolights.prod.directory}"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
+                    <bean:property name="prefixFile"      value="${ddi.common.metabolights.prefix}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="similarityStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                    <bean:property name="typeOfData">
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
+                    <bean:property name="termInDBService" ref="termInDBService"/>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
+                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
+                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -68,6 +99,8 @@
         </bean:property>
         <bean:property name="strict" value="false"/>
     </bean:bean>
+
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>

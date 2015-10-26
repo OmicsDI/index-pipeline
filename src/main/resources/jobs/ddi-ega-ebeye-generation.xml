@@ -3,13 +3,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:bean="http://www.springframework.org/schema/beans"
+       xmlns:bean="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <description>
-        This job generate the XML for a EGA to be submitted to OmicsDI system.
+        This job generate the XML for a EGA to be submitted to OmicsDI system including download the file and the enrichment.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
@@ -32,11 +32,27 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyFilesToData" parent="parentStep">
+        <batch:step id="copyFilesToData" parent="parentStep" next="enrichFiles">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
                     <bean:property name="sourceDirectory" value="file:${ddi.common.ega.original.directory}" />
                     <bean:property name="targetDirectory" value="file:${ddi.common.ega.data.directory}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichFiles" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.ega.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.ega.prod.directory}"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
+                    <bean:property name="prefixFile"      value="${ddi.common.ega.prefix}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -63,6 +79,8 @@
         </bean:property>
         <bean:property name="strict" value="false"/>
     </bean:bean>
+
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>

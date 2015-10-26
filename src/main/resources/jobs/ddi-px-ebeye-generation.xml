@@ -4,9 +4,14 @@
        xmlns:batch="http://www.springframework.org/schema/batch"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:bean="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+		                   http://www.springframework.org/schema/batch
+                           http://www.springframework.org/schema/batch/spring-batch.xsd
+		                   http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
     <description>
         This job generated EBE XML file for PX submission, Massive and PeptideAlas
@@ -82,7 +87,7 @@
                     <bean:property name="prefixFile"      value="${ddi.common.massive.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                          <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
                     </bean:property>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>

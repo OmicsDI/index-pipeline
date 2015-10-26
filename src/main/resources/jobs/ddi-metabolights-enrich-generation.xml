@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:bean="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <description>
+        This job do the enrichment of the metaboligths datasets
+    </description>
+
+    <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
+
+        <batch:step id="enrichFiles" parent="parentStep" next="similarityStep">
+            <batch:tasklet>
+                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolights.prod.directory}"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
+                    <bean:property name="prefixFile"      value="${ddi.common.metabolights.prefix}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="similarityStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                    <bean:property name="typeOfData">
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
+                    <bean:property name="termInDBService" ref="termInDBService"/>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
+                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
+                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <batch:step id="parentStep" abstract="true">
+        <batch:listeners>
+            <batch:listener ref="executionContextPromotionListener"/>
+            <batch:listener ref="throwablePromotionListener"/>
+        </batch:listeners>
+    </batch:step>
+
+    <!--listener for promoting properties in step execution context to job execution context-->
+    <bean:bean id="executionContextPromotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+        <bean:property name="keys">
+            <bean:array>
+                <bean:value>public.path.fragment</bean:value>
+                <!-- added by getAndStoreOrigPublicationDateTaskletStep; used by genPublicSearchParamsStep -->
+            </bean:array>
+        </bean:property>
+        <bean:property name="strict" value="false"/>
+    </bean:bean>
+
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
+
+
+    <!--load property files-->
+    <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
+
+</beans>

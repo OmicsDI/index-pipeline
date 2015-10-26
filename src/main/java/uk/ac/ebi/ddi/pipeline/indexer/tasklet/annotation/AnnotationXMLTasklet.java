@@ -63,7 +63,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
                     String entryId = dataset.getId();
                     List<Reference> refs = dataset.getCrossReferences().getRef();
-                    ddiExpDataImportService.importDataset(dataType.getName(), entryId, refs);
+                    ddiExpDataImportService.importDatasetTerms(dataType.getName(), entryId, dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()), refs);
 
                     dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), enrichedDataset1.getEnrichedTitle());
                     dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), enrichedDataset1.getEnrichedAbstractDescription());

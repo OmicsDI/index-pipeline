@@ -28,7 +28,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="validationXML" parent="parentStep" next="copyFilesToData">
+        <batch:step id="validationXML" parent="parentStep" next="copyPeptideAtlasFilesToData">
             <batch:tasklet>
                 <bean:bean id="validationXMLTaklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
                     <bean:property name="directory" value="${ddi.common.px.original.directory}" />
@@ -37,11 +37,22 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyFilesToData" parent="parentStep">
+        <batch:step id="copyPeptideAtlasFilesToData" parent="parentStep" next="copyMassiveFilesToData">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.px.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.px.data.directory}" />
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.px.atlas.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.atlas.prefix}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="copyMassiveFilesToData" parent="parentStep" >
+            <batch:tasklet>
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.px.massive.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.massive.prefix}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

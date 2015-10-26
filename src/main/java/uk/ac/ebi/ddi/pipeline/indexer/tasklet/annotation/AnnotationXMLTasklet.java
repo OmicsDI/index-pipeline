@@ -27,6 +27,7 @@ import java.util.List;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 19/10/15
  */
+
 public class AnnotationXMLTasklet extends AbstractTasklet{
 
     public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
@@ -56,7 +57,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
                 for(String id: reader.getEntryIds()){
                     logger.info("The ID: " + id + " will be enriched!!");
                     Entry dataset = reader.getEntryById(id);
-                    DatasetTobeEnriched datasetTobeEnriched = new DatasetTobeEnriched(dataset.getAcc(),dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()),
+                    DatasetTobeEnriched datasetTobeEnriched = new DatasetTobeEnriched(dataset.getId(),dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()),
                             dataset.getName().getValue(), dataset.getDescription(), dataset.getAdditionalFieldValue(Field.SAMPLE.getName()),
                             dataset.getAdditionalFieldValue(Field.DATA.getName()));
                     EnrichedDataset enrichedDataset1 = annotationService.enrichment(datasetTobeEnriched);

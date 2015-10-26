@@ -14,7 +14,8 @@
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
     <description>
-        This job generate the XML for a PRIDE to be submitted to OmicsDI system.
+        This job generate the XML for a PRIDE to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
+        between different datasets .
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
@@ -30,9 +31,10 @@
 
         <batch:step id="copyFilesToData" parent="parentStep" next="enrichFiles">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.pride.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.pride.data.directory}" />
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.pride.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

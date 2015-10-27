@@ -291,9 +291,10 @@
                 <version>2.7.2</version>
                 <configuration>
                     <excludes>
-                        <exclude>uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebepx.GenerateEBeyePxXMLTaskletTest</exclude>
-                        <exclude>uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw.GenerateEBeyeMwXMLTaskletTest</exclude>
-                        <exclude>uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilesFromFTPTaskletTest</exclude>
+                        <exclude>**/annotation/*.java</exclude>
+                        <exclude>**/ebemw/*.java</exclude>
+                        <exclude>**/ebepx/*.java</exclude>
+                        <exclude>**/io/*.java</exclude>
                     </excludes>
                     <skipTests>true</skipTests>
                     <junitArtifactName>junit:junit</junitArtifactName>

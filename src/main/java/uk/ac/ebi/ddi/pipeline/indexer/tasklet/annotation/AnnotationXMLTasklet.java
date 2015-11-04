@@ -11,7 +11,11 @@ import uk.ac.ebi.ddi.annotation.model.DatasetTobeEnriched;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService;
+import uk.ac.ebi.ddi.annotation.service.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.DataType;
+import uk.ac.ebi.ddi.extservices.pubmed.client.PubmedWsClient;
+import uk.ac.ebi.ddi.extservices.pubmed.config.PubmedWsConfigProd;
+import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
@@ -46,6 +50,8 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     private DDIExpDataImportService ddiExpDataImportService;
 
+    private DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         List<Entry> listToPrint = new ArrayList<>();
@@ -55,25 +61,20 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
             for(File file: inputDirectory.getFile().listFiles()){
                 OmicsXMLFile reader = new OmicsXMLFile(file);
                 for(String id: reader.getEntryIds()){
+
                     logger.info("The ID: " + id + " will be enriched!!");
                     Entry dataset = reader.getEntryById(id);
-                    DatasetTobeEnriched datasetTobeEnriched = new DatasetTobeEnriched(dataset.getId(),dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()),
-                            dataset.getName().getValue(), dataset.getDescription(), dataset.getAdditionalFieldValue(Field.SAMPLE.getName()),
-                            dataset.getAdditionalFieldValue(Field.DATA.getName()));
-                    EnrichedDataset enrichedDataset1 = annotationService.enrichment(datasetTobeEnriched);
 
-                    String entryId = dataset.getId();
-                    List<Reference> refs = dataset.getCrossReferences().getRef();
-                    ddiExpDataImportService.importDatasetTerms(dataType.getName(), entryId, dataset.getAdditionalFieldValue(Field.REPOSITORY.getName()), refs);
+                    EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
 
-                    dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), enrichedDataset1.getEnrichedTitle());
-                    dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), enrichedDataset1.getEnrichedAbstractDescription());
-                    dataset.addAdditionalField(Field.ENRICH_SAMPLE.getName(), enrichedDataset1.getEnrichedSampleProtocol());
-                    dataset.addAdditionalField(Field.ENRICH_DATA.getName(), enrichedDataset1.getEnrichedDataProtocol());
-                    logger.debug(enrichedDataset1.getEnrichedTitle());
-                    logger.debug(enrichedDataset1.getEnrichedAbstractDescription());
-                    logger.debug(enrichedDataset1.getEnrichedSampleProtocol());
-                    logger.debug(enrichedDataset1.getEnrichedDataProtocol());
+                    DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
+
+                    dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
+
+                    logger.debug(enrichedDataset.getEnrichedTitle());
+                    logger.debug(enrichedDataset.getEnrichedAbstractDescription());
+                    logger.debug(enrichedDataset.getEnrichedSampleProtocol());
+                    logger.debug(enrichedDataset.getEnrichedDataProtocol());
 
                     listToPrint.add(dataset);
 

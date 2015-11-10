@@ -23,8 +23,8 @@ public class Utils {
             }
             for(String synonym: resultStringSet)
                 resultSynonym += synonym + ", ";
-            if(!resultSynonym.isEmpty())
-                resultSynonym.substring(0, resultSynonym.length()-2);
+            if(!resultSynonym.isEmpty() && resultSynonym.length() > 2)
+                resultSynonym = resultSynonym.substring(0, resultSynonym.length()-2);
             return resultSynonym;
 
         }

@@ -8,6 +8,7 @@ import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService;
 import uk.ac.ebi.ddi.annotation.service.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.DataType;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Utils;
 import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Reference;
@@ -66,10 +67,10 @@ public class DatasetAnnotationEnrichmentService {
      * @return Entry a new entry with all the fields
      */
     public static Entry addEnrichedFields(Entry dataset, EnrichedDataset enrichedDataset){
-        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedTitle());
-        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedAbstractDescription());
-        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedSampleProtocol());
-        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedDataProtocol());
+        dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), Utils.removeRedundantSynonyms(enrichedDataset.getEnrichedTitle()));
+        dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), Utils.removeRedundantSynonyms(enrichedDataset.getEnrichedAbstractDescription()));
+        dataset.addAdditionalField(Field.ENRICH_SAMPLE.getName(), Utils.removeRedundantSynonyms(enrichedDataset.getEnrichedSampleProtocol()));
+        dataset.addAdditionalField(Field.ENRICH_DATA.getName(), Utils.removeRedundantSynonyms(enrichedDataset.getEnrichedDataProtocol()));
         return dataset;
     }
 

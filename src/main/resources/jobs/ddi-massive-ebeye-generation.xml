@@ -19,16 +19,16 @@
 
     <batch:job id="ddiMassiveXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <!-- EB-eye XML generation for public project -->
-        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">
-            <batch:tasklet>
-                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.massive.GenerateEBeyeMassiveXMLTasklet">
-                    <bean:property name="outputDirectory" value="${ddi.common.massive.original.directory}"/>
-                    <bean:property name="massiveConfig" ref="massiveWsConfig"/>
-                    <bean:property name="taxonomyConfig" ref="taxMassiveWsConfig"/>
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
+        <!--&lt;!&ndash; EB-eye XML generation for public project &ndash;&gt;-->
+        <!--<batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">-->
+            <!--<batch:tasklet>-->
+                <!--<bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.massive.GenerateEBeyeMassiveXMLTasklet">-->
+                    <!--<bean:property name="outputDirectory" value="${ddi.common.massive.original.directory}"/>-->
+                    <!--<bean:property name="massiveConfig" ref="massiveWsConfig"/>-->
+                    <!--<bean:property name="taxonomyConfig" ref="taxMassiveWsConfig"/>-->
+                <!--</bean:bean>-->
+            <!--</batch:tasklet>-->
+        <!--</batch:step>-->
 
         <batch:step id="validationXML" parent="parentStep" next="copyMassiveFilesToData">
             <batch:tasklet>
@@ -42,9 +42,9 @@
         <batch:step id="copyMassiveFilesToData" parent="parentStep" next="enrichMassiveFiles">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.px.massive.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.massive.prefix.prefix}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.massive.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.massive.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.massive.prefix}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -52,8 +52,8 @@
         <batch:step id="enrichMassiveFiles" parent="parentStep" next="similarityStep">
             <batch:tasklet>
                 <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.px.massive.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.px.massive.prod.directory}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.massive.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.massive.prod.directory}"/>
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
                     <bean:property name="prefixFile"      value="${ddi.common.massive.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>

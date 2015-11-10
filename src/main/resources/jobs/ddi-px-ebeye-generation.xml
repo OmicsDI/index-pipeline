@@ -42,7 +42,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyPeptideAtlasFilesToData" parent="parentStep" next="copyMassiveFilesToData">
+        <batch:step id="copyPeptideAtlasFilesToData" parent="parentStep" next="enrichAtlasFiles">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
@@ -52,17 +52,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyMassiveFilesToData" parent="parentStep" next="enrichAtlasFiles">
-            <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.px.massive.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.massive.prefix}"/>
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
-        <batch:step id="enrichAtlasFiles" parent="parentStep" next="enrichMassiveFiles">
+        <batch:step id="enrichAtlasFiles" parent="parentStep" next="similarityStep">
             <batch:tasklet>
                 <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.px.atlas.data.directory}"/>
@@ -78,28 +68,26 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="enrichMassiveFiles" parent="parentStep" next="similarityStep">
-            <batch:tasklet>
-                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.px.massive.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.px.massive.prod.directory}"/>
-                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
-                    <bean:property name="prefixFile"      value="${ddi.common.massive.prefix}" />
-                    <bean:property name="annotationService" ref="annotationService"/>
-                    <bean:property name="dataType" >
-                          <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
-                    </bean:property>
-                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
+        <!--<batch:step id="enrichMassiveFiles" parent="parentStep" next="similarityStep">-->
+            <!--<batch:tasklet>-->
+                <!--<bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">-->
+                    <!--<bean:property name="inputDirectory" value="file:${ddi.common.px.massive.data.directory}"/>-->
+                    <!--<bean:property name="outputDirectory" value="file:${ddi.common.px.massive.prod.directory}"/>-->
+                    <!--<bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>-->
+                    <!--<bean:property name="prefixFile"      value="${ddi.common.massive.prefix}" />-->
+                    <!--<bean:property name="annotationService" ref="annotationService"/>-->
+                    <!--<bean:property name="dataType" >-->
+                          <!--<util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>-->
+                    <!--</bean:property>-->
+                    <!--<bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />-->
+                <!--</bean:bean>-->
+            <!--</batch:tasklet>-->
+        <!--</batch:step>-->
 
         <batch:step id="similarityStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData">
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
-                    </bean:property>
+                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
                     <bean:property name="mongoTemplate" ref="mongoTemplate" />
                     <bean:property name="termInDBService" ref="termInDBService"/>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
@@ -131,6 +119,15 @@
         </bean:property>
         <bean:property name="strict" value="false"/>
     </bean:bean>
+
+    <bean id="dataTypesProteomics" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
 
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
 

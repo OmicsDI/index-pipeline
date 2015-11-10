@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SimilaryScoreTasklet extends AbstractTasklet{
 
-    DataType typeOfData;
+    List<DataType> typeOfData;
 
     TermInDBService termInDBService;
 
@@ -48,10 +48,11 @@ public class SimilaryScoreTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        ddiExpDataProcessService.calculateIDFWeight(typeOfData.getName());
-        ddiExpDataProcessService.calculateSimilarity(typeOfData.getName());
+        for (DataType type: typeOfData){
+            ddiExpDataProcessService.calculateIDFWeight(type.getName());
+            ddiExpDataProcessService.calculateSimilarity(type.getName());
+        }
         return RepeatStatus.FINISHED;
-
     }
 
     @Override
@@ -59,11 +60,11 @@ public class SimilaryScoreTasklet extends AbstractTasklet{
         Assert.notNull(typeOfData, "the dataType can't be null in the process");
     }
 
-    public DataType getTypeOfData() {
+    public List<DataType> getTypeOfData() {
         return typeOfData;
     }
 
-    public void setTypeOfData(DataType typeOfData) {
+    public void setTypeOfData(List<DataType> typeOfData) {
         this.typeOfData = typeOfData;
     }
 

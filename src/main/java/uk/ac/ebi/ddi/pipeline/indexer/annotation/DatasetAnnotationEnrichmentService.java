@@ -1,6 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 
 import org.json.JSONException;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.ddi.annotation.model.DatasetTobeEnriched;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
@@ -22,6 +23,9 @@ import java.util.List;
  * @date 04/11/15
  */
 public class DatasetAnnotationEnrichmentService {
+
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DatasetAnnotationEnrichmentService.class);
+
 
     /**
      * This function provides a way of doing the enrichment of an specific dataset using the enrichment service
@@ -62,10 +66,10 @@ public class DatasetAnnotationEnrichmentService {
      * @return Entry a new entry with all the fields
      */
     public static Entry addEnrichedFields(Entry dataset, EnrichedDataset enrichedDataset){
-        dataset.addAdditionalField(Field.ENRICH_TITLE.getName(), enrichedDataset.getEnrichedTitle());
-        dataset.addAdditionalField(Field.ENRICH_ABSTRACT.getName(), enrichedDataset.getEnrichedAbstractDescription());
-        dataset.addAdditionalField(Field.ENRICH_SAMPLE.getName(), enrichedDataset.getEnrichedSampleProtocol());
-        dataset.addAdditionalField(Field.ENRICH_DATA.getName(), enrichedDataset.getEnrichedDataProtocol());
+        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedTitle());
+        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedAbstractDescription());
+        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedSampleProtocol());
+        dataset.addAdditionalField(Field.ENRICH_SYNONYMS.getName(), enrichedDataset.getEnrichedDataProtocol());
         return dataset;
     }
 

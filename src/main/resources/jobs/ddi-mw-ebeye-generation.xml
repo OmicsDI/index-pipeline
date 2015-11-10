@@ -59,9 +59,8 @@
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
                     <bean:property name="prefixFile"      value="${ddi.common.mw.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
-                    <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
-                    </bean:property>
+                    <bean:property name="dataType" ref="dataTypesMetabolomics" />
+
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
             </batch:tasklet>
@@ -104,6 +103,14 @@
         </bean:property>
         <bean:property name="strict" value="false"/>
     </bean:bean>
+
+    <bean id="dataTypesMetabolomics" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+            </list>
+        </constructor-arg>
+    </bean>
 
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
 

@@ -52,12 +52,15 @@
     <bean id="mwWsConfig" class="uk.ac.ebi.ddi.mw.extws.mw.config.MWWsConfigProd"/>
     <bean id="taxWsConfig" class="uk.ac.ebi.ddi.mw.extws.entrez.config.TaxWsConfigProd"/>
 
+    <bean id="massiveWsConfig" class="uk.ac.ebi.ddi.massive.extws.massive.config.MassiveWsConfigProd"/>
+    <bean id="taxMassiveWsConfig" class="uk.ac.ebi.ddi.massive.extws.entrez.config.TaxWsConfigProd"/>
+
     <bean id="pxdatabases" class="java.util.ArrayList">
         <constructor-arg>
             <list>
 
                 <value>PeptideAtlas</value>
-                <value>MassIVE</value>
+                <!--<value>MassIVE</value>-->
             </list>
         </constructor-arg>
     </bean>

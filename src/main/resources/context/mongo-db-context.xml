@@ -31,10 +31,14 @@
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
     </bean>
 
+    <bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
     <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
+    <bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
     <bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
     <bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.DDIDatasetSimilarityService"/>
     <bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService"/>
     <bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.DDIDatasetSimilarityService"/>
+    <bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
+
 
 </beans>

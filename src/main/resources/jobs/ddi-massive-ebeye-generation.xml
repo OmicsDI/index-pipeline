@@ -20,15 +20,15 @@
     <batch:job id="ddiMassiveXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
         <!--&lt;!&ndash; EB-eye XML generation for public project &ndash;&gt;-->
-        <!--<batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">-->
-            <!--<batch:tasklet>-->
-                <!--<bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.massive.GenerateEBeyeMassiveXMLTasklet">-->
-                    <!--<bean:property name="outputDirectory" value="${ddi.common.massive.original.directory}"/>-->
-                    <!--<bean:property name="massiveConfig" ref="massiveWsConfig"/>-->
-                    <!--<bean:property name="taxonomyConfig" ref="taxMassiveWsConfig"/>-->
-                <!--</bean:bean>-->
-            <!--</batch:tasklet>-->
-        <!--</batch:step>-->
+        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">
+            <batch:tasklet>
+                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.massive.GenerateEBeyeMassiveXMLTasklet">
+                    <bean:property name="outputDirectory" value="${ddi.common.massive.original.directory}"/>
+                    <bean:property name="massiveConfig" ref="massiveWsConfig"/>
+                    <bean:property name="taxonomyConfig" ref="taxMassiveWsConfig"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
         <batch:step id="validationXML" parent="parentStep" next="copyMassiveFilesToData">
             <batch:tasklet>

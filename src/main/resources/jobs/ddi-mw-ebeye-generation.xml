@@ -59,8 +59,9 @@
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
                     <bean:property name="prefixFile"      value="${ddi.common.mw.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
-                    <bean:property name="dataType" ref="dataTypesMetabolomics" />
-
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
             </batch:tasklet>
@@ -69,9 +70,7 @@
         <batch:step id="similarityStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData">
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
-                    </bean:property>
+                    <bean:property name="typeOfData" ref="dataTypesMetabolomics" />
                     <bean:property name="mongoTemplate" ref="mongoTemplate" />
                     <bean:property name="termInDBService" ref="termInDBService"/>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>

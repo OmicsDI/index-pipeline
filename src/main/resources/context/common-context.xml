@@ -58,7 +58,6 @@
     <bean id="pxdatabases" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-
                 <value>PeptideAtlas</value>
                 <!--<value>MassIVE</value>-->
             </list>

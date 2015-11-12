@@ -52,7 +52,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="enrichAtlasFiles" parent="parentStep" next="similarityStep">
+        <batch:step id="enrichAtlasFiles" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.px.atlas.data.directory}"/>
@@ -84,18 +84,18 @@
             <!--</batch:tasklet>-->
         <!--</batch:step>-->
 
-        <batch:step id="similarityStep" parent="parentStep">
-            <batch:tasklet>
-                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
-                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
-                    <bean:property name="termInDBService" ref="termInDBService"/>
-                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
-                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
-                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
+        <!--<batch:step id="similarityStep" parent="parentStep">-->
+            <!--<batch:tasklet>-->
+                <!--<bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">-->
+                    <!--<bean:property name="typeOfData" ref="dataTypesProteomics" />-->
+                    <!--<bean:property name="mongoTemplate" ref="mongoTemplate" />-->
+                    <!--<bean:property name="termInDBService" ref="termInDBService"/>-->
+                    <!--<bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>-->
+                    <!--<bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>-->
+                    <!--<bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />-->
+                <!--</bean:bean>-->
+            <!--</batch:tasklet>-->
+        <!--</batch:step>-->
 
         <batch:listeners>
             <batch:listener ref="jobListener"/>

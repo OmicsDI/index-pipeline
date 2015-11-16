@@ -59,39 +59,44 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
         if(inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()){
             for(File file: inputDirectory.getFile().listFiles()){
-                OmicsXMLFile reader = new OmicsXMLFile(file);
-                for(String id: reader.getEntryIds()){
+                try{
+                    OmicsXMLFile reader = new OmicsXMLFile(file);
+                    for(String id: reader.getEntryIds()){
 
-                    logger.info("The ID: " + id + " will be enriched!!");
-                    Entry dataset = reader.getEntryById(id);
+                        logger.info("The ID: " + id + " will be enriched!!");
+                        Entry dataset = reader.getEntryById(id);
 
-                    EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
+                        EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
 
-                    DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
+                        DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
 
-                    dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
+                        dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
 
-                    dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
+                        dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
 
-                    logger.debug(enrichedDataset.getEnrichedTitle());
-                    logger.debug(enrichedDataset.getEnrichedAbstractDescription());
-                    logger.debug(enrichedDataset.getEnrichedSampleProtocol());
-                    logger.debug(enrichedDataset.getEnrichedDataProtocol());
+                        logger.debug(enrichedDataset.getEnrichedTitle());
+                        logger.debug(enrichedDataset.getEnrichedAbstractDescription());
+                        logger.debug(enrichedDataset.getEnrichedSampleProtocol());
+                        logger.debug(enrichedDataset.getEnrichedDataProtocol());
 
-                    listToPrint.add(dataset);
+                        listToPrint.add(dataset);
 
-                    if(listToPrint.size() == numberEntries){
+                        if(listToPrint.size() == numberEntries){
+                            DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
+                            listToPrint.clear();
+                            counterFiles++;
+                        }
+                    }
+                    // This must be printed before leave because it contains the end members of the list.
+                    if(!listToPrint.isEmpty()){
                         DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
                         listToPrint.clear();
                         counterFiles++;
                     }
+                }catch (Exception e){
+                    logger.info("Error Reading file: " + e.getMessage());
                 }
-                // This must be printed before leave because it contains the end members of the list.
-                if(!listToPrint.isEmpty()){
-                    DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
-                    listToPrint.clear();
-                    counterFiles++;
-                }
+
             }
         }
         return RepeatStatus.FINISHED;

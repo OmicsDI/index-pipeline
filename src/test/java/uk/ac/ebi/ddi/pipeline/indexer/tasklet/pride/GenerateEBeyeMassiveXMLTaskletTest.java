@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-pride-annotation-context.xml"})
-public class GenerateEBeyePrideXMLTaskletTest {
+public class GenerateEBeyeMassiveXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

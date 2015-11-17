@@ -20,11 +20,21 @@
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
+        <batch:step id="copyFileFromResource" parent="parentStep" next="decompressFiles">
             <batch:tasklet>
-                <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFileToDirectoryTasklet">
+                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFileToDirectoryTasklet">
                     <bean:property name="sourceFile" value="file:${ddi.common.ega.source.directory}"/>
                     <bean:property name="targetDirectory" value="file:${ddi.common.ega.original.directory}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="decompressFiles" parent="parentStep" next="validateXMLStep">
+            <batch:tasklet>
+                <bean:bean id="decompressXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DecompressFilesTasklet">
+                    <bean:property name="originalDirectory" value="file:${ddi.common.ega.original.directory}"/>
+                    <bean:property name="targetDirectory" value="file:${ddi.common.ega.original.directory}"/>
+                    <bean:property name="deleteOriginal" value="true"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -55,7 +65,9 @@
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
                     <bean:property name="prefixFile"      value="${ddi.common.ega.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
-                    <bean:property name="dataType" ref="dataTypesGenomics" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.GENOMICS_DATA"/>
+                    </bean:property>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
             </batch:tasklet>

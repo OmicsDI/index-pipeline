@@ -16,6 +16,7 @@ import uk.ac.ebi.ddi.annotation.utils.DataType;
 import uk.ac.ebi.ddi.extservices.pubmed.client.PubmedWsClient;
 import uk.ac.ebi.ddi.extservices.pubmed.config.PubmedWsConfigProd;
 import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationEnrichmentService;
+import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
@@ -65,6 +66,8 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
                         logger.info("The ID: " + id + " will be enriched!!");
                         Entry dataset = reader.getEntryById(id);
+
+                        DatasetAnnotationFieldsService.addpublicationDate(dataset);
 
                         EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
 

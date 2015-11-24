@@ -17,6 +17,7 @@ import uk.ac.ebi.ddi.xml.validator.utils.Field;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class contains a set of methods that hels the enrichment and annotation of different datasets
@@ -96,10 +97,30 @@ public class DatasetAnnotationEnrichmentService {
                         dataset.addCrossReferenceValue(Field.PUBMED.getName(), pubmedID);
                 }
             }
-
+        }
+        if(dataset.getCrossReferences() != null && !dataset.getCrossReferenceFieldValue(Field.PUBMED.getName()).isEmpty()){
+            List<String> pubmedIds = dataset.getCrossReferenceFieldValue(Field.PUBMED.getName());
+            List<Map<String, String[]>> information = service.getAbstractPublication(pubmedIds);
+            for(Map<String, String[]> entry: information){
+                if(!entry.isEmpty()){
+                    for(String key: entry.keySet()){
+                        if(key.equalsIgnoreCase("description")){
+                            for(String values: entry.get(key))
+                                dataset.addAdditionalField(Field.PUBMED_ABSTRACT.getName(), values);
+                        }else if(key.equalsIgnoreCase("name")) {
+                            for (String values : entry.get(key))
+                                dataset.addAdditionalField(Field.PUBMED_TITLE.getName(), values);
+                        }else if(key.equalsIgnoreCase("author")){
+                            String authorName = "";
+                            for(String authorValue: entry.get(key)){
+                                authorName += authorValue + ",";
+                            }
+                            dataset.addAdditionalField(Field.PUBMED_AUTHORS.getName(), authorName);
+                        }
+                    }
+                }
+            }
         }
         return dataset;
     }
-
-
 }

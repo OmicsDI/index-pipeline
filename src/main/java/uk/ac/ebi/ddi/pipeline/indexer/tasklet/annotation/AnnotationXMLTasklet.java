@@ -69,13 +69,14 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
                         DatasetAnnotationFieldsService.addpublicationDate(dataset);
 
+                        dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
+
                         EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
+
 
                         DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
 
                         dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
-
-                        dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
 
                         logger.debug(enrichedDataset.getEnrichedTitle());
                         logger.debug(enrichedDataset.getEnrichedAbstractDescription());

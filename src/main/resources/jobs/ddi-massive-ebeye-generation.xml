@@ -39,9 +39,9 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyMassiveFilesToData" parent="parentStep" next="enrichMassiveFiles">
+        <batch:step id="copyMassiveFilesToData" parent="parentStep" next="copyGNPSFilesData">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                <bean:bean id="copyMassiveFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.massive.original.directory}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.massive.data.directory}" />
                     <bean:property name="pattern" value="${ddi.common.massive.prefix}"/>
@@ -49,9 +49,19 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="enrichMassiveFiles" parent="parentStep" next="similarityStep">
+        <batch:step id="copyGNPSFilesData" parent="parentStep" next="enrichMassiveFiles">
             <batch:tasklet>
-                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                <bean:bean id="copyGNPSFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.massive.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.gnps.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.gnps.prefix}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichMassiveFiles" parent="parentStep" next="enrichGNPSFiles">
+            <batch:tasklet>
+                <bean:bean id="enrichMassiveTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.massive.data.directory}"/>
                     <bean:property name="outputDirectory" value="file:${ddi.common.massive.prod.directory}"/>
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
@@ -60,7 +70,21 @@
                     <bean:property name="dataType" >
                         <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
                     </bean:property>
-                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichGNPSFiles" parent="parentStep" next="similarityStep">
+            <batch:tasklet>
+                <bean:bean id="enrichGNPSTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.gnps.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.gnps.prod.directory}"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
+                    <bean:property name="prefixFile"      value="${ddi.common.gnps.prefix}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

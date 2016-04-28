@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ebemw;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

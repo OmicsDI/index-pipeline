@@ -41,7 +41,7 @@
 
         <batch:step id="enrichFiles" parent="parentStep" next="importBiologyTerms">
             <batch:tasklet>
-                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.gpmdb.GPMDBAnnotationTasklet">
+                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.GPMDBAnnotationTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.data.directory}"/>
                     <bean:property name="outputDirectory" value="file:${ddi.common.gpmdb.prod.directory}"/>
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>

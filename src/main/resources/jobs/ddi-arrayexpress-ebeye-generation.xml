@@ -13,57 +13,44 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
+
     <description>
-        This job generate the XML for a PRIDE to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
-        between different datasets .
+        This job generate the XML for a Metabolights to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiXMLJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="validateXMLStep" parent="parentStep" next="copyFilesToData">
+        <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
+            <batch:tasklet>
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.original.arrayexpress.prefix}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="validateXMLStep" parent="parentStep" next="enrichFiles">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.pride.original.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.arrayexpress.data.directory}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyFilesToData" parent="parentStep" next="enrichFiles">
+        <batch:step id="enrichFiles" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.original.directory}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.pride.prefix}" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
-        <batch:step id="enrichFiles" parent="parentStep" next="similarityStep">
-            <batch:tasklet>
-                <bean:bean id="enrichPRIDETasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.prod.directory}"/>
+                <bean:bean id="enrichArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
                     <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
-                    <bean:property name="prefixFile"      value="${ddi.common.pride.prefix}" />
+                    <bean:property name="prefixFile"      value="${ddi.common.arrayexpress.prefix}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.TRANSCRIPTOMIC_DATA"/>
                     </bean:property>
                     <!--<bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />-->
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
-        <batch:step id="similarityStep" parent="parentStep">
-            <batch:tasklet>
-                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
-                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
-                    <bean:property name="termInDBService" ref="termInDBService"/>
-                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
-                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
-                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -91,10 +78,10 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
-    <bean id="dataTypesProteomics" class="java.util.ArrayList">
+    <bean id="dataTypesMetabolomics" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
             </list>
         </constructor-arg>
     </bean>
@@ -103,5 +90,7 @@
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
+
+
 
 </beans>

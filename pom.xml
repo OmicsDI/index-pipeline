@@ -21,7 +21,7 @@
         <subethasmtp.wiser.version>1.2</subethasmtp.wiser.version>
 
         <ddi.px.reader.version>1.0-SNAPSHOT</ddi.px.reader.version>
-        <ddi.xml.validator.version>1.0-SNAPSHOT</ddi.xml.validator.version>
+        <ddi.xml.validator.version>1.1-SNAPSHOT</ddi.xml.validator.version>
         <ddi.annotation.version>1.0-SNAPSHOT</ddi.annotation.version>
         <ddi.mw.reader.version>1.0-SNAPSHOT</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.0-SNAPSHOT</ddi.massive.reader.version>
@@ -294,6 +294,14 @@
                     </excludes>
                     <skipTests>true</skipTests>
                     <junitArtifactName>junit:junit</junitArtifactName>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

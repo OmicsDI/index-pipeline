@@ -49,7 +49,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     DataType dataType;
 
-    private DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
+    DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -102,11 +102,6 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Assert.notNull(inputDirectory, "Input Directory can not be null");
-        Assert.notNull(outputDirectory, "Output Directory cant be null");
-    }
 
     public Resource getOutputDirectory() {
         return outputDirectory;
@@ -154,6 +149,13 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
+    }
+
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(inputDirectory, "Input Directory can not be null");
+        Assert.notNull(outputDirectory, "Output Directory cant be null");
     }
 
 //    public DDIExpDataImportService getDdiExpDataImportService() {

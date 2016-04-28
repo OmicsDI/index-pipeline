@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.gpmdb;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -23,24 +23,7 @@ import java.util.List;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 03/12/2015
  */
-public class GPMDBAnnotationTasklet extends AbstractTasklet {
-
-    Resource inputDirectory;
-
-    private DDIAnnotationService annotationService;
-
-    private int numberEntries;
-
-    private String prefixFile;
-
-    private Resource outputDirectory;
-
-    private DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
+public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -99,26 +82,4 @@ public class GPMDBAnnotationTasklet extends AbstractTasklet {
         }
         return RepeatStatus.FINISHED;
     }
-
-    public void setInputDirectory(Resource inputDirectory) {
-        this.inputDirectory = inputDirectory;
-    }
-
-    public void setAnnotationService(DDIAnnotationService annotationService) {
-        this.annotationService = annotationService;
-    }
-
-    public void setNumberEntries(int numberEntries) {
-        this.numberEntries = numberEntries;
-    }
-
-    public void setPrefixFile(String prefixFile) {
-        this.prefixFile = prefixFile;
-    }
-
-    public void setOutputDirectory(Resource outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-
 }

@@ -68,4 +68,29 @@ public class DDIFile {
         database.setEntries(new Entries(listToPrint));
         outputXMLFile.marshall(database, outputFile);
     }
+
+    public static void writeList(OmicsXMLFile originalReader, Entry dataset, String prefixFile, String postfix, File folder) throws FileNotFoundException {
+
+        if(folder != null && folder.isDirectory()){
+            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+            OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
+            Database database = new Database();
+            database.setDescription(originalReader.getDescription());
+            database.setName(originalReader.getName());
+            database.setRelease(originalReader.getRelease());
+            database.setReleaseDate(originalReader.getReleaseDate());
+            database.setEntryCount(1);
+            Entries entries = new Entries();
+            entries.addEntry(dataset);
+            database.setEntries(entries);
+            outputXMLFile.marshall(database, outputFile);
+        }
+
+
+    }
+
+
+
+
+
 }

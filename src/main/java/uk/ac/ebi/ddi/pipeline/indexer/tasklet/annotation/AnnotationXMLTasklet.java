@@ -41,13 +41,9 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     Resource inputDirectory;
 
-    DDIAnnotationService annotationService;
-
     int numberEntries;
 
     String prefixFile;
-
-    DataType dataType;
 
     DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
 
@@ -68,15 +64,6 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
                         DatasetAnnotationFieldsService.addpublicationDate(dataset);
 
                         dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
-
-                        EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
-
-                        dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
-
-                        logger.debug(enrichedDataset.getEnrichedTitle());
-                        logger.debug(enrichedDataset.getEnrichedAbstractDescription());
-                        logger.debug(enrichedDataset.getEnrichedSampleProtocol());
-                        logger.debug(enrichedDataset.getEnrichedDataProtocol());
 
                         listToPrint.add(dataset);
 
@@ -119,14 +106,6 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
         this.inputDirectory = inputDirectory;
     }
 
-    public DDIAnnotationService getAnnotationService() {
-        return annotationService;
-    }
-
-    public void setAnnotationService(DDIAnnotationService annotationService) {
-        this.annotationService = annotationService;
-    }
-
     public int getNumberEntries() {
         return numberEntries;
     }
@@ -142,15 +121,6 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
     public void setPrefixFile(String prefixFile) {
         this.prefixFile = prefixFile;
     }
-
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {

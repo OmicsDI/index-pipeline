@@ -9,6 +9,6 @@
     <import resource="context/common-context.xml"/>
     <import resource="context/db-job-repository.xml"/>
     <import resource="context/mongo-db-context.xml" />
-    <import resource="jobs/ddi-arrexpress-ebeye-generation.xml"/>
+    <import resource="jobs/ddi-arrayexpress-ebeye-generation.xml"/>
 
 </beans>

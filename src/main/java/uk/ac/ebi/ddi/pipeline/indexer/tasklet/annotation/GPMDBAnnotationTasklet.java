@@ -51,15 +51,6 @@ public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
 
                         dataset = CrossReferencesProteinDatabasesService.annotateCrossReferences(dataset);
 
-                        EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
-
-                        dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
-
-                        logger.debug(enrichedDataset.getEnrichedTitle());
-                        logger.debug(enrichedDataset.getEnrichedAbstractDescription());
-                        logger.debug(enrichedDataset.getEnrichedSampleProtocol());
-                        logger.debug(enrichedDataset.getEnrichedDataProtocol());
-
                         listToPrint.add(dataset);
 
                         if(listToPrint.size() == numberEntries){

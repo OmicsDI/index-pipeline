@@ -50,7 +50,6 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
                         Entry dataset = reader.getEntryById(id);
 
                         EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, dataset);
-
                         dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(dataset, enrichedDataset);
 
                         logger.debug(enrichedDataset.getEnrichedTitle());

@@ -1,30 +1,17 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.util.Assert;
-import uk.ac.ebi.ddi.annotation.model.DatasetTobeEnriched;
-import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
-import uk.ac.ebi.ddi.annotation.service.DDIAnnotationService;
-import uk.ac.ebi.ddi.annotation.service.DDIDatasetSimilarityService;
-import uk.ac.ebi.ddi.annotation.service.DDIExpDataImportService;
+import uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService;
+import uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService;
 import uk.ac.ebi.ddi.annotation.utils.DataType;
-import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService;
 import uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService;
-import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
-import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

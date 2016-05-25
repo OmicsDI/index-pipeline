@@ -13,7 +13,7 @@ import uk.ac.ebi.ddi.mw.extws.mw.config.MWWsConfigProd;
 
 /**
  * Generate all the files from pX submission by crawling the ProteomeXchange Page
- * and parsing the XML files. For every Dataset a file is created in the defined folder.
+ * and parsing the XML files. For every INSERTED a file is created in the defined folder.
  *
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 29/09/15

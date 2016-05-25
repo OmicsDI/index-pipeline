@@ -69,6 +69,7 @@ public class DDIFile {
         outputXMLFile.marshall(database, outputFile);
     }
 
+
     public static void writeList(OmicsXMLFile originalReader, Entry dataset, String prefixFile, String postfix, File folder) throws FileNotFoundException {
 
         if(folder != null && folder.isDirectory()){

@@ -40,7 +40,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="validateXMLStep" parent="parentStep" next="annotationFiles">
+        <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
                     <bean:property name="directory" value="${ddi.common.arrayexpress.data.directory}"/>
@@ -49,23 +49,31 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="annotationFiles" parent="parentStep" next="moveToProductionStep">
+        <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
-                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
+                <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
                     <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.data.directory}"/>
                     <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
-                    <bean:property name="numberEntries"   value="${ddi.common.number.entries}"/>
-                    <bean:property name="prefixFile"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="originalPrefix"  value="${ddi.common.original.arrayexpress.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="moveToProductionStep" parent="parentStep">
+        <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
-                <bean:bean id="copyFilesWithPatternFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImport">
                     <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
-                    <bean:property name="pattern"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="annotationFiles" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -76,15 +84,34 @@
     </batch:job>
 
     <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
-
         <batch:step id="enrihmentStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}" />
+                    <bean:property name="databaseName" value="file:${ddi.common.arrayexpress.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="dataType" >
                         <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.TRANSCRIPTOMIC_DATA"/>
                     </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <batch:job id="moveToProductionJob" xmlns="http://www.springframework.org/schema/batch">
+        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="moveToProductionStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyFilesWithPatternFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
+                    <bean:property name="pattern"      value="${ddi.common.arrayexpress.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

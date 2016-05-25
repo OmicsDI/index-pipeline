@@ -106,7 +106,7 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
-    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
 
     <bean id="dataTypesGenomics" class="java.util.ArrayList">
         <constructor-arg>

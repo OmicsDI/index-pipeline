@@ -65,4 +65,5 @@ public class GenerateEBeyeArrayExpressTaskletTest {
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
+
 }

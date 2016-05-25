@@ -112,7 +112,7 @@
         </constructor-arg>
     </bean>
 
-    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.DDIAnnotationService"/>
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>

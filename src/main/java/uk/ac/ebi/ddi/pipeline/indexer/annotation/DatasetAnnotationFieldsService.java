@@ -1,9 +1,13 @@
 package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 
+import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Reference;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -18,6 +22,38 @@ public class DatasetAnnotationFieldsService {
         }
         return dataset;
     }
+
+    public static Dataset addpublicationDate(Dataset dataset){
+
+        if(dataset.getDates() != null && !dataset.getDates().isEmpty() && containsPublicationDate(dataset.getDates())){
+            dataset = addDefaultPublicationDate(dataset);
+        }
+        return dataset;
+    }
+
+    private static Dataset addDefaultPublicationDate(Dataset dataset) {
+        Set<String> toAdd = null;
+        if(dataset.getDates() !=null && !dataset.getDates().isEmpty()){
+            for(String dateField: dataset.getDates().keySet()){
+                if(dateField.equalsIgnoreCase(Field.PUBLICATION_UPDATED.getName()))
+                    toAdd = dataset.getDates().get(dateField);
+            }
+        }
+        if(toAdd != null)
+            dataset.getDates().put(Field.PUBLICATION.getName(), toAdd);
+        return dataset;
+    }
+
+    private static boolean containsPublicationDate(Map<String, Set<String>> dates) {
+        if(dates != null && !dates.isEmpty())
+            for(String dateField: dates.keySet())
+                if(dateField.equalsIgnoreCase(Field.PUBLICATION.getName()))
+                    return true;
+
+
+        return false;
+    }
+
 
     public static Entry addPublicationDateFromSubmission(Entry dataset){
         if(dataset.getDates() != null && !dataset.getDates().isEmpty() && !dataset.getDates().containsPublicationDate()){

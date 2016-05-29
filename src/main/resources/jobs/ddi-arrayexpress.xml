@@ -18,7 +18,7 @@
         This job generate the XML for a Metabolights to be submitted to OmicsDI system.
     </description>
 
-    <batch:job id="ddiAnnotationJob" xmlns="http://www.springframework.org/schema/batch">
+    <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
         <batch:step id="generateXML" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
@@ -63,7 +63,7 @@
 
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
-                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImport">
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
@@ -99,7 +99,8 @@
         </batch:step>
     </batch:job>
 
-    <batch:job id="moveToProductionJob" xmlns="http://www.springframework.org/schema/batch">
+    <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
+
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
@@ -110,10 +111,13 @@
 
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="copyFilesWithPatternFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
+                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
-                    <bean:property name="pattern"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="databaseService" ref="databaseAnnotationService" />
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

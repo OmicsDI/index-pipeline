@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * Some considerations, we would have only one provider by database. This must be considered in the future.
  *
  */
-public class DatasetImport extends AbstractTasklet{
+public class DatasetImportTasklet extends AbstractTasklet{
 
     public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 

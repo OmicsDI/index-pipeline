@@ -20,8 +20,8 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-arrayexpress-annotation-context.xml"})
-public class GenerateEBeyeArrayExpressTaskletTest {
+@ContextConfiguration(locations = {"classpath:ddi-indexer-test-arrayexpress-import.xml"})
+public class ImportEBeyeArrayExpressTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
@@ -32,7 +32,7 @@ public class GenerateEBeyeArrayExpressTaskletTest {
 
 
     @Autowired
-    @Qualifier("ddiAnnotationJob")
+    @Qualifier("ddiImportJob")
     private Job job;
 
 

@@ -67,7 +67,7 @@
 
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
-                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImport">
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />

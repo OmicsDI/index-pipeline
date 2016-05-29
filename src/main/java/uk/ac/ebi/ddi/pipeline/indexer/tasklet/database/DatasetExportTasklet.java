@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * Created by yperez on 26/05/2016.
  */
-public class DatasetExport extends AbstractTasklet{
+public class DatasetExportTasklet extends AbstractTasklet{
 
     public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 
@@ -92,8 +92,20 @@ public class DatasetExport extends AbstractTasklet{
 
     }
 
-    public Resource getInputDirectory() {
+    public Resource getOutputDirectory() {
         return outputDirectory;
+    }
+
+    public void setOutputDirectory(Resource outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public DDIDatabaseAnnotationService getDatabaseService() {
+        return databaseService;
+    }
+
+    public void setDatabaseService(DDIDatabaseAnnotationService databaseService) {
+        this.databaseService = databaseService;
     }
 
     public String getDatabaseName() {

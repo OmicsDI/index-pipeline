@@ -27,6 +27,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
     String databaseName;
 
     DDIPublicationAnnotationService publicationService = DDIPublicationAnnotationService.getInstance();
+
     DDIDatasetAnnotationService datasetAnnotationService;
 
     @Override
@@ -51,9 +52,14 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
         this.databaseName = databaseName;
     }
 
+    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
+        this.datasetAnnotationService = datasetAnnotationService;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(databaseName, "Input Directory can not be null");
+        Assert.notNull(databaseName, "Database can not be null");
+        Assert.notNull(datasetAnnotationService, "Annotation Service can't be null");
 
     }
 }

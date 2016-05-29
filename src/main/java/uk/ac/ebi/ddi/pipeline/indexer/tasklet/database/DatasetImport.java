@@ -8,9 +8,11 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet;
+import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
@@ -38,6 +40,8 @@ public class DatasetImport extends AbstractTasklet{
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
+    DDIDatabaseAnnotationService databaseAnnotationService;
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<Pair<String,String>>();
@@ -45,6 +49,7 @@ public class DatasetImport extends AbstractTasklet{
             try{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
+
                     datasetAnnotationService.insertDataset(dataEntry);
                     threadSafeList.add(new Pair<String, String>(dataEntry.getId(), dataEntry.getDatabase()));
                     logger.debug("Dataset: " + dataEntry.toString() + "has been added");
@@ -54,6 +59,11 @@ public class DatasetImport extends AbstractTasklet{
                 logger.info("Error Reading file: " + e.getMessage());
             }
         });
+
+        if(inputDirectory.getFile().listFiles() != null && inputDirectory.getFile().listFiles().length > 0){
+            OmicsXMLFile file = new OmicsXMLFile(inputDirectory.getFile().listFiles()[0]);
+            databaseAnnotationService.updateDatabase(file.getName(),file.getDescription(), file.getReleaseDate(), file.getRelease(), null,null);
+        }
 
         //Todo: Here we need to be carefully. We need to know when a dataset has been removed or not. For now we will consider a dataset
         //Todo: as removed is they are not included in one of the releases.
@@ -74,7 +84,7 @@ public class DatasetImport extends AbstractTasklet{
             });
         });
 
-        removed.parallelStream().forEach( x -> {
+        removed.stream().forEach( x -> {
             datasetAnnotationService.updateDeleteStatus(x);
         });
 
@@ -87,6 +97,14 @@ public class DatasetImport extends AbstractTasklet{
 
     public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
         this.datasetAnnotationService = datasetAnnotationService;
+    }
+
+    public DDIDatabaseAnnotationService getDatabaseAnnotationService() {
+        return databaseAnnotationService;
+    }
+
+    public void setDatabaseAnnotationService(DDIDatabaseAnnotationService databaseAnnotationService) {
+        this.databaseAnnotationService = databaseAnnotationService;
     }
 
     @Override

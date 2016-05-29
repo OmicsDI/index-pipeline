@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +30,27 @@ public class DDIFile {
             database.setName(originalReader.getName());
             database.setRelease(originalReader.getRelease());
             database.setReleaseDate(originalReader.getReleaseDate());
+            database.setEntryCount(listToPrint.size());
+            database.setEntries(new Entries(listToPrint));
+            outputXMLFile.marshall(database, outputFile);
+        }
+
+
+    }
+
+    public static void writeList(List<Entry> listToPrint, String prefixFile,
+                                 int postfix, File folder, String databaseDescription,
+                                 String databaseName,
+                                 String databaseRelease) throws FileNotFoundException {
+
+        if(folder != null && folder.isDirectory()){
+            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+            OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
+            Database database = new Database();
+            database.setDescription(databaseDescription);
+            database.setName(databaseName);
+            database.setRelease(databaseRelease);
+            database.setReleaseDate(new Date().toString());
             database.setEntryCount(listToPrint.size());
             database.setEntries(new Entries(listToPrint));
             outputXMLFile.marshall(database, outputFile);

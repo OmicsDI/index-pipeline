@@ -3,10 +3,12 @@ package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 
 import java.util.List;
 
@@ -24,11 +26,18 @@ public class ArrayExpressAnnotationTasklet extends AnnotationXMLTasklet{
         if(databaseName != null){
             List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
             datasets.parallelStream().forEach( dataset -> {
-                Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
-                exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
-                exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
-                datasetAnnotationService.annotateDataset(exitingDataset);
+                try {
+                    if(dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType())){
+                        Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+                        exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
+                        exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
+                        exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
+                        datasetAnnotationService.annotateDataset(exitingDataset);
+                    }
+                }catch (RestClientException e){
+                    logger.debug(e.getMessage());
+                }
+
             });
         }
         return RepeatStatus.FINISHED;

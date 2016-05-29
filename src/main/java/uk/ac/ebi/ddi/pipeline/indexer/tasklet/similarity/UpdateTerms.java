@@ -5,14 +5,18 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService;
 import uk.ac.ebi.ddi.annotation.utils.DataType;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
+import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
+import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -20,15 +24,17 @@ import java.io.File;
  */
 public class UpdateTerms extends AbstractTasklet {
 
-    Resource inputDirectory;
+    String databaseName;
 
     DataType dataType;
 
     DDIExpDataImportService ddiExpDataImportService;
 
+    DDIDatasetAnnotationService datasetAnnotationService;
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(inputDirectory, "Input Directory can not be null");
+        Assert.notNull(databaseName, "Input Directory can not be null");
         Assert.notNull(ddiExpDataImportService, "This Service can't be null");
         Assert.notNull(dataType, "The datatype can't be null");
     }
@@ -36,32 +42,29 @@ public class UpdateTerms extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
-         if(inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()){
-            for(File file: inputDirectory.getFile().listFiles()){
-                try{
-                    OmicsXMLFile reader = new OmicsXMLFile(file);
-                    for(String id: reader.getEntryIds()){
+        List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
 
-                        logger.info("The ID: " + id + " will be imported!!");
-                        Entry dataset = reader.getEntryById(id);
-
-                        DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
-
-                    }
-                }catch (Exception e){
-                    logger.info("Error Reading file: " + e.getMessage());
-                }
-
-            }
-        }
+        datasets.parallelStream().forEach(dataset -> {
+            DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
+        });
         return RepeatStatus.FINISHED;
     }
 
-
-    public void setInputDirectory(Resource inputDirectory) {
-        this.inputDirectory = inputDirectory;
+    public String getDatabaseName() {
+        return databaseName;
     }
 
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public DDIDatasetAnnotationService getDatasetAnnotationService() {
+        return datasetAnnotationService;
+    }
+
+    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
+        this.datasetAnnotationService = datasetAnnotationService;
+    }
 
     public void setDataType(DataType dataType) {
         this.dataType = dataType;

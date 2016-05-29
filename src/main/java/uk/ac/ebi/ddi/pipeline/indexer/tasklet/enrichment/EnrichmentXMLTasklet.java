@@ -90,6 +90,10 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
         this.annotationService = annotationService;
     }
 
+    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
+        this.datasetAnnotationService = datasetAnnotationService;
+    }
+
     public DataType getDataType() {
         return dataType;
     }

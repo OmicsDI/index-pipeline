@@ -17,9 +17,9 @@
         <mongo:client-options connections-per-host="5"
                               threads-allowed-to-block-for-connection-multiplier="2"
                               connect-timeout="100000"
-                              max-wait-time="10000"
+                              max-wait-time="30000"
                               socket-keep-alive="true"
-                              socket-timeout="10000"
+                              socket-timeout="100000"
                               write-concern="NORMAL"
                               read-preference="SECONDARY"/>
     </mongo:mongo-client>
@@ -34,7 +34,8 @@
 
     <bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
     <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
-    <bean id="datasetService"       class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
+    <bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
+    <bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService" />
     <bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
 
     <bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
@@ -44,7 +45,8 @@
     <bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
     <bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
     <bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
-    <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
 
+    <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
+    <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
 
 </beans>

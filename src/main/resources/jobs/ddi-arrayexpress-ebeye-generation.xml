@@ -66,6 +66,7 @@
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImport">
                     <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -74,6 +75,7 @@
             <batch:tasklet>
                 <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
                     <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

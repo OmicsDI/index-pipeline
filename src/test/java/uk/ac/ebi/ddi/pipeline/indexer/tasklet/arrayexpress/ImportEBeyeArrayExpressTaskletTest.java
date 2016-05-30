@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-test-arrayexpress-import.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/arrayexpress/ddi-indexer-test-arrayexpress-import.xml"})
 public class ImportEBeyeArrayExpressTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

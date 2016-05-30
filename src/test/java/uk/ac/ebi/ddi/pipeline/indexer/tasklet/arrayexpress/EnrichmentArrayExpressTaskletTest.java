@@ -17,9 +17,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by yperez on 29/05/2016.
  */
+
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/arrayexpress/ddi-indexer-test-arrayexpress-generate.xml"})
-public class GenerateArrayExpressTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/arrayexpress/ddi-indexer-test-arrayexpress-enrichment.xml"})
+public class EnrichmentArrayExpressTaskletTest {
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
 
@@ -29,7 +30,7 @@ public class GenerateArrayExpressTaskletTest {
 
 
     @Autowired
-    @Qualifier("generatetionJob")
+    @Qualifier("ddiEnrichmentJob")
     private Job job;
 
 

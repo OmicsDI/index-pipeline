@@ -42,8 +42,8 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
 
         datasets.parallelStream().forEach( dataset -> {
-            if(dataset.getCurrentStatus() == DatasetCategory.INSERTED.getType() ||
-                    dataset.getCurrentStatus() == DatasetCategory.UPDATED.getType()){
+            if(dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
+                    dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType())){
 
                 Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
                 EnrichedDataset enrichedDataset = null;
@@ -92,6 +92,10 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
 
     public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
         this.datasetAnnotationService = datasetAnnotationService;
+    }
+
+    public DDIDatasetAnnotationService getDatasetAnnotationService() {
+        return datasetAnnotationService;
     }
 
     public DataType getDataType() {

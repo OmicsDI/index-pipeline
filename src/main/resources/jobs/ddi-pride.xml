@@ -13,29 +13,18 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
-
     <description>
-        This job generate the XML for a Metabolights to be submitted to OmicsDI system.
+        This job generate the XML for a PRIDE to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
+        between different datasets .
     </description>
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="generateXML" parent="parentStep" next="copyFilesToData">
-            <batch:tasklet>
-                <bean:bean id="generateXMLStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerationArrayExpressXML">
-                    <bean:property name="experimentFileName" value="${ddi.common.arrayexpress.experiment.file}"/>
-                    <bean:property name="protocolFileName" value="${ddi.common.arrayexpress.protocol.file}"/>
-                    <bean:property name="outputFile"  value="${ddi.common.arrayexpress.ddi.file}" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
         <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.original.directory}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.original.arrayexpress.prefix}" />
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
+                    <bean:property name="sourceDirectory" value="file:${ddi.common.pride.original.directory}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.pride.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -43,7 +32,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.arrayexpress.data.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.pride.data.directory}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -52,30 +41,30 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
-                    <bean:property name="originalPrefix"  value="${ddi.common.original.arrayexpress.prefix}" />
-                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.annotated.directory}"/>
+                    <bean:property name="originalPrefix"  value="${ddi.common.pride.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.single.file.number.entries}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.pride.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
-                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
         <batch:step id="annotationFiles" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}"/>
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
@@ -87,15 +76,43 @@
     </batch:job>
 
     <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
-        <batch:step id="enrihmentStep" parent="parentStep">
+        <batch:step id="enrichmentStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.TRANSCRIPTOMIC_DATA"/>
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
                     </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <batch:job id="similarityJob">
+        <batch:step id="importTerms" parent="parentStep" next="similarityStep">
+            <batch:tasklet>
+                <bean:bean id="importTermsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.UpdateTermsTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name}" />
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="similarityStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
+                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
+                    <bean:property name="termInDBService" ref="termInDBService"/>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
+                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
+                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -106,7 +123,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.pride.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -114,9 +131,9 @@
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.pride.prod.directory}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.pride.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
@@ -143,8 +160,15 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
+    <bean id="dataTypesProteomics" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
-
 
 </beans>

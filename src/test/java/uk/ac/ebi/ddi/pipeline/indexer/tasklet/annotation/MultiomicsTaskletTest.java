@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  * Created by yperez on 27/05/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-multiomics.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/multiomics/ddi-indexer-test-multiomics.xml"})
 public class MultiomicsTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

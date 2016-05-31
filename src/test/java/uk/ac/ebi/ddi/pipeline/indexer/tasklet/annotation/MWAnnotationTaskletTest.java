@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-mw-annotation-context.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/mw/ddi-indexer-test-mw-import.xml"})
 public class MWAnnotationTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

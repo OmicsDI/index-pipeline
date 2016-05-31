@@ -15,11 +15,11 @@
 
     <mongo:mongo-client id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
         <mongo:client-options connections-per-host="5"
-                              threads-allowed-to-block-for-connection-multiplier="2"
+                              threads-allowed-to-block-for-connection-multiplier="10"
                               connect-timeout="100000"
                               max-wait-time="30000"
                               socket-keep-alive="true"
-                              socket-timeout="100000"
+                              socket-timeout="1000000"
                               write-concern="NORMAL"
                               read-preference="SECONDARY"/>
     </mongo:mongo-client>
@@ -28,7 +28,7 @@
                       username="${ddi.mongo.app.user}" password="${ddi.mongo.app.password}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
     </bean>
 
 

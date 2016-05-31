@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-massive-annotation-context.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/massive/ddi-indexer-test-massive-import.xml"})
 public class GenerateEBeyeMassiveXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

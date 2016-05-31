@@ -6,6 +6,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.publication.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
@@ -36,10 +37,15 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
 
         datasets.parallelStream().forEach(dataset -> {
-            Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
-            exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
-            datasetAnnotationService.annotateDataset(exitingDataset);
+            try{
+                Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+                exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
+                exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
+                datasetAnnotationService.annotateDataset(exitingDataset);
+            }catch (RestClientException ex){
+                logger.debug(ex.getMessage());
+            }
+
         });
         return RepeatStatus.FINISHED;
     }

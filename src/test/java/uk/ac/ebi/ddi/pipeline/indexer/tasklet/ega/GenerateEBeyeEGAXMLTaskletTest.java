@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  * @date 17/11/2015
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-ega-annotation-context.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/ega/ddi-indexer-test-ega-import.xml"})
 public class GenerateEBeyeEGAXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

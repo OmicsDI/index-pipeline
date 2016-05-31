@@ -14,7 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-metabolights-context.xml"})
+@ContextConfiguration(locations = {"classpath:jobs/metabolights/ddi-indexer-test-metabolights-import.xml"})
 public class DownloadFilesFromFTPTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

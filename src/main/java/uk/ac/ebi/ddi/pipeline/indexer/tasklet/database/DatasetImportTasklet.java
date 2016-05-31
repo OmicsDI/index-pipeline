@@ -38,6 +38,8 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
     Resource inputDirectory;
 
+    String databaseName;
+
     DDIDatasetAnnotationService datasetAnnotationService;
 
     DDIDatabaseAnnotationService databaseAnnotationService;
@@ -50,7 +52,7 @@ public class DatasetImportTasklet extends AbstractTasklet{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
 
-                    datasetAnnotationService.insertDataset(dataEntry);
+                    datasetAnnotationService.insertDataset(dataEntry, databaseName);
                     threadSafeList.add(new Pair<String, String>(dataEntry.getId(), dataEntry.getDatabase()));
                     logger.debug("Dataset: " + dataEntry.toString() + "has been added");
                 });
@@ -107,10 +109,19 @@ public class DatasetImportTasklet extends AbstractTasklet{
         this.databaseAnnotationService = databaseAnnotationService;
     }
 
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(inputDirectory, "Input Directory can not be null");
         Assert.notNull(datasetAnnotationService, "Annotation Service can't be null");
+        Assert.notNull(databaseName, "DatabaseName can't be null");
 
     }
 }

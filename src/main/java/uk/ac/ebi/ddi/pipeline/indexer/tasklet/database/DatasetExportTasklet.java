@@ -51,22 +51,26 @@ public class DatasetExportTasklet extends AbstractTasklet{
         List<Entry> listToPrint = new ArrayList<>();
         final int[] counterFiles = {1};
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
-        Database database = databaseService.getDatabaseInfo(databaseName);
-        datasets.stream().forEach( dataset -> {
-            if(dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()) ||
-                    dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.ENRICHED.getType())){
-                Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
-                listToPrint.add(entry);
+        datasets = datasets.parallelStream()
+                .filter(x -> x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
+                        x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()) ||
+                        x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.ENRICHED.getType())
+                )
+                .collect(Collectors.toList());
 
-                if(listToPrint.size() == numberEntries){
-                    try {
-                        DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
-                        listToPrint.clear();
-                        counterFiles[0]++;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        Database database = databaseService.getDatabaseInfo(databaseName);
+
+        datasets.stream().forEach( dataset -> {
+            Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+            Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
+            listToPrint.add(entry);
+            if(listToPrint.size() == numberEntries){
+                try {
+                    DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
+                    listToPrint.clear();
+                    counterFiles[0]++;
+                }catch (IOException e){
+                    e.printStackTrace();
                 }
             }
         });

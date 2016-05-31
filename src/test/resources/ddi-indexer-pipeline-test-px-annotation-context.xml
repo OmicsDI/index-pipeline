@@ -7,7 +7,7 @@
 
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:context/mongo-db-context.xml"/>
-    <import resource="classpath*:jobs/ddi-px-ebeye-generation.xml"/>
+    <import resource="classpath*:jobs/ddi-px-passel.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils"/>

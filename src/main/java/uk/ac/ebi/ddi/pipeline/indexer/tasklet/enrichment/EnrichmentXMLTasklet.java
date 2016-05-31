@@ -17,6 +17,8 @@ import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 
@@ -40,21 +42,22 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
+        datasets = datasets.parallelStream()
+                .filter(x -> x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
+                        x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()))
+                .collect(Collectors.toList());
 
         datasets.parallelStream().forEach( dataset -> {
-            if(dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
-                    dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType())){
-
-                Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                EnrichedDataset enrichedDataset = null;
-                try {
-                    enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset);
-                    dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
-                    logger.debug(enrichedDataset.getEnrichedTitle());
-                    logger.debug(enrichedDataset.getEnrichedAbstractDescription());
-                    logger.debug(enrichedDataset.getEnrichedSampleProtocol());
-                    logger.debug(enrichedDataset.getEnrichedDataProtocol());
-                    datasetAnnotationService.enrichedDataset(existingDataset);
+            Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+            EnrichedDataset enrichedDataset = null;
+            try {
+                enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset);
+                dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
+                logger.debug(enrichedDataset.getEnrichedTitle());
+                logger.debug(enrichedDataset.getEnrichedAbstractDescription());
+                logger.debug(enrichedDataset.getEnrichedSampleProtocol());
+                logger.debug(enrichedDataset.getEnrichedDataProtocol());
+                datasetAnnotationService.enrichedDataset(existingDataset);
                 } catch (DDIException e) {
                     e.printStackTrace();
                 } catch (UnsupportedEncodingException e) {
@@ -62,7 +65,6 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
         });
 
         return RepeatStatus.FINISHED;

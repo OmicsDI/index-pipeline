@@ -7,11 +7,11 @@
 
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:context/mongo-db-context.xml"/>
-    <import resource="classpath*:jobs/ddi-arrayexpress.xml"/>
+    <import resource="classpath*:jobs/ddi-metabolights.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">
-        <property name="job" ref="ddiImportJob"/>
+        <property name="job" ref="generatetionJob"/>
     </bean>
 
     <context:property-placeholder
@@ -19,5 +19,7 @@
             ignore-unresolvable="true" ignore-resource-not-found="true" order="-1"/>
 
     <util:properties id="config" location="classpath:prop/common-override.properties"/>
+
+
 
 </beans>

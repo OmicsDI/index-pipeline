@@ -1,6 +1,5 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:ddi-indexer-pipeline-test-pride-annotation-context.xml"})
+@ContextConfiguration(locations = {"classpath:jobs.pride/ddi-indexer-test-pride-import.xml"})
 public class AnnotationXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";

@@ -14,18 +14,22 @@
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
 
-    <description>
+<description>
         This job generate the XML for a Metabolights to be submitted to OmicsDI system.
     </description>
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="generateXML" parent="parentStep" next="copyFilesToData">
+        <batch:step id="downloadFilesStep" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
-                <bean:bean id="generateXMLStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerationArrayExpressXML">
-                    <bean:property name="experimentFileName" value="${ddi.common.arrayexpress.experiment.file}"/>
-                    <bean:property name="protocolFileName" value="${ddi.common.arrayexpress.protocol.file}"/>
-                    <bean:property name="outputFile"  value="${ddi.common.arrayexpress.ddi.file}" />
+                <bean:bean id="downloadFilesTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilesFromFTPTasklet">
+                    <bean:property name="server" value="${ddi.common.metabolights.ftp.server}" />
+                    <bean:property name="user" value="${ddi.common.metabolights.ftp.user}" />
+                    <bean:property name="password" value="${ddi.common.metabolights.ftp.password}" />
+                    <bean:property name="port" value="${ddi.common.metabolights.ftp.port}" />
+                    <bean:property name="pattern" value="${ddi.common.metabolights.ftp.pattern}" />
+                    <bean:property name="sourceDirectory" value="${ddi.common.metabolights.ftp.folder}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.metabolights.original.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -33,9 +37,9 @@
         <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.original.directory}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.original.arrayexpress.prefix}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolights.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.metabolights.ftp.pattern}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -43,7 +47,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.arrayexpress.data.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.metabolights.original.directory}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -52,50 +56,77 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
-                    <bean:property name="originalPrefix"  value="${ddi.common.original.arrayexpress.prefix}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolights.annotated.directory}"/>
+                    <bean:property name="originalPrefix"  value="${ddi.common.metabolights.ftp.pattern}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="filePrefix"      value="${ddi.common.metabolights.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
-                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.annotated.directory}"/>
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolights.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.metaboligths.database.name}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="annotationFiles" parent="parentStep">
+        <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
             <batch:tasklet>
-                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}"/>
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.metaboligths.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
+
+        <batch:step id="enrichmentStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.metaboligths.database.name}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
 
         <batch:listeners>
             <batch:listener ref="jobListener"/>
         </batch:listeners>
     </batch:job>
 
-    <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
-        <batch:step id="enrihmentStep" parent="parentStep">
+    <batch:job id="similarityJob">
+        <batch:step id="importTerms" parent="parentStep" next="similarityStep">
             <batch:tasklet>
-                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
-                    <bean:property name="annotationService" ref="annotationService"/>
+                <bean:bean id="importTermsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.UpdateTermsTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.metaboligths.database.name}" />
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.TRANSCRIPTOMIC_DATA"/>
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
                     </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="similarityStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                    <bean:property name="typeOfData" ref="dataTypesMetabolomics" />
+                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
+                    <bean:property name="termInDBService" ref="termInDBService"/>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
+                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
+                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -106,7 +137,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metaboligths.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -114,9 +145,9 @@
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.arrayexpress.prod.directory}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.arrayexpress.prefix}" />
+                    <bean:property name="databaseName" value="${ddi.common.metaboligths.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolights.prod.directory}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.metabolights.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
@@ -143,8 +174,19 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
+    <bean id="dataTypesMetabolomics" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
+
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
+
 
 
 </beans>

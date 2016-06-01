@@ -14,7 +14,7 @@ public class DDIException extends Exception{
     }
 
     public DDIException(String message, Throwable cause) {
-        super(message, cause);
+        super("The config file was removed or was not provided please check the folder config/config.xml", cause);
     }
 
     public DDIException(Throwable cause) {

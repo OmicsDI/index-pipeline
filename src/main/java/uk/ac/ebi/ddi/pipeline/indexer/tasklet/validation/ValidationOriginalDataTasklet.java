@@ -37,7 +37,7 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         File inFile = new File(directory);
         if(inFile.exists() && inFile.isDirectory()){
             File[] fileList = inFile.listFiles();
@@ -46,7 +46,7 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
                     files.add(a);
                 }
             }
-            Map<File, List<Tuple>> errors = new HashMap<File, List<Tuple>>();
+            Map<File, List<Tuple>> errors = new HashMap<>();
             for(File file: files){
                 List<Tuple> error = OmicsXMLFile.validateSchema(file);
                 error.addAll(OmicsXMLFile.validateSemantic(file));

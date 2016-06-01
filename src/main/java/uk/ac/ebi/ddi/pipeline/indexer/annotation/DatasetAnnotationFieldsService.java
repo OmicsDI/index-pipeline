@@ -1,19 +1,23 @@
 package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 
+import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
-import uk.ac.ebi.ddi.xml.validator.parser.model.Reference;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 18/11/2015
  */
 public class DatasetAnnotationFieldsService {
+
+    static Pattern pattern = Pattern.compile("(MSV[0-9]+)");
 
     public static Entry addpublicationDate(Entry dataset){
 
@@ -65,10 +69,31 @@ public class DatasetAnnotationFieldsService {
         return dataset;
     }
 
+    @Deprecated
     public static Entry cleanDescription(Entry dataset){
         if(dataset != null && dataset.getDescription() != null){
-            String finalDescription = "";
-            String[] descriptionArray = dataset.getDescription().toString().split("\\(\\[\\[");
+            String finalDescription;
+            String[] descriptionArray = dataset.getDescription().split("\\(\\[\\[");
+            if(descriptionArray.length > 1){
+                String[] descriptionArraySecond = descriptionArray[1].split("\\]\\]\\)");
+                if(descriptionArraySecond.length > 1){
+                    finalDescription = descriptionArray[0] + " " + descriptionArraySecond[1];
+                    dataset.setDescription(finalDescription);
+                }
+            }
+        }
+        return dataset;
+    }
+
+    /**
+     * Remove unecesary scripts from the description.
+     * @param dataset
+     * @return
+     */
+    public static Dataset cleanDescription(Dataset dataset){
+        if(dataset != null && dataset.getDescription() != null){
+            String finalDescription;
+            String[] descriptionArray = dataset.getDescription().split("\\(\\[\\[");
             if(descriptionArray.length > 1){
                 String[] descriptionArraySecond = descriptionArray[1].split("\\]\\]\\)");
                 if(descriptionArraySecond.length > 1){
@@ -83,10 +108,7 @@ public class DatasetAnnotationFieldsService {
     public static Entry replaceMEDLINEPubmed(Entry dataset){
 
         if(dataset.getCrossReferences() != null && !dataset.getCrossReferenceFieldValue(Field.MEDLINE.getName()).isEmpty()){
-            for(String value: dataset.getCrossReferenceFieldValue(Field.MEDLINE.getName())){
-                if(value != null && !value.isEmpty())
-                    dataset.addCrossReferenceValue(Field.PUBMED.getName(), value);
-            }
+            dataset.getCrossReferenceFieldValue(Field.MEDLINE.getName()).stream().filter(value -> value != null && !value.isEmpty()).forEach(value -> dataset.addCrossReferenceValue(Field.PUBMED.getName(), value));
             dataset.removeCrossReferences(Field.MEDLINE.getName());
         }
         return dataset;
@@ -106,5 +128,15 @@ public class DatasetAnnotationFieldsService {
             dataset.setKeywords(null);
         }
         return dataset;
+    }
+
+    public static Dataset addCrossReferenceAnnotation(Dataset existing) {
+
+        Matcher matcher  = pattern.matcher(existing.getDescription());
+        boolean match = matcher.find();
+        if(match){
+            DatasetUtils.addCrossReferenceValue(existing, "ProteomeXChange", matcher.group(0));
+        }
+        return existing;
     }
 }

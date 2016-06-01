@@ -21,9 +21,7 @@ public class ExecutionContextThrowablePromotionListener extends StepExecutionLis
 
         List<Throwable> exceptions = stepExecution.getFailureExceptions();
         if (!exceptions.isEmpty()) {
-            for (Throwable exception : exceptions) {
-                jobExecution.addFailureException(exception);
-            }
+            exceptions.forEach(jobExecution::addFailureException);
         }
 
         return ExitStatus.COMPLETED;

@@ -7,11 +7,12 @@
 
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:context/mongo-db-context.xml"/>
-    <import resource="classpath*:context/email-context.xml"/>
     <import resource="classpath*:jobs/ddi-massive.xml"/>
+    <import resource="classpath*:context/email-context.xml"/>
 
-
-    <bean class="org.springframework.batch.test.JobLauncherTestUtils"/>
+    <bean class="org.springframework.batch.test.JobLauncherTestUtils">
+        <property name="job" ref="ddiImportJob"/>
+    </bean>
 
     <context:property-placeholder
             location="classpath:prop/common-override.properties, classpath:prop/submission-email-override.properties"

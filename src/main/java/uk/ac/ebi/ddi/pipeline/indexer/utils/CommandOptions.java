@@ -17,7 +17,7 @@ public enum CommandOptions {
 
     private final String name;
 
-    private CommandOptions(String name) {
+    CommandOptions(String name) {
         this.name = name;
     }
 
@@ -26,7 +26,7 @@ public enum CommandOptions {
     }
 
     public static List<String> getValuesName() {
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         for (CommandOptions command : values())
             values.add(command.getName());
         return values;

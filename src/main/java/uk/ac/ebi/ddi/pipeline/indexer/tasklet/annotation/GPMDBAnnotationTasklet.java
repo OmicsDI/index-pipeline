@@ -3,6 +3,13 @@ package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.web.client.RestClientException;
+import uk.ac.ebi.ddi.annotation.service.crossreferences.CrossReferencesProteinDatabasesService;
+import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
+import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+
+import java.util.List;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -13,49 +20,21 @@ public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
-//        List<Entry> listToPrint = new ArrayList<>();
-//        int counterFiles = 1;
-//
-//        if(inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()){
-//            for(File file: inputDirectory.getFile().listFiles()){
-//                try{
-//                    OmicsXMLFile reader = new OmicsXMLFile(file);
-//                    reader.setDatabaseName("GPMDB");
-//                    for(String id: reader.getEntryIds()){
-//
-//                        logger.info("The ID: " + id + " will be enriched!!");
-//                        Entry dataset = reader.getEntryById(id);
-//
-//                        DatasetAnnotationFieldsService.addpublicationDate(dataset);
-//
-//                        dataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, dataset);
-//
-//                        dataset = DatasetAnnotationFieldsService.cleanDescription(dataset);
-//
-//                        dataset = CrossReferencesProteinDatabasesService.annotateGPMDBProteins(dataset);
-//
-//                        dataset = CrossReferencesProteinDatabasesService.annotateCrossReferences(dataset);
-//
-//                        listToPrint.add(dataset);
-//
-//                        if(listToPrint.size() == numberEntries){
-//                            DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
-//                            listToPrint.clear();
-//                            counterFiles++;
-//                        }
-//                    }
-//                    // This must be printed before leave because it contains the end members of the list.
-//                    if(!listToPrint.isEmpty()){
-//                        DDIFile.writeList(reader, listToPrint, prefixFile, counterFiles, outputDirectory.getFile());
-//                        listToPrint.clear();
-//                        counterFiles++;
-//                    }
-//                }catch (Exception e){
-//                    logger.info("Error Reading file: " + e.getMessage());
-//                }
-//
-//            }
-//        }
+        List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
+
+        datasets.parallelStream().forEach( dataset -> {
+            Dataset existing = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+            DatasetAnnotationFieldsService.addpublicationDate(existing);
+            existing = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, existing);
+            existing = DatasetAnnotationFieldsService.cleanDescription(existing);
+            existing = DatasetAnnotationFieldsService.addCrossReferenceAnnotation(existing);
+            try{
+                existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
+            }catch(RestClientException ex){
+                logger.debug(ex.getMessage());
+            }
+            datasetAnnotationService.updateDataset(existing);
+        });
         return RepeatStatus.FINISHED;
     }
 }

@@ -2,21 +2,19 @@ package uk.ac.ebi.ddi.pipeline.indexer.cli;
 
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.ddi.pipeline.indexer.exception.DDIException;
 import uk.ac.ebi.ddi.pipeline.indexer.model.DataSource;
 
 
-import javax.naming.NamingException;
-import javax.xml.crypto.Data;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -37,7 +35,7 @@ public class ConfigurationFileBootstrap {
         XMLConfiguration config = null;
         try
         {
-            URL pathURL = getFullPath(ConfigurationFileBootstrap.class, "config/config.xml");
+            URL pathURL = getFullPath(ConfigurationFileBootstrap.class);
             config = new XMLConfiguration(pathURL);
         }
         catch(ConfigurationException cex){
@@ -50,10 +48,9 @@ public class ConfigurationFileBootstrap {
      * This function provides a way to retrieve the config file from the config folder for the project
      *
      * @param cs
-     * @param subPath
      * @return URL
      */
-    private static URL getFullPath(Class cs, String subPath) {
+    private static URL getFullPath(Class cs) {
 
         if ( cs == null) {
             throw new IllegalArgumentException("Input class cannot be NULL");
@@ -63,13 +60,13 @@ public class ConfigurationFileBootstrap {
 
         CodeSource src = cs.getProtectionDomain().getCodeSource();
         if (src != null) {
-            if (subPath == null) {
+            if ("config/config.xml" == null) {
                 fullPath = src.getLocation();
             } else {
                 try {
-                    fullPath = new URL(src.getLocation(), subPath);
+                    fullPath = new URL(src.getLocation(), "config/config.xml");
                 } catch (MalformedURLException e) {
-                    logger.error("Failed to create a new URL based on: " + subPath);
+                    logger.error("Failed to create a new URL based on: " + "config/config.xml");
                 }
             }
         }
@@ -78,7 +75,7 @@ public class ConfigurationFileBootstrap {
     }
 
     public static List<DataSource> getDataSources(XMLConfiguration config){
-        List<DataSource> dataSources = new ArrayList<DataSource>();
+        List<DataSource> dataSources = new ArrayList<>();
         if(config != null){
             Object prop = config.getProperty("sources.source.name");
             if(prop instanceof Collection){
@@ -117,9 +114,6 @@ public class ConfigurationFileBootstrap {
      * @return A list of all databases or sources to be use
      */
     public static List<String> getSourceNames(XMLConfiguration config) {
-        List<String> sources = new ArrayList<String>();
-        for(DataSource source: getDataSources(config))
-            sources.add(source.getName());
-        return sources;
+        return getDataSources(config).stream().map(DataSource::getName).collect(Collectors.toList());
     }
 }

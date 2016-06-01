@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.metaboligths;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.gpmdb;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +18,8 @@ import static org.junit.Assert.assertEquals;
  * Created by yperez on 30/05/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/metabolights/ddi-indexer-test-metaboligths-similarity.xml"})
-public class SimilarityPrideTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/pride/ddi-indexer-test-pride-similarity.xml"})
+public class SimilarityGPMDBTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

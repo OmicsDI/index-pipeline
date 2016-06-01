@@ -12,9 +12,7 @@ import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet;
-import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
@@ -46,14 +44,14 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<Pair<String,String>>();
+        CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<>();
         Arrays.asList(inputDirectory.getFile().listFiles()).parallelStream().forEach(file ->{
             try{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
 
                     datasetAnnotationService.insertDataset(dataEntry, databaseName);
-                    threadSafeList.add(new Pair<String, String>(dataEntry.getId(), dataEntry.getDatabase()));
+                    threadSafeList.add(new Pair<>(dataEntry.getId(), dataEntry.getDatabase()));
                     logger.debug("Dataset: " + dataEntry.toString() + "has been added");
                 });
 
@@ -64,31 +62,25 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
         if(inputDirectory.getFile().listFiles() != null && inputDirectory.getFile().listFiles().length > 0){
             OmicsXMLFile file = new OmicsXMLFile(inputDirectory.getFile().listFiles()[0]);
-            databaseAnnotationService.updateDatabase(file.getName(),file.getDescription(), file.getReleaseDate(), file.getRelease(), null,null);
+            databaseAnnotationService.updateDatabase(databaseName,file.getDescription(), file.getReleaseDate(), file.getRelease(), null,null);
         }
 
         //Todo: Here we need to be carefully. We need to know when a dataset has been removed or not. For now we will consider a dataset
         //Todo: as removed is they are not included in one of the releases.
 
-        Set<String> databases = threadSafeList.parallelStream().map(x -> x.getValue()).collect(Collectors.toSet());
+        Set<String> databases = threadSafeList.parallelStream().map(Pair::getValue).collect(Collectors.toSet());
         CopyOnWriteArrayList<Pair<List<Dataset>, String>> datasets = new CopyOnWriteArrayList<>();
-        databases.parallelStream().forEach( database ->{
-            datasets.add( new Pair<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database));
-        });
+        databases.parallelStream().forEach( database -> datasets.add( new Pair<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database)));
 
         CopyOnWriteArrayList<Dataset> removed = new CopyOnWriteArrayList<>();
-        datasets.parallelStream().forEach(x -> {
-            x.getKey().parallelStream().forEach( dataset ->{
-                Pair<String, String> pair = new Pair<>(dataset.getAccession(), dataset.getDatabase());
-                if(!threadSafeList.contains(pair)){
-                    removed.add(dataset);
-                }
-            });
-        });
+        datasets.parallelStream().forEach(x -> x.getKey().parallelStream().forEach(dataset ->{
+            Pair<String, String> pair = new Pair<>(dataset.getAccession(), dataset.getDatabase());
+            if(!threadSafeList.contains(pair)){
+                removed.add(dataset);
+            }
+        }));
 
-        removed.stream().forEach( x -> {
-            datasetAnnotationService.updateDeleteStatus(x);
-        });
+        removed.stream().forEach( x -> datasetAnnotationService.updateDeleteStatus(x));
 
         return RepeatStatus.FINISHED;
     }

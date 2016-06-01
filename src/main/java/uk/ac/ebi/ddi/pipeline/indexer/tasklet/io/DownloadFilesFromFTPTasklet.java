@@ -1,6 +1,5 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;

@@ -58,11 +58,7 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
                 logger.debug(enrichedDataset.getEnrichedSampleProtocol());
                 logger.debug(enrichedDataset.getEnrichedDataProtocol());
                 datasetAnnotationService.enrichedDataset(existingDataset);
-                } catch (DDIException e) {
-                    e.printStackTrace();
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
+                } catch (DDIException | UnsupportedEncodingException | JSONException e) {
                     e.printStackTrace();
                 }
         });

@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.publication.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
+import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
 import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
@@ -31,6 +32,8 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
+    NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
@@ -41,6 +44,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
                 Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
                 exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
                 exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
+                exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
                 datasetAnnotationService.annotateDataset(exitingDataset);
             }catch (RestClientException ex){
                 logger.debug(ex.getMessage());

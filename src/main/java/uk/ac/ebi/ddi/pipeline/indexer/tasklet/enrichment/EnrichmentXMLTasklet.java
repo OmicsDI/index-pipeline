@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService;
@@ -53,12 +54,9 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
             try {
                 enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset);
                 dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
-                logger.debug(enrichedDataset.getEnrichedTitle());
-                logger.debug(enrichedDataset.getEnrichedAbstractDescription());
-                logger.debug(enrichedDataset.getEnrichedSampleProtocol());
-                logger.debug(enrichedDataset.getEnrichedDataProtocol());
+                logger.debug(enrichedDataset.getEnrichedAttributes().toString());
                 datasetAnnotationService.enrichedDataset(existingDataset);
-                } catch (DDIException | UnsupportedEncodingException | JSONException e) {
+                } catch (DDIException | RestClientException | UnsupportedEncodingException | JSONException e) {
                     e.printStackTrace();
                 }
         });

@@ -62,7 +62,6 @@ public class DecompressFilesTasklet extends AbstractTasklet {
                         decompressedFile = gunzip(compressedFile, targetDir);
                         break;
                     default:
-                        decompressedFile = null;
                         break;
                 }
 
@@ -130,7 +129,7 @@ public class DecompressFilesTasklet extends AbstractTasklet {
      * decompress gzip file
      */
     private File gunzip(File file, File targetDir) throws IOException {
-        File decompressedFile = null;
+        File decompressedFile;
         FileInputStream fileInputStream = new FileInputStream(file);
 
 

@@ -7,11 +7,11 @@
 
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:prop/mongo-db-context-test.xml"/>
-    <import resource="classpath*:jobs/ddi-pride.xml"/>
+    <import resource="classpath*:jobs/ddi-metabolomeexpress.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">
-        <property name="job" ref="ddiImportJob"/>
+        <property name="job" ref="similarityJob"/>
     </bean>
 
     <context:property-placeholder

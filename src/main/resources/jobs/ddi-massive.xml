@@ -25,7 +25,6 @@
                 <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyeMassiveXMLTasklet">
                     <bean:property name="outputDirectory" value="${ddi.common.massive.original.directory}"/>
                     <bean:property name="massiveConfig" ref="massiveWsConfig"/>
-                    <bean:property name="taxonomyConfig" ref="taxMassiveWsConfig"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -116,8 +115,8 @@
     <batch:job id="ddiEnrichmentJob">
         <batch:step id="enrichmentStep" parent="parentStep" next="enrichmentGNPSStep">
             <batch:tasklet>
-                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.massive.database.name" />
+                <bean:bean id="enrichmentMassiveTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.massive.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
@@ -129,8 +128,8 @@
 
         <batch:step id="enrichmentGNPSStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.GNPS.database.name}" />
+                <bean:bean id="enrichmentGNPSTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.gnps.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
@@ -142,10 +141,9 @@
     </batch:job>
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
-
         <batch:step id="cleanMassiveStep" next="moveMassiveToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanMassiveTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
                     <bean:property name="inputDirectory" value="file:${ddi.common.massive.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
@@ -153,7 +151,7 @@
 
         <batch:step id="moveMassiveToProductionStep" parent="parentStep" next="cleanGNPSStep">
             <batch:tasklet>
-                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                <bean:bean id="generateMassiveFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.massive.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.massive.prod.directory}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.massive.prefix}" />
@@ -166,7 +164,7 @@
 
         <batch:step id="cleanGNPSStep" next="moveGNPSToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanGNPSTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
                     <bean:property name="inputDirectory" value="file:${ddi.common.gnps.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
@@ -174,7 +172,7 @@
 
         <batch:step id="moveGNPSToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                <bean:bean id="generateGNPSFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.gnps.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.gnps.prod.directory}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.gnps.prefix}" />

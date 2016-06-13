@@ -30,7 +30,7 @@ public class ConfigurationFileBootstrap {
      *
      * @return Properties   bootstrap settings.
      */
-    public static XMLConfiguration getBootstrapSettings() {
+    public static XMLConfiguration getBootstrapSettings() throws DDIException {
         // load properties
         XMLConfiguration config = null;
         try
@@ -39,7 +39,7 @@ public class ConfigurationFileBootstrap {
             config = new XMLConfiguration(pathURL);
         }
         catch(ConfigurationException cex){
-            new DDIException("The config file was removed or was not provided please check the folder config/config.xml", cex);
+            throw  new DDIException("The config file was removed or was not provided please check the folder config/config.xml", cex);
         }
         return config;
     }

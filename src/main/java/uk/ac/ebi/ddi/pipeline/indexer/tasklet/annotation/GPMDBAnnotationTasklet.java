@@ -10,12 +10,16 @@ import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 03/12/2015
  */
 public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
+
+    private List<String> databases;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -30,11 +34,24 @@ public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
             existing = DatasetAnnotationFieldsService.addCrossReferenceAnnotation(existing);
             try{
                 existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
+                Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);
+                if(!similars.isEmpty())
+                    datasetAnnotationService.updateDatasetSimilars(existing.getId(), existing.getAccession(), existing.getDatabase(), similars);
             }catch(RestClientException ex){
                 logger.debug(ex.getMessage());
             }
             datasetAnnotationService.updateDataset(existing);
+
+
         });
         return RepeatStatus.FINISHED;
+    }
+
+    public List<String> getDatabases() {
+        return databases;
+    }
+
+    public void setDatabases(List<String> databases) {
+        this.databases = databases;
     }
 }

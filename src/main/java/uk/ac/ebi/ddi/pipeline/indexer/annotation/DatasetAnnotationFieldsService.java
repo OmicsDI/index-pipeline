@@ -6,6 +6,8 @@ import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -17,7 +19,8 @@ import java.util.regex.Pattern;
  */
 public class DatasetAnnotationFieldsService {
 
-    static Pattern pattern = Pattern.compile("(MSV[0-9]+)");
+    static Pattern patternMassive = Pattern.compile("(MSV[0-9]+)");
+    static Pattern patternPX = Pattern.compile("(PXD[0-9]+)");
 
     public static Entry addpublicationDate(Entry dataset){
 
@@ -132,11 +135,29 @@ public class DatasetAnnotationFieldsService {
 
     public static Dataset addCrossReferenceAnnotation(Dataset existing) {
 
-        Matcher matcher  = pattern.matcher(existing.getDescription());
+        Matcher matcher  = patternMassive.matcher(existing.getDescription());
         boolean match = matcher.find();
+        if(match){
+            DatasetUtils.addCrossReferenceValue(existing, "Massive", matcher.group(0));
+        }
+
+        matcher  = patternPX.matcher(existing.getDescription());
+        match = matcher.find();
         if(match){
             DatasetUtils.addCrossReferenceValue(existing, "ProteomeXChange", matcher.group(0));
         }
+
         return existing;
+    }
+
+    public static Map<String, Set<String>> getCrossSimilars(Dataset dataset, List<String> databases){
+        Map<String, Set<String>> similars = new HashMap<>();
+        if(dataset.getCrossReferences() != null && !dataset.getCrossReferences().isEmpty())
+            dataset.getCrossReferences().entrySet().stream().forEach(cross -> {
+                if (databases.contains(cross.getKey())) {
+                    similars.put(cross.getKey(), cross.getValue());
+                }
+            });
+        return similars;
     }
 }

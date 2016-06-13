@@ -13,7 +13,7 @@
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
-    <mongo:mongo-client credentials="${ddi.mongo.app.user}:${ddi.mongo.app.password}@${ddi.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
+    <mongo:mongo-client id="mongoClient" host="localhost" port="27017">
         <mongo:client-options connections-per-host="5"
                               threads-allowed-to-block-for-connection-multiplier="10"
                               connect-timeout="100000"
@@ -42,8 +42,8 @@
 <bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
 
 <bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
-<bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
 <bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
+<bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
 <bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
 <bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
 <bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
@@ -52,6 +52,5 @@
 
 <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
 <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
-
 
 </beans>

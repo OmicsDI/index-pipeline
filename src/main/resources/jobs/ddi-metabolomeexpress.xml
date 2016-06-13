@@ -13,27 +13,28 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
+
     <description>
-        This job generate the XML for a GPMDB to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
-        between different datasets .
+        This job generate the XML for a MetabolomeExpress to be submitted to OmicsDI system including download the file and the enrichment.
     </description>
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="copyFromSource" parent="parentStep" next="copyFilesToData">
+        <batch:step id="copyFileFromResource" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
-                <bean:bean id="copyFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.gpmdb.source.directory}"/>
-                    <bean:property name="targetDirectory" value="file:${ddi.common.gpmdb.original.directory}"/>
+                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilefromURLTasklet">
+                    <bean:property name="originalFileURL" value="${ddi.common.metabolomeexpress.source.file}"/>
+                    <bean:property name="targetFileName" value="${ddi.common.metabolomeexpress.original.file}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
+
         <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.gpmdb.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.gpmdb.data.directory}" />
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFileToDirectoryTasklet">
+                    <bean:property name="sourceFile" value="file:${ddi.common.metabolomeexpress.original.file}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.metabolomeexpress.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -41,7 +42,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.gpmdb.data.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.metabolomeexpress.data.directory}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -50,11 +51,11 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.gpmdb.annotated.directory}"/>
-                    <bean:property name="originalPrefix"  value="${ddi.common.gpmdb.prefix}" />
-                    <bean:property name="numberEntries"   value="${ddi.common.single.file.number.entries}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.gpmdb.prefix}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolomeexpress.data.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolomeexpress.annotated.directory}"/>
+                    <bean:property name="originalPrefix"  value="${ddi.common.ega.pattern}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.metabolomeexpress.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -62,52 +63,50 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.annotated.directory}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolomeexpress.annotated.directory}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
-                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.metabolomeexpress.database.name}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="annotationFiles" parent="parentStep">
+        <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
             <batch:tasklet>
-                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.GPMDBAnnotationTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}"/>
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.metabolomeexpress.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="databases" ref="crossDatabases" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
+
+        <batch:step id="enrichmentStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.metabolomeexpress.database.name}" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+                    </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
 
         <batch:listeners>
             <batch:listener ref="jobListener"/>
         </batch:listeners>
     </batch:job>
 
-    <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
-        <batch:step id="enrichmentStep" parent="parentStep">
-            <batch:tasklet>
-                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name" />
-                    <bean:property name="annotationService" ref="annotationService"/>
-                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
-                    </bean:property>
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-    </batch:job>
-
     <batch:job id="similarityJob">
         <batch:step id="importTerms" parent="parentStep" next="similarityStep">
             <batch:tasklet>
                 <bean:bean id="importTermsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.UpdateTermsTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.metabolomeexpress.database.name}" />
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
                     </bean:property>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
                 </bean:bean>
@@ -117,7 +116,7 @@
         <batch:step id="similarityStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
+                    <bean:property name="typeOfData" ref="dataTypesMetabolomics" />
                     <bean:property name="mongoTemplate" ref="mongoTemplate" />
                     <bean:property name="termInDBService" ref="termInDBService"/>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
@@ -133,7 +132,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.prod.directory}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.metabolomeexpress.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -141,9 +140,9 @@
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.gpmdb.prod.directory}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.gpmdb.prefix}" />
+                    <bean:property name="databaseName" value="${ddi.common.metabolomeexpress.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.metabolomeexpress.prod.directory}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.metabolomeexpress.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
@@ -170,24 +169,15 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
-    <bean id="dataTypesProteomics" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
-            </list>
-        </constructor-arg>
-    </bean>
-
-    <bean id="crossDatabases" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <value>${ddi.common.massive.database.name}</value>
-                <value>${ddi.common.pride.database.name}</value>
-            </list>
-        </constructor-arg>
-    </bean>
-
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
+
+    <bean id="dataTypesMetabolomics" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.METABOLOMICS_DATA"/>
+            </list>
+        </constructor-arg>
+    </bean>
 
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>

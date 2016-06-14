@@ -79,7 +79,7 @@
         <batch:step id="enrichmentStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.pride.database.name" />
+                    <bean:property name="databaseName" value="${ddi.common.pride.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >

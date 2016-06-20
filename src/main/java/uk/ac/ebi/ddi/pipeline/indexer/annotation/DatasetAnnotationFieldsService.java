@@ -6,10 +6,7 @@ import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -159,5 +156,14 @@ public class DatasetAnnotationFieldsService {
                 }
             });
         return similars;
+    }
+
+    public static Dataset cleanRepository(Dataset dataset, String database) {
+        if(dataset.getAdditional().containsKey(Field.REPOSITORY.getName())){
+            Set<String> databaseSet = new HashSet<>();
+            databaseSet.add(database);
+            dataset.addAdditional(Field.REPOSITORY.getName(), databaseSet);
+        }
+        return dataset;
     }
 }

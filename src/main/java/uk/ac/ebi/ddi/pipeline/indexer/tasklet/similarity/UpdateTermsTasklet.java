@@ -48,7 +48,7 @@ public class UpdateTermsTasklet extends AbstractTasklet {
                 .collect(Collectors.toList());
         datasets.parallelStream().forEach(dataset -> {
             dataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType,ddiExpDataImportService);
+            DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType, ddiExpDataImportService);
         });
         return RepeatStatus.FINISHED;
     }

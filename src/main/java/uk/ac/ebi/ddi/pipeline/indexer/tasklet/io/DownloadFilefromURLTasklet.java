@@ -25,13 +25,6 @@ public class DownloadFilefromURLTasklet extends AbstractTasklet{
 
     String targetFileName;
 
-//    @Override
-//    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-//        FileUtils.copyURLToFile(new URL(originalFileURL), new File(targetFileName));
-//        return RepeatStatus.FINISHED;
-//    }
-
-
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         // Create a new trust manager that trust all certificates

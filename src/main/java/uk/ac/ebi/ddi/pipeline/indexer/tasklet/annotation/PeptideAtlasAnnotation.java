@@ -34,7 +34,7 @@ public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
                 existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
                 Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);
                 if(!similars.isEmpty())
-                    datasetAnnotationService.updateDatasetSimilars(existing.getId(), existing.getAccession(), existing.getDatabase(), similars);
+                    datasetAnnotationService.addDatasetReanalisisSimilars(existing, similars);
             }catch(RestClientException ex){
                 logger.debug(ex.getMessage());
             }

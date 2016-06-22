@@ -26,18 +26,18 @@ public class SimilarsEnrichmentTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets();
-        datasetList = datasetList.parallelStream().filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty()).collect(Collectors.toList());
-        Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
-        publicationMap.entrySet().parallelStream().forEach( publication -> {
-            publication.getValue().parallelStream().forEach( x -> {
-                List<PublicationDataset> similars = publication.getValue().stream().filter(dat -> dat.getDatasetID() != x.getDatasetID()).collect(Collectors.toList());
-                Map<String, Set<String>> similarMap = similars.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getDatabase, Collectors.mapping(PublicationDataset::getDatasetID, Collectors.toSet())));
-                datasetAnnotationService.updateDatasetSimilars(x.getDatasetID(), x.getDatabase(), similarMap);
-                });
-            }
-        );
-        return RepeatStatus.FINISHED;
+//        List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets();
+//        datasetList = datasetList.parallelStream().filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty()).collect(Collectors.toList());
+//        Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
+//        publicationMap.entrySet().parallelStream().forEach( publication -> {
+//            publication.getValue().parallelStream().forEach( x -> {
+//                List<PublicationDataset> similars = publication.getValue().stream().filter(dat -> dat.getDatasetID() != x.getDatasetID()).collect(Collectors.toList());
+//                Map<String, Set<String>> similarMap = similars.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getDatabase, Collectors.mapping(PublicationDataset::getDatasetID, Collectors.toSet())));
+//                datasetAnnotationService.updateDatasetSimilars(x.getDatasetID(), x.getDatabase(), similarMap);
+//                });
+//            }
+//        );
+          return RepeatStatus.FINISHED;
     }
 
     @Override

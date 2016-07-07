@@ -1,11 +1,15 @@
 package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 
+import org.apache.log4j.Logger;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
+import uk.ac.ebi.ddi.xml.validator.utils.Utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,6 +22,8 @@ public class DatasetAnnotationFieldsService {
 
     static Pattern patternMassive = Pattern.compile("(MSV[0-9]+)");
     static Pattern patternPX = Pattern.compile("(PXD[0-9]+)");
+
+    private static final Logger logger = Logger.getLogger(DatasetAnnotationFieldsService.class);
 
     public static Entry addpublicationDate(Entry dataset){
 
@@ -165,5 +171,54 @@ public class DatasetAnnotationFieldsService {
             dataset.addAdditional(Field.REPOSITORY.getName(), databaseSet);
         }
         return dataset;
+    }
+
+    public static Dataset addInformationFromOriginal(Dataset originalDataset, Dataset reanalysisDataset){
+        if(originalDataset.getName() != null && !originalDataset.getName().isEmpty()){
+            reanalysisDataset.setName(originalDataset.getName());
+        }
+        if(originalDataset.getDescription() != null && !originalDataset.getDescription().isEmpty()){
+            reanalysisDataset.setDescription(originalDataset.getDescription());
+        }
+        if(originalDataset.getAdditional().containsKey(Field.SAMPLE.getName())){
+            reanalysisDataset.addAdditional(Field.SAMPLE.getName(), originalDataset.getAdditional().get(Field.SAMPLE.getName()));
+        }
+        if(originalDataset.getCrossReferences() != null){
+            for(Map.Entry entry: originalDataset.getCrossReferences().entrySet()){
+                String key = (String) entry.getKey();
+                Set<String> values = (Set<String>) entry.getValue();
+                reanalysisDataset.addCrossReferences(key, values);
+            }
+        }
+        return reanalysisDataset;
+    }
+
+    public static Dataset refineDates(Dataset dataset) {
+        if(dataset.getDates() !=null && !dataset.getDates().isEmpty()){
+            Map<String, Set<String>> newDates = new HashMap<>();
+            for(String dateField: dataset.getDates().keySet()){
+                Set<String> newValues = new HashSet<>();
+                for(String oldDate: dataset.getDates().get(dateField))
+                    newValues.add(returnDate(oldDate));
+                newDates.put(dateField, newValues);
+            }
+            dataset.setDates(newDates);
+        }
+        return dataset;
+    }
+
+    private static String returnDate(String value) {
+        String[] dateValues = new String[]{"yyyy-MM-dd", "dd-MMM-yyyy HH:mm:ss"};
+
+        for(String dateStr: dateValues){
+            try {
+                java.util.Date date = new SimpleDateFormat(dateStr).parse(value);
+                return new SimpleDateFormat("yyyy-MM-dd").format(date);
+            } catch (ParseException e) {
+                logger.debug(e.getMessage());
+            }
+        }
+
+        return value;
     }
 }

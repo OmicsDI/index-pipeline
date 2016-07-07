@@ -8,7 +8,6 @@ import uk.ac.ebi.ddi.annotation.service.crossreferences.CrossReferencesProteinDa
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.service.db.utils.DatasetSimilarsType;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
                 existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
                 Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);
                 if(!similars.isEmpty()) {
-                    datasetAnnotationService.addDatasetReanalisisSimilars(existing, similars);
+                    datasetAnnotationService.addDatasetReanalysisSimilars(existing, similars);
                 }
             }catch(RestClientException ex){
                 logger.debug(ex.getMessage());

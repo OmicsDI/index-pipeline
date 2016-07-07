@@ -22,9 +22,9 @@
 
         <batch:step id="copyFileFromResource" parent="parentStep" next="copyFilesToData">
             <batch:tasklet>
-                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilefromURLTasklet">
-                    <bean:property name="originalFileURL" value="${ddi.common.atlas.source.file}"/>
-                    <bean:property name="targetFileName" value="${ddi.common.atlas.original.file}"/>
+                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadPeptideAtlasSummaryFileTasklet">
+                    <bean:property name="originalFolder" value="${ddi.common.atlas.original.folder}"/>
+                    <bean:property name="peptideAtlasSumamryFile" value="${ddi.common.atlas.source.file}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -32,9 +32,10 @@
 
         <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFileToDirectoryTasklet">
-                    <bean:property name="sourceFile" value="file:${ddi.common.atlas.original.file}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.atlas.data.directory}" />
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.atlas.original.folder}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.atlas.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.ega.pattern}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -98,6 +99,34 @@
         <batch:listeners>
             <batch:listener ref="jobListener"/>
         </batch:listeners>
+    </batch:job>
+
+    <batch:job id="similarityJob">
+        <batch:step id="importTerms" parent="parentStep" next="similarityStep">
+            <batch:tasklet>
+                <bean:bean id="importTermsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.UpdateTermsTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                    </bean:property>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="similarityStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
+                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
+                    <bean:property name="mongoTemplate" ref="mongoTemplate" />
+                    <bean:property name="termInDBService" ref="termInDBService"/>
+                    <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
+                    <bean:property name="ddiExpDataProcessService" ref="ddiExpDataProcessService"/>
+                    <bean:property name="expOutputDatasetService" ref="expOutputDatasetService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
     </batch:job>
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">

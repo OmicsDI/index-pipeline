@@ -52,7 +52,7 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
             Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
             EnrichedDataset enrichedDataset = null;
             try {
-                enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset);
+                enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset, false);
                 dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
                 logger.debug(enrichedDataset.getEnrichedAttributes().toString());
                 datasetAnnotationService.enrichedDataset(existingDataset);

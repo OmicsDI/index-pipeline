@@ -22,22 +22,7 @@
     <!--listen to the job execution status-->
     <bean id="jobListener" class="uk.ac.ebi.ddi.pipeline.indexer.pipeline.listener.PipelineJobStatusListener"/>
 
-    <!--
-        There should be one persister per submission/dataset, which should be defined by the submission ticket number ('submission.ticket').
-        Known keys to store data in validation part
-    -->
-    <!--<bean id="fileSystemPersisterFactory2" class="uk.ac.ebi.pride.io.FileSystemPersisterFactory">-->
-        <!--<constructor-arg name="locationPrefix" value="file:${spring.batch.tmp.persistence.dir}"/>-->
-    <!--</bean>-->
 
-    <!--load property files-->
-    <!--<context:property-placeholder location="classpath:prop/common.properties, classpath:prop/accession.properties"-->
-                                  <!--ignore-unresolvable="true" order="1"/>-->
-    <!--<bean id="jobRepository" scope="prototype" class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean">-->
-        <!--&lt;!&ndash;<property name="dataSource" ref="dataSource"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;<property name="transactionManager" ref="transactionManager"/>&ndash;&gt;-->
-        <!--&lt;!&ndash;<property name="isolationLevelForCreate" value="ISOLATION_READ_COMMITTED"/>&ndash;&gt;-->
-    <!--</bean>-->
     <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
       <property name="transactionManager" ref="transactionManager"/>
     </bean>

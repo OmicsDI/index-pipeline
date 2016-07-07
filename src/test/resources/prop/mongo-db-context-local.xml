@@ -27,28 +27,28 @@
 
     <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
 
-<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-<constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
-</bean>
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
 
 
-<bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
-<bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
-<bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
-<bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService" />
-<bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
+    <bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
+    <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
+    <bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
+    <bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService" />
+    <bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
 
-<bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
-<bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
-<bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
-<bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
-<bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
-<bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
-<bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
-<bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
+    <bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
+    <bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
+    <bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
+    <bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
+    <bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
+    <bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
+    <bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
+    <bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
 
-<bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
-<bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
+    <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
+    <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
 
 
 </beans>

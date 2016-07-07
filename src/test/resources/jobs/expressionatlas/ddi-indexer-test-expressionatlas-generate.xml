@@ -6,12 +6,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <import resource="classpath*:context/common-context.xml"/>
-    <import resource="classpath*:prop/mongo-db-context-local.xml"/>
-    <import resource="classpath*:jobs/ddi-gpmdb.xml"/>
+    <import resource="classpath*:prop/mongo-db-context-test.xml"/>
+    <import resource="classpath*:jobs/ddi-expressionatlas.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">
-        <property name="job" ref="ddiEnrichmentJob"/>
+        <property name="job" ref="generatetionJob"/>
     </bean>
 
     <context:property-placeholder

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <import resource="classpath*:context/common-context.xml"/>
+    <import resource="classpath*:prop/mongo-db-context-local.xml"/>
+    <import resource="classpath*:jobs/ddi-date-annotation.xml"/>
+    <import resource="classpath*:context/email-context.xml"/>
+
+    <bean class="org.springframework.batch.test.JobLauncherTestUtils">
+        <property name="job" ref="dateAnnotationJob"/>
+    </bean>
+
+    <context:property-placeholder
+            location="classpath:prop/common-override.properties, classpath:prop/submission-email-override.properties"
+            ignore-unresolvable="true" ignore-resource-not-found="true" order="-1"/>
+
+    <util:properties id="config" location="classpath:prop/common-override.properties"/>
+
+
+
+</beans>

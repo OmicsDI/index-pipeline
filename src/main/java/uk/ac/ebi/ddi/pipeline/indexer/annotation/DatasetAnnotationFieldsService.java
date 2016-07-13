@@ -208,7 +208,7 @@ public class DatasetAnnotationFieldsService {
     }
 
     private static String returnDate(String value) {
-        String[] dateValues = new String[]{"yyyy-MM-dd", "dd-MMM-yyyy HH:mm:ss"};
+        String[] dateValues = new String[]{"yyyy-MM-dd", "dd-MMM-yyyy HH:mm:ss", "yy-MM-dd"};
 
         for(String dateStr: dateValues){
             try {

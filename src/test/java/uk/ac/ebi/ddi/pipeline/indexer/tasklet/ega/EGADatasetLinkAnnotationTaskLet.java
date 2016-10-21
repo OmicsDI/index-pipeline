@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.peptideatlas;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ega;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +15,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by yperez on 29/05/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * == General Description ==
+ * <p>
+ * This class Provides a general information or functionalities for
+ * <p>
+ * ==Overview==
+ * <p>
+ * How to used
+ * <p>
+ * Created by yperez (ypriverol@gmail.com) on 21/10/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/peptideatlas/ddi-indexer-test-peptideatlas-generate.xml"})
-public class GeneratePeptideAtlasTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/ega/ddi-indexer-test-egalink-annotation.xml"})
+public class EGADatasetLinkAnnotationTaskLet {
+
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
 
@@ -29,7 +44,7 @@ public class GeneratePeptideAtlasTaskletTest {
 
 
     @Autowired
-    @Qualifier("generationJob")
+    @Qualifier("annotationJob")
     private Job job;
 
 

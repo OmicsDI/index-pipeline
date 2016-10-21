@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:jobs/metabolights/ddi-indexer-test-metaboligths-similarity.xml"})
-public class SimilarityPrideTaskletTest {
+public class SimilarityMWTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

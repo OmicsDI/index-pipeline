@@ -4,6 +4,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.FileUtil;
 
@@ -26,6 +27,8 @@ public class DownloadPeptideAtlasSummaryFileTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+
+        DDICleanDirectory.cleanDirectory(originalFolder);
 
         // Create a new trust manager that trust all certificates
         TrustManager[] trustAllCerts = new TrustManager[]{
@@ -54,7 +57,7 @@ public class DownloadPeptideAtlasSummaryFileTasklet extends AbstractTasklet{
         URLConnection connection = url.openConnection();
         InputStream is = connection.getInputStream();
         BufferedReader in = new BufferedReader(new InputStreamReader(is));
-        String line = null;
+        String line;
         int count = 0;
         while((line = in.readLine()) != null) {
             if(count != 0){

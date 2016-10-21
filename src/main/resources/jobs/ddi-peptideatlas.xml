@@ -129,11 +129,11 @@
         </batch:step>
     </batch:job>
 
-    <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
+    <batch:job id="generationJob" xmlns="http://www.springframework.org/schema/batch">
 
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.atlas.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>

@@ -5,6 +5,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.io.DDIFile;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
@@ -46,6 +47,8 @@ public class SplitterFromSource extends AbstractTasklet{
         OmicsXMLFile reader = null;
 
         if(inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()){
+
+            DDICleanDirectory.cleanDirectory(outputDirectory);
             for(File file: inputDirectory.getFile().listFiles()){
                 try{
                     if(file.getAbsolutePath().contains(originalPrefix)){

@@ -6,6 +6,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.px.GeneratePxEbeFiles;
 
@@ -38,6 +39,8 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+        DDICleanDirectory.cleanDirectory(outputDirectory);
 
         GeneratePxEbeFiles.searchFilesWeb(Integer.valueOf(loopGap),Integer.valueOf(endPoint),pxPrefix,pxURL,outputDirectory, databases);
 

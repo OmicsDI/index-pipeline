@@ -143,7 +143,7 @@
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
         <batch:step id="cleanMassiveStep" next="moveMassiveToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanMassiveTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanMassiveTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.massive.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>
@@ -164,7 +164,7 @@
 
         <batch:step id="cleanGNPSStep" next="moveGNPSToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanGNPSTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanGNPSTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.gnps.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>

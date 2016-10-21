@@ -6,37 +6,66 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
+import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
+import uk.ac.ebi.ddi.annotation.service.taxonomy.UniProtTaxonomy;
 import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
+import uk.ac.ebi.ddi.service.db.model.dataset.SimilarDataset;
+import uk.ac.ebi.ddi.service.db.utils.DatasetSimilarsType;
 
 import java.util.List;
 
 /**
- * Created by yperez on 13/07/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * == General Description ==
+ * <p>
+ * This class Provides a general information or functionalities for
+ * <p>
+ * ==Overview==
+ * <p>
+ * How to used
+ * <p>
+ * Created by yperez (ypriverol@gmail.com) on 20/10/2016.
  */
-public class DateAnnotationTasklet extends AbstractTasklet{
+public class AnnotateStrainTasklet extends AbstractTasklet{
+
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
     DDIDatabaseAnnotationService databaseAnnotationService;
 
+    UniProtTaxonomy taxonomyService = UniProtTaxonomy.getInstance();
+
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<Database> databases = databaseAnnotationService.getDatabases();
+
         if(databases != null && !databases.isEmpty()){
             databases.parallelStream().forEach(database ->{
                 List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(database.getName());
-                datasets.parallelStream().forEach( dataset -> {
+                datasets.stream().forEach( dataset -> {
                     Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                    existingDataset = DatasetAnnotationFieldsService.refineDates(existingDataset);
+                    existingDataset = taxonomyService.annotateParentForNonRanSpecies(existingDataset);
                     datasetAnnotationService.updateDataset(existingDataset);
                 });
             });
         }
         return RepeatStatus.FINISHED;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(datasetAnnotationService, "The dataset annotation object can't be null");
     }
 
     public DDIDatasetAnnotationService getDatasetAnnotationService() {
@@ -53,11 +82,5 @@ public class DateAnnotationTasklet extends AbstractTasklet{
 
     public void setDatabaseAnnotationService(DDIDatabaseAnnotationService databaseAnnotationService) {
         this.databaseAnnotationService = databaseAnnotationService;
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Assert.notNull(datasetAnnotationService, "The dataset annotation object can't be null");
-        Assert.notNull(databaseAnnotationService, "The database annotation object can't be null");
     }
 }

@@ -2,11 +2,12 @@ package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 
 import org.apache.log4j.Logger;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
+import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
-import uk.ac.ebi.ddi.xml.validator.utils.Utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -208,6 +209,7 @@ public class DatasetAnnotationFieldsService {
     }
 
     private static String returnDate(String value) {
+        value = returnStringDateRefined(value);
         String[] dateValues = new String[]{"yyyy-MM-dd", "dd-MMM-yyyy HH:mm:ss", "yy-MM-dd"};
 
         for(String dateStr: dateValues){
@@ -220,5 +222,62 @@ public class DatasetAnnotationFieldsService {
         }
 
         return value;
+    }
+
+    private static String returnStringDateRefined(String value) {
+        if(value != null && !value.isEmpty()){
+            String[] valueArr = value.split("-");
+            if(valueArr.length == 3){
+                String year = correctYear(valueArr[0]);
+                return year+"-"+valueArr[1]+"-"+valueArr[2];
+            }
+        }
+        return value;
+
+    }
+
+    private static String correctYear(String s) {
+        if(s.length() == 4 && s.startsWith("0"))
+            s = s.replaceFirst("0", "2");
+        return s;
+
+    }
+
+    public static Dataset refinePeptideAtlasKeyword(Dataset existingDataset) {
+        if(existingDataset != null && existingDataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.DELETED.getType())){
+            existingDataset.setCurrentStatus(DatasetCategory.ENRICHED.getType());
+        }
+        if(existingDataset.getAdditional() != null && existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName()) != null){
+            boolean isSRM = false;
+            for(String keyword: existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName()))
+                if(keyword.equalsIgnoreCase(Constants.PEPTIDEATLAS_SRM))
+                    isSRM = true;
+            if(isSRM)
+                existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName()).add("PASSEL");
+        }
+        if(existingDataset.getAdditional() != null && existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName()) != null){
+            boolean isSRM = false;
+            for(String keyword: existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName()))
+                if(keyword.equalsIgnoreCase(Constants.PEPTIDEATLAS_SRM))
+                    isSRM = true;
+            if(isSRM)
+                    existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName()).add("PASSEL");
+        }
+        return existingDataset;
+    }
+
+    /**
+     * This is needed because EGA is exporting in a wrong way the data.
+     * Todo: EGA should export the data using the correct term.
+     * @param existingDataset Dataset to be curated.
+     * @return return the curated dataset.
+     */
+    public static Dataset replaceStudyByDatasetLink(Dataset existingDataset){
+         if(existingDataset.getAdditional()!= null && existingDataset.getAdditional().containsKey("full_study_link")){
+             Set<String> links = existingDataset.getAdditional().remove("full_study_link");
+             existingDataset.getAdditional().put(Field.LINK.getName(), links);
+         }
+        return existingDataset;
+
     }
 }

@@ -13,16 +13,13 @@ import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService;
-import uk.ac.ebi.ddi.annotation.utils.DataType;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by yperez on 07/07/2016.

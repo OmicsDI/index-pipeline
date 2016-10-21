@@ -5,17 +5,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
-import uk.ac.ebi.ddi.annotation.utils.Constants;
-import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.service.db.model.publication.PublicationDataset;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created by yperez on 13/06/2016.

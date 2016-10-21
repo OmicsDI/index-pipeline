@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.peptideatlas;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by yperez on 29/05/2016.
+ * Created by yperez on 15/07/2016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/peptideatlas/ddi-indexer-test-peptideatlas-generate.xml"})
-public class GeneratePeptideAtlasTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/similars/ddi-indexer-test-check-similars.xml"})
+public class CheckSimilarsTaskletTest {
+
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
 
@@ -29,7 +30,7 @@ public class GeneratePeptideAtlasTaskletTest {
 
 
     @Autowired
-    @Qualifier("generationJob")
+    @Qualifier("similarsAnnotationJob")
     private Job job;
 
 

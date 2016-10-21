@@ -43,4 +43,6 @@ public class Constants {
 
     public static final String MS_SOFTWARE_NAME = "software";
     public static final String MS_INSTRUMENT_MODEL_NAME = "instrument model";
+
+    public static final String PEPTIDEATLAS_SRM = "SRM";
 }

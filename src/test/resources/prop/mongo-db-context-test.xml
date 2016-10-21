@@ -24,11 +24,7 @@
                               read-preference="SECONDARY"/>
     </mongo:mongo-client>
 
-    <!--<mongo:db-factory dbname="${ddi.mongo.app.db}" authentication-dbname="${ddi.mongo.app.authenticationDatabase}"-->
-                      <!--username="${ddi.mongo.app.user}" password="${ddi.mongo.app.password}" port="${ddi.mongo.app.port}"-->
-                      <!--mongo-ref="mongoClient"/>-->
-
-    <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
+    <mongo:db-factory dbname="ddiDB" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
 
 <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>

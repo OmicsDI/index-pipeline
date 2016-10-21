@@ -8,6 +8,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 
@@ -35,6 +36,8 @@ public class CopyFileToDirectoryTasklet extends AbstractTasklet {
         } else {
             // there are files to copy, so let's try to get on with the job
             File target = targetDirectory.getFile();
+
+            DDICleanDirectory.cleanDirectory(targetDirectory);
 
             Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
             logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());

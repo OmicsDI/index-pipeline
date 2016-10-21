@@ -19,38 +19,38 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <!--&lt;!&ndash; EB-eye XML generation for public project &ndash;&gt;-->
-        <!--<batch:step id="genEbEyeXmlStep" parent="parentStep" next="copyFilesToData">-->
-            <!--<batch:tasklet>-->
-                <!--<bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyePxXMLTasklet">-->
-                    <!--<bean:property name="pxURL" value="${ddi.common.px.url}"/>-->
-                    <!--<bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>-->
-                    <!--<bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>-->
-                    <!--<bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>-->
-                    <!--<bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>-->
-                    <!--<bean:property name="databases" ref="pxdatabases" />-->
-                <!--</bean:bean>-->
-            <!--</batch:tasklet>-->
-        <!--</batch:step>-->
+        <!-- EB-eye XML generation for public project -->
+        <batch:step id="genEbEyeXmlStep" parent="parentStep" next="copyFilesToData">
+            <batch:tasklet>
+                <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyePxXMLTasklet">
+                    <bean:property name="pxURL" value="${ddi.common.px.url}"/>
+                    <bean:property name="pxPrefix" value="${ddi.common.px.acc.prefix}"/>
+                    <bean:property name="outputDirectory" value="${ddi.common.px.original.directory}"/>
+                    <bean:property name="endPoint" value="${ddi.common.px.loop.end}"/>
+                    <bean:property name="loopGap" value="${ddi.common.px.loop.gap}"/>
+                    <bean:property name="databases" ref="pxdatabases" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
-        <!--<batch:step id="copyFilesToData" parent="parentStep" next="validationXML">-->
-            <!--<batch:tasklet>-->
-                <!--<bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">-->
-                    <!--<bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />-->
-                    <!--<bean:property name="outputDirectory" value="file:${ddi.common.px.atlas.data.directory}" />-->
-                    <!--<bean:property name="pattern" value="${ddi.common.atlas.prefix}" />-->
-                <!--</bean:bean>-->
-            <!--</batch:tasklet>-->
-        <!--</batch:step>-->
+        <batch:step id="copyFilesToData" parent="parentStep" next="validationXML">
+            <batch:tasklet>
+                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.px.original.directory}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.px.atlas.data.directory}" />
+                    <bean:property name="pattern" value="${ddi.common.atlas.prefix}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
-        <!--<batch:step id="validationXML" parent="parentStep" next="splitterStep">-->
-            <!--<batch:tasklet>-->
-                <!--<bean:bean id="validationXMLTaklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">-->
-                    <!--<bean:property name="directory" value="${ddi.common.px.atlas.data.directory}" />-->
-                    <!--<bean:property name="reportName" value="${ddi.common.original.report.name}"/>-->
-                <!--</bean:bean>-->
-            <!--</batch:tasklet>-->
-        <!--</batch:step>-->
+        <batch:step id="validationXML" parent="parentStep" next="splitterStep">
+            <batch:tasklet>
+                <bean:bean id="validationXMLTaklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
+                    <bean:property name="directory" value="${ddi.common.px.atlas.data.directory}" />
+                    <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
@@ -71,6 +71,7 @@
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="updateStatus" value="false" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -107,7 +108,7 @@
 
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectory">
+                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.px.atlas.prod.directory}" />
                 </bean:bean>
             </batch:tasklet>

@@ -42,6 +42,8 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
     DDIDatabaseAnnotationService databaseAnnotationService;
 
+    Boolean updateStatus = true;
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<>();
@@ -80,7 +82,8 @@ public class DatasetImportTasklet extends AbstractTasklet{
             }
         }));
 
-        removed.stream().forEach( x -> datasetAnnotationService.updateDeleteStatus(x));
+        if(!updateStatus)
+            removed.stream().forEach( x -> datasetAnnotationService.updateDeleteStatus(x));
 
         return RepeatStatus.FINISHED;
     }
@@ -101,6 +104,14 @@ public class DatasetImportTasklet extends AbstractTasklet{
         this.databaseAnnotationService = databaseAnnotationService;
     }
 
+    public Boolean getUpdateStatus() {
+        return updateStatus;
+    }
+
+    public void setUpdateStatus(Boolean updateStatus) {
+        this.updateStatus = updateStatus;
+    }
+
     public String getDatabaseName() {
         return databaseName;
     }
@@ -114,6 +125,6 @@ public class DatasetImportTasklet extends AbstractTasklet{
         Assert.notNull(inputDirectory, "Input Directory can not be null");
         Assert.notNull(datasetAnnotationService, "Annotation Service can't be null");
         Assert.notNull(databaseName, "DatabaseName can't be null");
-
+        Assert.notNull(updateStatus, "UpdateStatus can't be null");
     }
 }

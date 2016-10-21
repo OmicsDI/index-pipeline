@@ -6,6 +6,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 import java.io.File;
@@ -45,6 +46,10 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
         } else {
             // there are files to copy, so let's try to get on with the job
             File target = outputDirectory.getFile();
+
+            DDICleanDirectory.cleanDirectory(outputDirectory);
+
+            DDICleanDirectory.cleanDirectory(outputDirectory);
 
             for (File sourceFile : sourceFiles) {
                 if(sourceFile.isFile() && sourceFile.getName().contains(pattern)){

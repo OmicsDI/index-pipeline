@@ -3,7 +3,6 @@ package uk.ac.ebi.ddi.pipeline.indexer.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;

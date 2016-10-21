@@ -32,7 +32,7 @@ public class ConfigurationFileBootstrap {
      */
     public static XMLConfiguration getBootstrapSettings() throws DDIException {
         // load properties
-        XMLConfiguration config = null;
+        XMLConfiguration config;
         try
         {
             URL pathURL = getFullPath(ConfigurationFileBootstrap.class);

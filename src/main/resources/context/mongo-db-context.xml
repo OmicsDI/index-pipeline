@@ -21,7 +21,7 @@
                               socket-keep-alive="true"
                               socket-timeout="1000000"
                               write-concern="NORMAL"
-                              read-preference="SECONDARY"/>
+                              read-preference="PRIMARY_PREFERRED"/>
     </mongo:mongo-client>
 
 

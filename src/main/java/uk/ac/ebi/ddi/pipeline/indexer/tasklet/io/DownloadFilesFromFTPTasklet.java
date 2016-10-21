@@ -10,6 +10,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 import java.io.FileOutputStream;
@@ -57,6 +58,8 @@ public class DownloadFilesFromFTPTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+
+        DDICleanDirectory.cleanDirectory(targetDirectory);
 
         //new ftp client
         FTPClient ftp = new FTPClient();

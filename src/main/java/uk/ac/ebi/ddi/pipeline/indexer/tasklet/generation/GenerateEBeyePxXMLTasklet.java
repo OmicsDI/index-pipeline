@@ -6,10 +6,13 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.api.readers.model.IGenerator;
 import uk.ac.ebi.ddi.pipeline.indexer.io.DDICleanDirectory;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.ddi.px.GeneratePxEbeFiles;
+import uk.ac.ebi.ddi.api.readers.px.GeneratePxOmicsXML;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -28,9 +31,9 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
 
     private String pxPrefix;
 
-    private String endPoint;
+    private int endPoint;
 
-    private String loopGap;
+    private int loopGap;
 
     private String outputDirectory;
 
@@ -40,10 +43,12 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        LocalDate localDate = LocalDate.now();
+
         DDICleanDirectory.cleanDirectory(outputDirectory);
-
-        GeneratePxEbeFiles.searchFilesWeb(Integer.valueOf(loopGap),Integer.valueOf(endPoint),pxPrefix,pxURL,outputDirectory, databases);
-
+        IGenerator generator = new GeneratePxOmicsXML(loopGap, endPoint,pxPrefix,pxURL, outputDirectory, databases, dtf.format(localDate));
+        generator.generate();
         return RepeatStatus.FINISHED;
 
     }
@@ -55,6 +60,7 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
         Assert.notNull(pxPrefix, "pxPrefix can't be null.");
         Assert.notNull(endPoint, "endPoint can't be null.");
         Assert.notNull(loopGap,"loopGap can't be null.");
+
     }
 
     public String getPxURL() {
@@ -73,19 +79,19 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
         this.pxPrefix = pxPrefix;
     }
 
-    public String getEndPoint() {
+    public int getEndPoint() {
         return endPoint;
     }
 
-    public void setEndPoint(String endPoint) {
+    public void setEndPoint(int endPoint) {
         this.endPoint = endPoint;
     }
 
-    public String getLoopGap() {
+    public int getLoopGap() {
         return loopGap;
     }
 
-    public void setLoopGap(String loopGap) {
+    public void setLoopGap(int loopGap) {
         this.loopGap = loopGap;
     }
 

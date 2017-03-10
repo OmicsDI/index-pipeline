@@ -20,6 +20,4 @@
 
     <util:properties id="config" location="classpath:prop/common-override.properties"/>
 
-
-
 </beans>

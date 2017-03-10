@@ -13,7 +13,7 @@
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
-    <mongo:mongo-client credentials="${ddi.mongo.app.user}:${ddi.mongo.app.password}@${ddi.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.mongo.app.machine.one}:${ddi.mongo.app.port},${ddi.mongo.app.machine.two}:${ddi.mongo.app.port},${ddi.mongo.app.machine.three}:${ddi.mongo.app.port}">
+    <mongo:mongo-client credentials="${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port}">
         <mongo:client-options connections-per-host="10"
                               threads-allowed-to-block-for-connection-multiplier="10"
                               connect-timeout="1000000"
@@ -25,10 +25,10 @@
     </mongo:mongo-client>
 
 
-    <mongo:db-factory dbname="${ddi.mongo.app.db}" port="${ddi.mongo.app.port}" mongo-ref="mongoClient"/>
+    <mongo:db-factory dbname="${ddi.common.mongo.app.db}" port="${ddi.common.mongo.app.port}" mongo-ref="mongoClient"/>
 
 <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-<constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
 </bean>
 
 

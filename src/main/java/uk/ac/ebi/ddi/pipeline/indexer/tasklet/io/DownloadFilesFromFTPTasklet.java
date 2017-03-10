@@ -89,7 +89,7 @@ public class DownloadFilesFromFTPTasklet extends AbstractTasklet {
 
         if (ftpFiles != null && ftpFiles.length > 0) {
             for (FTPFile file : ftpFiles) {
-                if(file.isFile() && (pattern !=null && !pattern.isEmpty() && file.getName().contains(pattern))){
+                if((file.isFile() || file.isSymbolicLink()) && (pattern !=null && !pattern.isEmpty() && file.getName().contains(pattern))){
                     System.out.println("File is " + file.getName());
                     //get output stream
                     OutputStream output;

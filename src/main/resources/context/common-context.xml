@@ -34,12 +34,10 @@
 
     <!-- This objects are needed for the metabolome workbench reader -->
 
-    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.mw.extws.mw.config.MWWsConfigProd"/>
-    <bean id="taxWsConfig" class="uk.ac.ebi.ddi.mw.extws.entrez.config.TaxWsConfigProd"/>
+    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd"/>
+    <bean id="massiveWsConfig" class="uk.ac.ebi.ddi.api.readers.massive.ws.client.MassiveWsConfigProd"/>
 
-    <bean id="massiveWsConfig" class="uk.ac.ebi.ddi.massive.extws.massive.config.MassiveWsConfigProd"/>
-
-    <bean id="pxdatabases" class="java.util.ArrayList">
+    <bean id="pxpeptideAtlas" class="java.util.ArrayList">
         <constructor-arg>
             <list>
                 <value>PeptideAtlas</value>
@@ -47,6 +45,26 @@
         </constructor-arg>
     </bean>
 
+    <bean id="pxJPOST" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <value>jPOST</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+
+    <bean id="fastDateFormat" class="org.apache.commons.lang.time.FastDateFormat"
+          factory-method="getInstance">
+        <constructor-arg value="yyyyMMdd" />
+    </bean>
+
+    <bean id="currentDate" class="java.util.Date" factory-bean="fastDateFormat"
+          factory-method="format">
+        <constructor-arg>
+            <bean class="java.util.Date" />
+        </constructor-arg>
+    </bean>
 
 
 </beans>

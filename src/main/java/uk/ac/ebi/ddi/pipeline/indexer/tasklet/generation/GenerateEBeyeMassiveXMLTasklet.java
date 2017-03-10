@@ -4,8 +4,8 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
-import uk.ac.ebi.ddi.massive.GenerateMassiveEbeFiles;
-import uk.ac.ebi.ddi.massive.extws.massive.config.MassiveWsConfigProd;
+import uk.ac.ebi.ddi.api.readers.massive.ws.client.MassiveWsConfigProd;
+import uk.ac.ebi.ddi.api.readers.model.IGenerator;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 /**
@@ -26,7 +26,7 @@ public class GenerateEBeyeMassiveXMLTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        GenerateMassiveEbeFiles.generateMWXMLfiles(massiveConfig, outputDirectory);
+        //IGenerator generator = GenerateMassiveEbeFiles.generateMWXMLfiles(massiveConfig, outputDirectory);
         return RepeatStatus.FINISHED;
     }
 

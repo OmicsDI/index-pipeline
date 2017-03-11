@@ -5,7 +5,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.api.readers.massive.ws.client.MassiveWsConfigProd;
-import uk.ac.ebi.ddi.api.readers.model.IGenerator;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 /**

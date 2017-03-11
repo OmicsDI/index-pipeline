@@ -12,7 +12,17 @@ import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import java.util.*;
 
 /**
- * Created by yperez on 26/06/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+
+ *  ==Overview==
+ *
+ *  This class
+ *
+ * Created by ypriverol (ypriverol@gmail.com) on 26/06/2016.
  */
 public class ExpressionAtlasAnnotationTasklet extends AnnotationXMLTasklet{
 
@@ -34,8 +44,8 @@ public class ExpressionAtlasAnnotationTasklet extends AnnotationXMLTasklet{
                         exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
                         if(originalDataset != null){
                             DatasetAnnotationFieldsService.addInformationFromOriginal(originalDataset, exitingDataset);
-                            Map<String, Set<String>> similars = new HashMap<String, Set<String>>();
-                            Set<String> values = new HashSet<String>();
+                            Map<String, Set<String>> similars = new HashMap<>();
+                            Set<String> values = new HashSet<>();
                             values.add(originalDataset.getAccession());
                             similars.put(originalDatabase, values);
                             datasetAnnotationService.addDatasetReanalysisSimilars(exitingDataset, similars);

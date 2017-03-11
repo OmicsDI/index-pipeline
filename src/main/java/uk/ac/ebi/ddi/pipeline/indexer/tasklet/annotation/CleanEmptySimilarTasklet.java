@@ -14,7 +14,17 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by yperez on 18/07/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+
+ *  ==Overview==
+ *
+ *  This class
+ *
+ * Created by ypriverol (ypriverol@gmail.com) on 18/07/2016.
  */
 
 /** If a similar datasets is removed from the Sdataset Table it should be updated in the
@@ -30,19 +40,18 @@ public class CleanEmptySimilarTasklet extends AbstractTasklet{
 
         List<DatasetSimilars> datasetSimilars = datasetAnnotationService.getDatasetSimilars();
         if(datasetSimilars != null && !datasetSimilars.isEmpty()){
-            for(int i = 0; i < datasetSimilars.size(); i++){
-                DatasetSimilars dataset = datasetSimilars.get(i);
+            for (DatasetSimilars dataset : datasetSimilars) {
                 Set<SimilarDataset> toRemove = new HashSet<>();
                 Set<SimilarDataset> newSimilars = new HashSet<>();
-                for(SimilarDataset datasetSimilar: dataset.getSimilars()){
-                    if(datasetSimilar.getSimilarDataset() == null)
+                for (SimilarDataset datasetSimilar : dataset.getSimilars()) {
+                    if (datasetSimilar.getSimilarDataset() == null)
                         toRemove.add(datasetSimilar);
                     else
                         newSimilars.add(datasetSimilar);
                 }
-                if(toRemove.size() == dataset.getSimilars().size()){
+                if (toRemove.size() == dataset.getSimilars().size()) {
                     datasetAnnotationService.removeSimilar(dataset);
-                }else if(!toRemove.isEmpty()){
+                } else if (!toRemove.isEmpty()) {
                     datasetAnnotationService.updateDatasetSimilars(dataset.getAccession(), dataset.getDatabase(), newSimilars);
                 }
             }

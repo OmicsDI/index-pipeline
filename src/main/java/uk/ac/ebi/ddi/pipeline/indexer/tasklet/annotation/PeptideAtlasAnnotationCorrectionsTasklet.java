@@ -12,7 +12,17 @@ import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import java.util.List;
 
 /**
- * Created by yperez on 15/07/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+
+ *  ==Overview==
+ *
+ *  This class
+ *
+ * Created by ypriverol (ypriverol@gmail.com) on 15/07/2016.
  */
 public class PeptideAtlasAnnotationCorrectionsTasklet extends AbstractTasklet{
 

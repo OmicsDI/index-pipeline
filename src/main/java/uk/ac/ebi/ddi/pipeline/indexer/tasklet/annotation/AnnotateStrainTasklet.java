@@ -6,15 +6,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
-import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
 import uk.ac.ebi.ddi.annotation.service.taxonomy.UniProtTaxonomy;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
-import uk.ac.ebi.ddi.service.db.model.dataset.DatasetSimilars;
-import uk.ac.ebi.ddi.service.db.model.dataset.SimilarDataset;
-import uk.ac.ebi.ddi.service.db.utils.DatasetSimilarsType;
 
 import java.util.List;
 

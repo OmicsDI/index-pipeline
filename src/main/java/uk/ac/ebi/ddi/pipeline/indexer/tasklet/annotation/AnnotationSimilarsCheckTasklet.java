@@ -13,7 +13,17 @@ import uk.ac.ebi.ddi.service.db.utils.DatasetSimilarsType;
 import java.util.List;
 
 /**
- * Created by yperez on 15/07/2016.
+ * This code is licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+
+ *  ==Overview==
+ *
+ *  This class
+ *
+ * Created by ypriverol (ypriverol@gmail.com) on 15/07/2016.
  */
 public class AnnotationSimilarsCheckTasklet extends AbstractTasklet{
 
@@ -28,9 +38,8 @@ public class AnnotationSimilarsCheckTasklet extends AbstractTasklet{
                 DatasetSimilars dataset = datasetSimilars.get(i);
                 for(SimilarDataset datasetSimilar: dataset.getSimilars()){
                     boolean match = false;
-                    for(int j = 0; j < datasetSimilars.size(); j++){
-                        DatasetSimilars datasetSimilarOld = datasetSimilars.get(j);
-                        if( datasetSimilarOld.getAccession().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getAccession()) && datasetSimilarOld.getDatabase().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getDatabase())){
+                    for (DatasetSimilars datasetSimilarOld : datasetSimilars) {
+                        if (datasetSimilarOld.getAccession().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getAccession()) && datasetSimilarOld.getDatabase().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getDatabase())) {
                             match = true;
                         }
                     }

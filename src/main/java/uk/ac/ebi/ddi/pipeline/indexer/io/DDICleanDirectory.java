@@ -23,7 +23,7 @@ public class DDICleanDirectory {
 
     public static void cleanDirectory(String directoryName){
         File inputDirectory = new File(directoryName);
-        if(inputDirectory != null && inputDirectory.isDirectory() && inputDirectory.listFiles().length > 0){
+        if(inputDirectory.isDirectory() && inputDirectory.listFiles().length > 0){
             Arrays.asList(inputDirectory.listFiles()).stream().forEach(file -> {
                 try {
                     Files.deleteIfExists(file.toPath());

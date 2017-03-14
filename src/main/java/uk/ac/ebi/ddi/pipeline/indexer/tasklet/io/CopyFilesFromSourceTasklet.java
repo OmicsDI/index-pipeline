@@ -31,7 +31,7 @@ public class CopyFilesFromSourceTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         List<File> sourceFiles = new ArrayList<>();
-        if(sourceDirectory.exists() && sourceDirectory.getFile().isDirectory()){
+        if(sourceDirectory.exists() && sourceDirectory.getFile().isDirectory() && sourceDirectory.getFile().listFiles() != null){
             sourceFiles = Arrays.asList(sourceDirectory.getFile().listFiles());
         }
 

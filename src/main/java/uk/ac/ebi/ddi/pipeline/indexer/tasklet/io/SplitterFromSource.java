@@ -66,6 +66,7 @@ public class SplitterFromSource extends AbstractTasklet{
                                 counterFiles++;
                             }
                         }
+                        reader.close();
                     }
                 }catch (Exception e){
                     logger.info("Error Reading file: " + e.getMessage());

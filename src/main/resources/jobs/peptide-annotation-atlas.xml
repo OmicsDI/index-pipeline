@@ -28,7 +28,7 @@
         <batch:step id="peptideAtlasAnnotationStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="dateAnnotationDateStepTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.PeptideAtlasAnnotationCorrectionsTasklet">
-                    <bean:property name="databaseName"  value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="databaseName"  value="${ddi.common.peptideatlas.database.name}" />
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>

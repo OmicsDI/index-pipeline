@@ -35,7 +35,6 @@
     <!-- This objects are needed for the metabolome workbench reader -->
 
     <bean id="mwWsConfig" class="uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd"/>
-    <bean id="massiveWsConfig" class="uk.ac.ebi.ddi.api.readers.massive.ws.client.MassiveWsConfigProd"/>
 
     <bean id="pxpeptideAtlas" class="java.util.ArrayList">
         <constructor-arg>
@@ -44,15 +43,6 @@
             </list>
         </constructor-arg>
     </bean>
-
-    <bean id="pxJPOST" class="java.util.ArrayList">
-        <constructor-arg>
-            <list>
-                <value>jPOST</value>
-            </list>
-        </constructor-arg>
-    </bean>
-
 
     <bean id="fastDateFormat" class="org.apache.commons.lang.time.FastDateFormat"
           factory-method="getInstance">

@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.biomodels;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.jpost;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +19,8 @@ import static org.junit.Assert.assertEquals;
  * @date 17/11/2015
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/biomodels/ddi-indexer-test-biomodels-import.xml"})
-public class ImportEBeyeBioModelsXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/jpost/ddi-indexer-test-jpost-import.xml"})
+public class ImportEBeyeJPOSTPXXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

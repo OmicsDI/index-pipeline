@@ -7,10 +7,7 @@ import uk.ac.ebi.ddi.xml.validator.parser.model.Database;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entries;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +17,7 @@ import java.util.List;
  */
 public class DDIFile {
 
-    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile, int postfix, File folder) throws FileNotFoundException {
+    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile, int postfix, File folder) throws IOException {
 
         if(folder != null && folder.isDirectory()){
             OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
@@ -33,6 +30,7 @@ public class DDIFile {
             database.setEntryCount(listToPrint.size());
             database.setEntries(new Entries(listToPrint));
             outputXMLFile.marshall(database, outputFile);
+            outputFile.close();
         }
 
 
@@ -41,7 +39,7 @@ public class DDIFile {
     public static void writeList(List<Entry> listToPrint, String prefixFile,
                                  int postfix, File folder, String databaseDescription,
                                  String databaseName,
-                                 String databaseRelease) throws FileNotFoundException {
+                                 String databaseRelease) throws IOException {
 
         if(folder != null && folder.isDirectory()){
             OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
@@ -54,6 +52,7 @@ public class DDIFile {
             database.setEntryCount(listToPrint.size());
             database.setEntries(new Entries(listToPrint));
             outputXMLFile.marshall(database, outputFile);
+            outputFile.close();
         }
 
 

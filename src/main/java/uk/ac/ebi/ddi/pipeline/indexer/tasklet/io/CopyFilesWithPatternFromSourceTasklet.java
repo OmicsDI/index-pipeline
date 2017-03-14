@@ -41,7 +41,7 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
             sourceFiles = Arrays.asList(inputDirectory.getFile().listFiles());
         }
 
-        if (sourceFiles == null || sourceFiles.isEmpty()) {
+        if (sourceFiles.isEmpty()) {
             logger.warn("Skipping file copy, since there are no files listed!");
         } else {
             // there are files to copy, so let's try to get on with the job

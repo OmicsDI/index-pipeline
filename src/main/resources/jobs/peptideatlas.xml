@@ -23,22 +23,11 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="copyFileFromResource" parent="parentStep" next="copyFilesToData">
+        <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadPeptideAtlasSummaryFileTasklet">
-                    <bean:property name="originalFolder" value="${ddi.common.atlas.original.folder}"/>
+                    <bean:property name="originalFolder" value="${ddi.common.original.directory}/${ddi.common.peptideatlas.database.index}"/>
                     <bean:property name="peptideAtlasSumamryFile" value="${ddi.common.atlas.source.file}"/>
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
-
-        <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
-            <batch:tasklet>
-                <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.atlas.original.folder}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.atlas.data.directory}" />
-                    <bean:property name="pattern" value="${ddi.common.ega.pattern}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -46,7 +35,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.atlas.data.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.peptideatlas.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -54,10 +43,10 @@
 
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
-                <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.atlas.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.atlas.annotated.directory}"/>
-                    <bean:property name="originalPrefix"  value="${ddi.common.ega.pattern}" />
+                <bean:bean id="splitterTasklet"           scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}/${ddi.common.peptideatlas.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.peptideatlas.database.index}"/>
+                    <bean:property name="originalPrefix"  value="${ddi.common.atlas.source.pattern}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.atlas.prefix}" />
                 </bean:bean>
@@ -67,10 +56,10 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.atlas.annotated.directory}"/>
-                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="inputDirectory"            value="file:${ddi.common.data.directory}/${ddi.common.peptideatlas.database.index}"/>
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
-                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="databaseName"              value="${ddi.common.peptideatlas.database.name}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -78,9 +67,9 @@
         <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.PeptideAtlasAnnotation">
-                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}"/>
+                    <bean:property name="databaseName"             value="${ddi.common.peptideatlas.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="databases" ref="crossDatabases" />
+                    <bean:property name="databases"                ref="crossDatabases" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -88,7 +77,7 @@
         <batch:step id="enrichmentStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.peptideatlas.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
@@ -108,7 +97,7 @@
         <batch:step id="importTerms" parent="parentStep" next="similarityStep">
             <batch:tasklet>
                 <bean:bean id="importTermsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.UpdateTermsTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.peptideatlas.database.name}" />
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType" >
                         <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
@@ -121,7 +110,9 @@
         <batch:step id="similarityStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
-                    <bean:property name="typeOfData" ref="dataTypesProteomics" />
+                    <bean:property name="typeOfData" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
+                    </bean:property>
                     <bean:property name="mongoTemplate" ref="mongoTemplate" />
                     <bean:property name="termInDBService" ref="termInDBService"/>
                     <bean:property name="ddiExpDataImportService" ref="ddiExpDataImportService"/>
@@ -145,7 +136,7 @@
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.atlas.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.peptideatlas.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.atlas.prod.directory}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.atlas.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />

@@ -73,8 +73,8 @@ public class DownloadPeptideAtlasSummaryFileTasklet extends AbstractTasklet{
             if(count != 0){
                 if(line.split("\t").length > 4){
                     String urlStr = line.split("\t")[3];
-                    String fileName = urlStr.substring( urlStr.lastIndexOf('/')+1, urlStr.length());
-                    String localPath = originalFolder + "/" +fileName;
+                    String fileName = urlStr.substring( urlStr.lastIndexOf('/') +1 , urlStr.length());
+                    String localPath = originalFolder + "/" + fileName;
                     FileUtil.downloadFileFromURL(urlStr, localPath);
                 }
             }

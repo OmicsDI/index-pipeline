@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.expressionatlas;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.lincs;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,12 +15,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by yperez on 15/07/2016.
+ * @author Yasset Perez-Riverol (ypriverol@gmail.com)
+ * @date 17/11/2015
  */
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/peptideatlas/ddi-index-peptide-atlas-correction.xml"})
-public class PeptideAtlasAnnotationCorrectionTasklet {
+@ContextConfiguration(locations = {"classpath:jobs/lincs/ddi-indexer-test-lincs-import.xml"})
+public class ImportEBeyeLINCSXMLTaskletTest {
+
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
 
@@ -30,7 +31,7 @@ public class PeptideAtlasAnnotationCorrectionTasklet {
 
 
     @Autowired
-    @Qualifier("peptideAtlasAnnotationJob")
+    @Qualifier("ddiImportJob")
     private Job job;
 
 

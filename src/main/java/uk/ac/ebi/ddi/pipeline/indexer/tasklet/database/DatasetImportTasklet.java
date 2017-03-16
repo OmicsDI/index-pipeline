@@ -47,7 +47,7 @@ public class DatasetImportTasklet extends AbstractTasklet{
             try{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
-
+                    System.out.println(dataEntry.getId());
                     datasetAnnotationService.insertDataset(dataEntry, databaseName);
                     threadSafeList.add(new Pair<>(dataEntry.getId(), dataEntry.getDatabase()));
                     logger.debug("Dataset: " + dataEntry.toString() + "has been added");

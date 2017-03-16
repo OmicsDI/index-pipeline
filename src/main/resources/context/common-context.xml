@@ -34,8 +34,6 @@
 
     <!-- This objects are needed for the metabolome workbench reader -->
 
-    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd"/>
-
     <bean id="pxpeptideAtlas" class="java.util.ArrayList">
         <constructor-arg>
             <list>

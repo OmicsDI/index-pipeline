@@ -188,6 +188,9 @@
             </list>
         </constructor-arg>
     </bean>
+
+    <bean id="mwWsConfig" class="uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd"/>
+
     <bean:bean id="mwReader" class="uk.ac.ebi.ddi.api.readers.mw.GenerateMWOmicsXML">
         <bean:constructor-arg index="0" ref="mwWsConfig"/>
         <bean:constructor-arg index="1" value="${ddi.common.original.directory}/${ddi.common.mw.database.index}"/>

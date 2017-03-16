@@ -26,7 +26,7 @@
         <batch:step id="downloadFilesStep" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="downloadFilesTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateFromAPIOmicsDITasklet">
-                    <bean:property name="generator" ref="lincsGenerator"/>
+                    <bean:property name="generator" ref="paxdbGenerator"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -34,7 +34,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.lincs.database.index}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.paxdb.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -44,11 +44,11 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}/${ddi.common.lincs.database.index}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.lincs.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.paxdb.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.original.pattern}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.lincs.prefix}" />
+                    <bean:property name="filePrefix"      value="${ddi.common.paxdb.prefix}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -57,10 +57,10 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.lincs.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.paxdb.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
-                    <bean:property name="databaseName" value="${ddi.common.lincs.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -68,7 +68,7 @@
         <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.lincs.database.name}"/>
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
@@ -77,11 +77,11 @@
         <batch:step id="enrichmentStep" parent="parentStep" next="cleanFolder">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.lincs.database.name}" />
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="dataType">
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.INTERACTIONS_DATA"/>
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
                     </bean:property>
                 </bean:bean>
             </batch:tasklet>
@@ -90,7 +90,7 @@
         <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.lincs.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -98,9 +98,9 @@
         <batch:step id="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.lincs.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.lincs.database.index}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.lincs.prefix}" />
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.paxdb.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
@@ -119,7 +119,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.lincs.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -127,9 +127,9 @@
         <batch:step id="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.lincs.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.lincs.database.index}"/>
-                    <bean:property name="filePrefix"      value="${ddi.common.lincs.prefix}" />
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.paxdb.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
@@ -157,11 +157,15 @@
     </bean:bean>
 
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
-    <bean id="lincsWsConfig" class="uk.ac.ebi.ddi.api.readers.lincs.ws.client.LINCSConfigProd"/>
+    <bean:bean id="paxdbWsConfig" class="uk.ac.ebi.ddi.api.readers.paxdb.ws.client.PaxDBClient">
+        <constructor-arg index="0" value="http://pax-db.org/downloads/latest/datasets/paxdb-abundance-files-v4.0.zip"/>
+        <constructor-arg index="1" value="http://pax-db.org/downloads/latest/omicsdb_export.tsv"/>
+        <constructor-arg index="2" value="http://pax-db.org/downloads/latest/UniProt_mappings/paxdb-uniprot-links-v4_0.zip"/>
+    </bean:bean>
 
-    <bean:bean id="lincsGenerator" class="uk.ac.ebi.ddi.api.readers.lincs.GenerateLINCSOmicsXML">
-        <bean:constructor-arg index="0" ref="lincsWsConfig"/>
-        <bean:constructor-arg index="1" value="${ddi.common.original.directory}/${ddi.common.lincs.database.index}"/>
+    <bean:bean id="paxdbGenerator" class="uk.ac.ebi.ddi.api.readers.paxdb.GeneratePaxDBOmicsXML">
+        <bean:constructor-arg index="0" ref="paxdbWsConfig"/>
+        <bean:constructor-arg index="1" value="${ddi.common.original.directory}/${ddi.common.paxdb.database.index}"/>
         <bean:constructor-arg index="2" value="#{currentDate}"/>
     </bean:bean>
 

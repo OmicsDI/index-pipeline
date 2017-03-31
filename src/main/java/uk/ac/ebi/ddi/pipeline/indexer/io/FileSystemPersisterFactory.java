@@ -22,7 +22,7 @@ public class FileSystemPersisterFactory {
     private Resource locationPrefix;
 
 
-    public FileSystemPersisterFactory(Resource locationPrefix) throws IOException {
+    public FileSystemPersisterFactory(Resource locationPrefix) {
         this.locationPrefix = locationPrefix;
         logger.info("Created factory at " + locationPrefix);
     }

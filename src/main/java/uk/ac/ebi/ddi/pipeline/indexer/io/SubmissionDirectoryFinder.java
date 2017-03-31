@@ -26,7 +26,7 @@ public class SubmissionDirectoryFinder {
         }
     }
 
-    private static boolean isSubmissionDirectory(File file, String accession) throws IOException {
+    private static boolean isSubmissionDirectory(File file, String accession) {
         return (file.isDirectory() && file.getName().equals(accession));
     }
 

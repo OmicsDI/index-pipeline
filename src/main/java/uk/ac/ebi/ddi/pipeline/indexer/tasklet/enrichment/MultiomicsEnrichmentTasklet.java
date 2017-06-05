@@ -1,8 +1,13 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import com.mongodb.BasicDBObject;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.JSONObject;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.Constants;
@@ -36,7 +41,21 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
     DDIDatasetAnnotationService datasetAnnotationService;
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception{
+        List<PublicationDataset> pubData = datasetAnnotationService.getMul();
+        pubData.parallelStream().forEach(
+                x-> {
+                    Dataset dataset = datasetAnnotationService.getDataset(x.getDatasetID(), x.getDatabase());
+                    if (dataset != null) {
+                        dataset = DatasetUtils.addAdditionalField(dataset, Field.OMICS.getName(), Constants.MULTIOMICS_TYPE);
+                        datasetAnnotationService.updateDataset(dataset);
+                    }
+                }
+        );
+        return RepeatStatus.FINISHED;
+    }
+
+    /*public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets();
         datasetList = datasetList.parallelStream().filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty()).collect(Collectors.toList());
         Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
@@ -55,7 +74,7 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
         });
         return RepeatStatus.FINISHED;
     }
-
+*/
     public DDIDatasetAnnotationService getDatasetAnnotationService() {
         return datasetAnnotationService;
     }

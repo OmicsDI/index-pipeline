@@ -42,7 +42,7 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception{
-        List<PublicationDataset> pubData = datasetAnnotationService.getMul();
+        List<PublicationDataset> pubData = datasetAnnotationService.getMultiomics();
         pubData.parallelStream().forEach(
                 x-> {
                     Dataset dataset = datasetAnnotationService.getDataset(x.getDatasetID(), x.getDatabase());

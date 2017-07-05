@@ -13,8 +13,7 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
-
-    <description>This job is to compute the similars datasets</description>
+    <description>This job is to annotated multiomics datasets</description>
 
     <import resource="../context/common-context.xml"/>
     <import resource="../context/db-job-repository.xml"/>
@@ -22,9 +21,9 @@
 
     <batch:job id="ddiClaimDatasetJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="claimDatasetStep" parent="parentStep">
+        <batch:step id="ddiClaimDatasetStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="claimDatasetStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.IsClaimDatasetTasklet">
+                <bean:bean id="claimDatasetStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.ClaimDatasetTasklet">
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
@@ -54,8 +53,8 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
+    <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
-
 
 </beans>

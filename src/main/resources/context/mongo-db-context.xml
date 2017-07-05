@@ -60,6 +60,6 @@
 
 <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
 <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
-
+    <bean id="mostAccessedDatasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
 
 </beans>

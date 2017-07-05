@@ -8,6 +8,7 @@
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:jobs/ega.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
+    <import resource="classpath*:prop/mongo-db-context-test.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">
         <property name="job" ref="ddiImportJob"/>

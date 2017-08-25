@@ -40,6 +40,7 @@ public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
             existing = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, existing);
             existing = DatasetAnnotationFieldsService.cleanRepository(existing, databaseName);
             existing = DatasetAnnotationFieldsService.addCrossReferenceAnnotation(existing);
+            existing = DatasetAnnotationFieldsService.replaceTextCase(existing);
             try{
                 existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
                 Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);

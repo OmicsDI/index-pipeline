@@ -291,8 +291,13 @@ public class DatasetAnnotationFieldsService {
         }
         if(existingDataset.getAdditional().get(Field.SPECIE_FIELD) != null){
             Set<String> diseases = existingDataset.getAdditional().get(Field.SPECIE_FIELD);
-            Set<String> updatedDisease =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
-            existingDataset.addAdditional(Field.DISEASE_FIELD.getName(),updatedDisease);
+            Set<String> updatedSpecies =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
+            existingDataset.addAdditional(Field.SPECIE_FIELD.getName(),updatedSpecies);
+        }
+        if(existingDataset.getAdditional().get(Field.TISSUE_FIELD) != null){
+            Set<String> diseases = existingDataset.getAdditional().get(Field.TISSUE_FIELD);
+            Set<String> updatedTissue =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
+            existingDataset.addAdditional(Field.TISSUE_FIELD.getName(),updatedTissue);
         }
         return existingDataset;
 

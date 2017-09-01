@@ -49,6 +49,18 @@
 
     <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
     <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
+    <bean id="citationClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.europmc.CitationClient">
+        <constructor-arg name="config" ref="ebeyeWsConfig"/>
+    </bean>
+    <bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
+        <constructor-arg name="config" ref="ebeyeWsConfig"/>
+    </bean>
+    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
+    <bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
+    <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
+    <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
+    <bean id="mostAccessedDatasetsService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
+
 
 
 </beans>

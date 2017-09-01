@@ -3,21 +3,23 @@ package uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
+import uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts;
 
 /**
  * Created by gaur on 13/07/17.
  */
 public class CitationSimilarityTasklet extends AbstractTasklet {
 
-    DDIDatasetAnnotationService datasetAnnotationService;
+    SimilarityCounts similarityCounts;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
-            datasetAnnotationService.updateMostAccessed();
+            similarityCounts.addAllCitations();
         }
         catch(Exception ex)
         {
@@ -26,16 +28,16 @@ public class CitationSimilarityTasklet extends AbstractTasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
+    public SimilarityCounts getSimilarityCounts() {
+        return similarityCounts;
     }
 
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
+    public void setSimilarityCounts(SimilarityCounts similarityCounts) {
+        this.similarityCounts = similarityCounts;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(datasetAnnotationService, "The dataset annotation object can't be null");
+        Assert.notNull(similarityCounts, "The similarity count object can't be null");
     }
 }

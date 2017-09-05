@@ -27,7 +27,6 @@
 
     <mongo:db-factory dbname="${ddi.common.mongo.app.db}" port="${ddi.common.mongo.app.port}" mongo-ref="mongoClient" id="mongoDbFactory"/>
 
-
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
         <constructor-arg name="mongoConverter" ref="mongoConverter"/>
@@ -61,5 +60,15 @@
 <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
 <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
 <bean id="mostAccessedDatasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
-
+<bean id="similarityCounts" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
+<bean id="citationClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.europmc.CitationClient">
+    <constructor-arg name="config" ref="ebeyeWsConfig"/>
+</bean>
+<bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
+    <constructor-arg name="config" ref="ebeyeWsConfig"/>
+</bean>
+<bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
+<bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
+<bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
+    <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
 </beans>

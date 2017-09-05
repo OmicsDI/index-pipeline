@@ -3,6 +3,7 @@ package uk.ac.ebi.ddi.pipeline.indexer.annotation;
 import org.apache.log4j.Logger;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Utils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
@@ -14,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -277,6 +279,26 @@ public class DatasetAnnotationFieldsService {
              Set<String> links = existingDataset.getAdditional().remove("full_study_link");
              existingDataset.getAdditional().put(Field.LINK.getName(), links);
          }
+        return existingDataset;
+
+    }
+
+    public static Dataset replaceTextCase(Dataset existingDataset){
+        if(existingDataset.getAdditional().get(Field.DISEASE_FIELD) != null){
+            Set<String> diseases = existingDataset.getAdditional().get(Field.DISEASE_FIELD);
+            Set<String> updatedDisease =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
+            existingDataset.addAdditional(Field.DISEASE_FIELD.getName(),updatedDisease);
+        }
+        if(existingDataset.getAdditional().get(Field.SPECIE_FIELD) != null){
+            Set<String> diseases = existingDataset.getAdditional().get(Field.SPECIE_FIELD);
+            Set<String> updatedSpecies =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
+            existingDataset.addAdditional(Field.SPECIE_FIELD.getName(),updatedSpecies);
+        }
+        if(existingDataset.getAdditional().get(Field.TISSUE_FIELD) != null){
+            Set<String> diseases = existingDataset.getAdditional().get(Field.TISSUE_FIELD);
+            Set<String> updatedTissue =  diseases.parallelStream().map(x -> Utils.toTitleCase(x)).collect(Collectors.toSet());
+            existingDataset.addAdditional(Field.TISSUE_FIELD.getName(),updatedTissue);
+        }
         return existingDataset;
 
     }

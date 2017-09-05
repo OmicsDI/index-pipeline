@@ -54,7 +54,7 @@ public class DatasetImportTasklet extends AbstractTasklet{
                 });
 
             }catch (Exception e){
-                logger.info("Error Reading file: " + e.getMessage());
+                logger.info("Error Reading file : " + file +" with exception " + e.getMessage());
             }
         });
 

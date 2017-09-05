@@ -32,6 +32,7 @@ public class GPMDBAnnotationTasklet extends AnnotationXMLTasklet {
             existing = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, existing);
             existing = DatasetAnnotationFieldsService.cleanDescription(existing);
             existing = DatasetAnnotationFieldsService.addCrossReferenceAnnotation(existing);
+            existing = DatasetAnnotationFieldsService.replaceTextCase(existing);
             try{
                 existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
                 Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);

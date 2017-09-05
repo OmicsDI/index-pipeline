@@ -6,12 +6,12 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <import resource="classpath*:context/common-context.xml"/>
-    <import resource="classpath*:jobs/ega.xml"/>
+    <import resource="classpath*:prop/mongo-db-context-prod-data.xml"/>
+    <import resource="classpath*:jobs/citation.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
-    <import resource="classpath*:prop/mongo-db-context-test.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">
-        <property name="job" ref="ddiImportJob"/>
+        <property name="job" ref="ddiCitationCountJob"/>
     </bean>
 
     <context:property-placeholder
@@ -19,5 +19,7 @@
             ignore-unresolvable="true" ignore-resource-not-found="true" order="-1"/>
 
     <util:properties id="config" location="classpath:prop/common-override.properties"/>
+
+
 
 </beans>

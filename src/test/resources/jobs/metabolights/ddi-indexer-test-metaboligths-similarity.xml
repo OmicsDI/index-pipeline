@@ -14,9 +14,9 @@
     </bean>
 
     <context:property-placeholder
-            location="classpath:prop/common-override.properties, classpath:prop/submission-email-override.properties"
+            location="classpath:prop/common.properties, classpath:prop/submission-email-override.properties"
             ignore-unresolvable="true" ignore-resource-not-found="true" order="-1"/>
 
-    <util:properties id="config" location="classpath:prop/common-override.properties"/>
+    <!--<util:properties id="config" location="classpath:prop/common-override.properties"/>-->
 
 </beans>

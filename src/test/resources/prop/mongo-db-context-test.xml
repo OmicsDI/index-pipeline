@@ -34,7 +34,7 @@
 <bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
 <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
 <bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
-<bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatabaseService" />
+<bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.database.DatabaseService" />
 <bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
 
 <bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />

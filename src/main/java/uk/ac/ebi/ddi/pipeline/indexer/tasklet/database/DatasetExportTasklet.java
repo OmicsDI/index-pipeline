@@ -65,24 +65,29 @@ public class DatasetExportTasklet extends AbstractTasklet{
                 .collect(Collectors.toList());
 
         Database database = databaseService.getDatabaseInfo(databaseName);
-
-        datasets.stream().forEach( dataset -> {
-            Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
-            listToPrint.add(entry);
-            if(listToPrint.size() == numberEntries){
-                try {
-                    DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
-                    listToPrint.clear();
-                    counterFiles[0]++;
-                }catch (IOException e){
-                    e.printStackTrace();
+        try {
+            datasets.stream().forEach(dataset -> {
+                Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+                Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
+                listToPrint.add(entry);
+                if (listToPrint.size() == numberEntries) {
+                    try {
+                        DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
+                        listToPrint.clear();
+                        counterFiles[0]++;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+            });
+            // This must be printed before leave because it contains the end members of the list.
+            if (!listToPrint.isEmpty()) {
+                DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
             }
-        });
-        // This must be printed before leave because it contains the end members of the list.
-        if(!listToPrint.isEmpty()){
-            DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            logger.error("exception thrown in dataset exportlet tasklet" + ex.getMessage());
         }
         return RepeatStatus.FINISHED;
     }

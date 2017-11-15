@@ -43,6 +43,11 @@ public class DatasetImportTasklet extends AbstractTasklet{
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<>();
+
+        //debuggg
+        System.out.print("...inputDirectory...!");
+        System.out.print(inputDirectory.getURI());
+
         Arrays.asList(inputDirectory.getFile().listFiles()).parallelStream().forEach(file ->{
             try{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();

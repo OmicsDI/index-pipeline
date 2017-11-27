@@ -21,8 +21,6 @@
     <import resource="../context/db-job-repository.xml"/>
     <import resource="../context/mongo-db-context.xml" />
 
-
-
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
         <!-- EB-eye XML generation for public project -->
@@ -37,7 +35,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.bioprojects.database.index}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -46,7 +44,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="cleanStep">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:/nfs/nobackup/pride/ebeye_files/tmp/original/bioprojects"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="GEO" />
@@ -57,7 +55,7 @@
         <batch:step id="cleanStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.bioprojects.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.bioprojects.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -87,13 +85,13 @@
 
     <bean:bean id="bioprojectsClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.BioprojectsClient">
         <constructor-arg index="0" value="/nfs/pride/prod/ddi/pipeline/testDev/BioProjects"/>
-        <constructor-arg index="1" value="GEO"/>
     </bean:bean>
 
     <bean:bean id="bioprojectsGenerator" class="uk.ac.ebi.ddi.api.readers.bioprojects.GenerateBioprojectsOmicsXML">
         <constructor-arg index="0" ref="bioprojectsClient"></constructor-arg>
-        <bean:constructor-arg index="1" value="${ddi.common.original.directory}/${ddi.common.bioprojects.database.index}"/>
+        <bean:constructor-arg index="1" value="${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
         <bean:constructor-arg index="2" value="#{currentDate}"/>
+        <bean:constructor-arg index="3" value="GEO,dbGaP"/>
     </bean:bean>
 
     <!--load property files-->

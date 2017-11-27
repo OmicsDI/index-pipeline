@@ -8,6 +8,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
@@ -45,16 +46,17 @@ public class DatasetImportTasklet extends AbstractTasklet{
         CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<>();
 
         //debuggg
-        System.out.print("...inputDirectory...!");
-        System.out.print(inputDirectory.getURI());
+        System.out.print(String.format("DataSet import, inputDirectory: %s ",inputDirectory.getURI()));
 
         Arrays.asList(inputDirectory.getFile().listFiles()).parallelStream().forEach(file ->{
             try{
                 List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
-                    System.out.println(dataEntry.getId());
-                    datasetAnnotationService.insertDataset(dataEntry, databaseName);
-                    threadSafeList.add(new Pair<>(dataEntry.getId(), dataEntry.getDatabase()));
+
+                    String dataset_database = dataEntry.getDatabase();
+
+                    datasetAnnotationService.insertDataset(dataEntry, StringUtils.isEmpty(dataset_database) ? databaseName : dataset_database);
+                    threadSafeList.add(new Pair<>(dataEntry.getId(), dataset_database));
                     logger.debug("Dataset: " + dataEntry.toString() + "has been added");
                 });
 

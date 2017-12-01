@@ -9,7 +9,7 @@ function s4() {
 }
 
 var aggregate = db.datasets.dataset.aggregate([{"$match":{"additional.submitter_email":{"$exists":true},"database":{"$in":["Massive","Pride",
-    "MetabolomicsWorkbench","MetaboLights"]}}},
+    "MetabolomicsWorkbench","MetaboLights","ArrayExpress","JPOST Repository"]}}},
 {"$unwind":"$additional.submitter_email"},
 {"$group":{"_id":"$additional.submitter_email","dataSets":{"$push":{"_id":"$accession","source":"$database"}},"id":{"$last":(new ObjectId).valueOf()},
 "count":{"$sum":1}}},{"$sort":{"count":-1}},{"$project":{"email":"$_id","dataSets":1,"_id":0}}]);
@@ -20,7 +20,7 @@ aggregate.forEach(function(input_data){
     });
 
 var databases = ["Massive","Pride",
-    "MetabolomicsWorkbench","MetaboLights"];
+    "MetabolomicsWorkbench","MetaboLights","ArrayExpress","JPOST Repository"];
     
 databases.forEach(function(element){
         print(element);
@@ -31,9 +31,18 @@ databases.forEach(function(element){
     }
     });
 
+function guid() {
+  return s4() + s4() + s4();
+}
+
+function s4() {
+  return Math.floor((1 + Math.random()) * 0x10000)
+    .toString(16)
+    .substring(1);
+}
 
 var aggr = db.datasets.dataset.aggregate([{"$match":{"additional.submitter_mail":{"$exists":true},"database":{"$in":["Massive","Pride",
-    "MetabolomicsWorkbench","MetaboLights"]}}},
+    "MetabolomicsWorkbench","MetaboLights","ArrayExpress","JPOST Repository"]}}},
 {"$unwind":"$additional.submitter_mail"},
 {"$group":{"_id":"$additional.submitter_mail","dataSets":{"$push":{"_id":"$accession","source":"$database"}},"id":{"$last":(new ObjectId).valueOf()},
 "count":{"$sum":1}}},{"$sort":{"count":-1}},{"$project":{"email":"$_id","dataSets":1,"_id":0}}]);
@@ -44,7 +53,7 @@ aggr.forEach(function(input_data){
     });
 
 var datab = ["Massive","Pride",
-    "MetabolomicsWorkbench","MetaboLights"];
+    "MetabolomicsWorkbench","MetaboLights","ArrayExpress","JPOST Repository"];
     
 datab.forEach(function(element){
         print(element);

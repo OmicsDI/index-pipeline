@@ -34,6 +34,8 @@
             </batch:tasklet>
         </batch:step>
 
+
+
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">

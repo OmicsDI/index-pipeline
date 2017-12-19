@@ -50,14 +50,24 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
         Arrays.asList(inputDirectory.getFile().listFiles()).parallelStream().forEach(file ->{
             try{
-                List<Entry> entries = (new OmicsXMLFile(file)).getAllEntries();
+                logger.debug("processing file:" + file);
+
+                OmicsXMLFile omicsXMLFile = new OmicsXMLFile(file);
+
+                List<Entry> entries = omicsXMLFile.getAllEntries();
                 entries.parallelStream().forEach(dataEntry -> {
 
-                    String dataset_database = dataEntry.getDatabase();
+                    String databaseName = omicsXMLFile.getDatabaseName();
+                    if(null==databaseName){
+                        databaseName = dataEntry.getRepository();
+                    }
+
+                    String dataset_database = omicsXMLFile.getDatabaseName();
+                    logger.debug("inserting: " + dataEntry.getId() + " " + dataset_database + "");
 
                     datasetAnnotationService.insertDataset(dataEntry, StringUtils.isEmpty(dataset_database) ? databaseName : dataset_database);
                     threadSafeList.add(new Pair<>(dataEntry.getId(), dataset_database));
-                    logger.debug("Dataset: " + dataEntry.toString() + "has been added");
+                    logger.debug("Dataset: " + dataEntry.getId() + " " + dataset_database + "has been added");
                 });
 
             }catch (Exception e){

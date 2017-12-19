@@ -70,6 +70,13 @@ public class DatasetExportTasklet extends AbstractTasklet{
                 Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
                 Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
                 listToPrint.add(entry);
+
+                //shorten description per EBI Search request
+                String description = entry.getDescription();
+                if(null!=description && description.length()>100){
+                    entry.setDescription(description.substring(0,100)+"...");
+                }
+
                 if (listToPrint.size() == numberEntries) {
                     try {
                         DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());

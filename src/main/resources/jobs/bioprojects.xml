@@ -41,7 +41,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="importDataStep" parent="parentStep" next="cleanStep">
+        <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
@@ -52,10 +52,45 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="cleanStep" parent="parentStep">
+        <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationBioprojectsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.BioprojectsAnnotationTasklet">
+                    <bean:property name="databaseName" value="GEO"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichmentStep" parent="parentStep" next="cleanStep">
+            <batch:tasklet>
+                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="GEO" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.GENOMICS_DATA"/>
+                    </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="cleanStep" parent="parentStep" next="writeIndexes">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.bioprojects.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="writeIndexes" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                    <bean:property name="databaseName" value="GEO" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/geo"/>
+                    <bean:property name="filePrefix"      value="GEO_EBEYE" />
+                    <bean:property name="numberEntries"   value="200" />
+                    <bean:property name="databaseService" ref="databaseAnnotationService" />
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -83,15 +118,21 @@
         <bean:property name="strict" value="false"/>
     </bean:bean>
 
+    <bean id="geoClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.GeoClient">
+        <constructor-arg index="0" value="/nfs/pride/prod/ddi/pipeline/testDev/BioProjectsGeo"/>
+    </bean>
+
     <bean:bean id="bioprojectsClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.BioprojectsClient">
         <constructor-arg index="0" value="/nfs/pride/prod/ddi/pipeline/testDev/BioProjects"/>
+        <constructor-arg index="1" ref="geoClient"/>
     </bean:bean>
 
     <bean:bean id="bioprojectsGenerator" class="uk.ac.ebi.ddi.api.readers.bioprojects.GenerateBioprojectsOmicsXML">
-        <constructor-arg index="0" ref="bioprojectsClient"></constructor-arg>
-        <bean:constructor-arg index="1" value="${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
-        <bean:constructor-arg index="2" value="#{currentDate}"/>
-        <bean:constructor-arg index="3" value="GEO,dbGaP"/>
+        <bean:constructor-arg index="0" ref="bioprojectsClient"/>
+        <bean:constructor-arg index="1" ref="datasetService"/>
+        <bean:constructor-arg index="2" value="${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
+        <bean:constructor-arg index="3" value="#{currentDate}"/>
+        <bean:constructor-arg index="4" value="GEO,dbGaP"/>
     </bean:bean>
 
     <!--load property files-->

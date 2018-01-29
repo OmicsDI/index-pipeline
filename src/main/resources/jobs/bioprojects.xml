@@ -119,11 +119,11 @@
     </bean:bean>
 
     <bean id="geoClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.GeoClient">
-        <constructor-arg index="0" value="${ddi.bioprojects.directory}/Geo"/>
+        <constructor-arg index="0" value="${ddi.original.directory}bioprojects/Geo"/>
     </bean>
 
     <bean:bean id="bioprojectsClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.BioprojectsClient">
-        <constructor-arg index="0" value="${ddi.bioprojects.directory}"/>
+        <constructor-arg index="0" value="${ddi.original.directory}bioprojects/"/>
         <constructor-arg index="1" ref="geoClient"/>
     </bean:bean>
 

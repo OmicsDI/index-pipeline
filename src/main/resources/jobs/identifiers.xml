@@ -24,7 +24,7 @@
         <batch:step id="ddiIdentifiersStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="identifiersEnrichmentTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.IdentifierEnrichmentTasklet">
-                    <bean:property name="filePath" value="${ddi.original.directory}ncbi/" />
+                    <bean:property name="filePath" value="${ddi.common.original.directory}ncbi/" />
                     <bean:property name="enrichmentInfoService" ref="enrichmentInfoService" />
                 </bean:bean>
             </batch:tasklet>

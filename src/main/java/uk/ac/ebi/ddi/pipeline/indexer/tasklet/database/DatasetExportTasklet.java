@@ -67,16 +67,17 @@ public class DatasetExportTasklet extends AbstractTasklet{
         Database database = databaseService.getDatabaseInfo(databaseName);
         try {
             datasets.stream().forEach(dataset -> {
-                Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
-                listToPrint.add(entry);
+                if(datasetAnnotationService.getMergedDatasetCount(dataset.getDatabase(), dataset.getAccession()) == 0) {
+                    Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+                    Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
+                    listToPrint.add(entry);
 
-                //shorten description per EBI Search request
-                String description = entry.getDescription();
-                if(null!=description && description.length()>100){
-                    entry.setDescription(description.substring(0,100)+"...");
+                    //shorten description per EBI Search request
+                    String description = entry.getDescription();
+                    if (null != description && description.length() > 100) {
+                        entry.setDescription(description.substring(0, 100) + "...");
+                    }
                 }
-
                 if (listToPrint.size() == numberEntries) {
                     try {
                         DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());

@@ -13,6 +13,7 @@
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
 
+
     <mongo:mongo-client credentials="${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port}">
         <mongo:client-options connections-per-host="10"
                               threads-allowed-to-block-for-connection-multiplier="10"
@@ -23,7 +24,6 @@
                               write-concern="NORMAL"
                               read-preference="PRIMARY_PREFERRED"/>
     </mongo:mongo-client>
-
 
     <mongo:db-factory dbname="${ddi.common.mongo.app.db}" port="${ddi.common.mongo.app.port}" mongo-ref="mongoClient" id="mongoDbFactory"/>
 
@@ -67,6 +67,9 @@
 <bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
     <constructor-arg name="config" ref="ebeyeWsConfig"/>
 </bean>
+    <bean id="domainWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
+        <constructor-arg name="config" ref="ebeyeWsConfig"/>
+    </bean>
 <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
 <bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
 <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>

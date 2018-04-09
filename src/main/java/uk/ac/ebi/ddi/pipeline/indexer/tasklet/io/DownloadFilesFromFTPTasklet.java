@@ -78,19 +78,28 @@ public class DownloadFilesFromFTPTasklet extends AbstractTasklet {
         //enter passive mode
         ftp.enterLocalPassiveMode();
         //get system name
-        logger.debug("Remote system is " + ftp.getSystemType());
+        logger.info("Remote system is " + ftp.getSystemType());
         //change current directory
         ftp.changeWorkingDirectory(sourceDirectory);
 
-        logger.debug("Current directory is " + ftp.printWorkingDirectory());
+        logger.info("Current directory is " + ftp.printWorkingDirectory());
+
+        logger.info("pattern is " + pattern);
 
         //get list of filenames
         FTPFile[] ftpFiles = ftp.listFiles();
 
+        logger.info("number of files are " + ftpFiles.length);
+        for (FTPFile ftpFile:ftpFiles
+             ) {
+            logger.info("file names are " + ftpFile.getName());
+        }
         if (ftpFiles != null && ftpFiles.length > 0) {
             for (FTPFile file : ftpFiles) {
+                logger.info("file name is " + file.getName());
+                logger.info( "does file has pattern "+ file.getName().contains(pattern));
                 if((file.isFile() || file.isSymbolicLink()) && (pattern !=null && !pattern.isEmpty() && file.getName().contains(pattern))){
-                    System.out.println("File is " + file.getName());
+                    logger.info("File is " + file.getName());
                     //get output stream
                     OutputStream output;
                     output = new FileOutputStream(targetDirectory.getFile() + "/" + file.getName());

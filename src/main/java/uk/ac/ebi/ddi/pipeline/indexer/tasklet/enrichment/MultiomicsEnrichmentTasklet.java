@@ -40,7 +40,7 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
-    @Override
+   /* @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception{
         List<PublicationDataset> pubData = datasetAnnotationService.getMultiomics();
         pubData.parallelStream().forEach(
@@ -49,13 +49,14 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
                     if (dataset != null) {
                         dataset = DatasetUtils.addAdditionalField(dataset, Field.OMICS.getName(), Constants.MULTIOMICS_TYPE);
                         datasetAnnotationService.updateDataset(dataset);
+                        //datasetAnnotationService.addDatasetSimilars(dataset, publication.getValue(), DatasetSimilarsType.OTHER_OMICS_DATA.getType());
                     }
                 }
         );
         return RepeatStatus.FINISHED;
     }
-
-    /*public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+*/
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets();
         datasetList = datasetList.parallelStream().filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty()).collect(Collectors.toList());
         Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream().collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
@@ -74,7 +75,6 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet{
         });
         return RepeatStatus.FINISHED;
     }
-*/
     public DDIDatasetAnnotationService getDatasetAnnotationService() {
         return datasetAnnotationService;
     }

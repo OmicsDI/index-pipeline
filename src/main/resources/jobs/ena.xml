@@ -24,16 +24,6 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
-            <batch:tasklet>
-                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                    <bean:property name="inputDirectory"      value="file:/home/gaur/enatest"/>
-                    <bean:property name="outputDirectory" value="file:/home/gaur/${ddi.common.ena.database.index}test/out"/>
-                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>
-
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
@@ -49,7 +39,7 @@
                     <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.original.pattern}" />
-                    <bean:property name="numberEntries"   value="${ddi.common.single.file.number.entries}"/>
+                    <bean:property name="numberEntries"   value="200"/>
                     <bean:property name="filePrefix"      value="${ddi.common.ena.prefix}" />
                 </bean:bean>
             </batch:tasklet>
@@ -58,7 +48,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationLink">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory"            value="file:/home/gaur/enatest/out/"/>
+                    <bean:property name="inputDirectory"            value="file:${ddi.common.data.directory}${ddi.common.ena.database.index}"/>
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName"              value="${ddi.common.ena.database.name}" />

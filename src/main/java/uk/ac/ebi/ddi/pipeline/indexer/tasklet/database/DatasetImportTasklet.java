@@ -55,25 +55,36 @@ public class DatasetImportTasklet extends AbstractTasklet{
                 OmicsXMLFile omicsXMLFile = new OmicsXMLFile(file);
 
                 List<Entry> entries = omicsXMLFile.getAllEntries();
-                entries.parallelStream().forEach(dataEntry -> {
+                if(entries != null) {
+                    entries.parallelStream().forEach(dataEntry -> {
+                        try {
+                            System.out.println(dataEntry);
+                            String databaseName = omicsXMLFile.getDatabaseName() != null ? omicsXMLFile.getDatabaseName() : "NA";
+                            if ("" == databaseName) {
+                                databaseName = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
+                            }
 
-                    String databaseName = omicsXMLFile.getDatabaseName();
-                    if(null==databaseName){
-                        databaseName = dataEntry.getRepository();
-                    }
 
-                    String dataset_database = omicsXMLFile.getDatabaseName();
-                    logger.debug("inserting: " + dataEntry.getId() + " " + dataset_database + "");
+                            logger.debug("inserting: " + dataEntry.getId() + " " + databaseName + "");
 
-                    datasetAnnotationService.insertDataset(dataEntry, StringUtils.isEmpty(dataset_database) ? databaseName : dataset_database);
-                    threadSafeList.add(new Pair<>(dataEntry.getId(), dataset_database));
-                    logger.debug("Dataset: " + dataEntry.getId() + " " + dataset_database + "has been added");
-                });
-
+                            datasetAnnotationService.insertDataset(dataEntry, databaseName);
+                            threadSafeList.add(new Pair<>(dataEntry.getId(), databaseName));
+                            logger.debug("Dataset: " + dataEntry.getId() + " " + databaseName + "has been added");
+                        } catch (Exception ex) {
+                            logger.info("Exception in dataset " + ex.getMessage() + " entry is " + dataEntry.getId());
+                        }
+                    });
+                }
+                else
+                {
+                    logger.info("entries are null");
+                }
             }catch (Exception e){
+                logger.info("entries are null");
                 logger.info("Error Reading file : " + file +" with exception " + e.getMessage());
             }
         });
+
 
         if(inputDirectory.getFile().listFiles() != null && inputDirectory.getFile().listFiles().length > 0){
             OmicsXMLFile file = new OmicsXMLFile(inputDirectory.getFile().listFiles()[0]);

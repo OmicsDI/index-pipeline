@@ -58,7 +58,7 @@ public class DatasetExportTasklet extends AbstractTasklet{
         final int[] counterFiles = {1};
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
         datasets = datasets.parallelStream()
-                .filter(x -> x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
+                .filter(x ->  x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
                         x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()) ||
                         x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.ENRICHED.getType())
                 )

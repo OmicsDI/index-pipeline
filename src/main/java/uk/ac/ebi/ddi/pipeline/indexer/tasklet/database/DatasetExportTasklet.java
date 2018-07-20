@@ -74,8 +74,9 @@ public class DatasetExportTasklet extends AbstractTasklet{
 
                     //shorten description per EBI Search request
                     String description = entry.getDescription();
-                    if (null != description && description.length() > 100) {
-                        entry.setDescription(description.substring(0, 100) + "...");
+                    if (null != description ) {
+                        //entry.setDescription(description.substring(0, 100) + "...");&& description.length() > 100
+                        entry.setDescription(description);
                     }
                 }
                 if (listToPrint.size() == numberEntries) {

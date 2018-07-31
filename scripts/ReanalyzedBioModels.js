@@ -1,4 +1,4 @@
-var reanalysed = db.datasets.similars.aggregate([{"$match":{"similars.relationType":"Reanalysis of","database":"BioModels Database"}}, 
+var reanalysed = db.datasets.similars.aggregate([{"$match":{"similars.relationType":"Reanalysis of","database":"BioModels"}},
 {"$unwind":"$similars"},{"$group":{"_id":"$similars.similarDataset","data":{"$addToSet":{"acc":"$accession","db":"$database"}} }}]);
 
 reanalysed.forEach(function(input_data){

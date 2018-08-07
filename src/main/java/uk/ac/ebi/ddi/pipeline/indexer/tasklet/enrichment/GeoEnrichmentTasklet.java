@@ -48,18 +48,30 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         for (Dataset dataset : datasets) {
-            List<String> sampleIds = getSampleIds(dataset);
-            for (String sampleId : sampleIds) {
-                Set<PublicationDataset> publicationDatasets = getReanalysisDataset(sampleId);
-                datasetAnnotationService.addDatasetSimilars(dataset, publicationDatasets, Constants.REANALYZED_TYPE);
-            }
+            LOGGER.debug("Processing dataset {}", dataset);
+            process(dataset);
         }
-        return null;
+        return RepeatStatus.FINISHED;
     }
 
-    public List<String> getSampleIds(Dataset dataset) {
+    void process(Dataset dataset) {
+        try {
+            List<String> sampleIds = getSampleIds(dataset.getAccession());
+            for (String sampleId : sampleIds) {
+                Set<PublicationDataset> pubDatasets = getReanalysisDataset(sampleId);
+                if (pubDatasets.size() == 0) {
+                    continue;
+                }
+                datasetAnnotationService.addDatasetSimilars(dataset, pubDatasets, Constants.REANALYZED_TYPE);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Exception occurred when processing dataset {}", dataset);
+        }
+    }
+
+    List<String> getSampleIds(String accession) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
-                .queryParam("acc", dataset.getAccession())
+                .queryParam("acc", accession)
                 .queryParam("targ", "self")
                 .queryParam("form", "text");
         ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
@@ -67,8 +79,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
             String line = reader.readLine();
             while (line != null) {
-                String patternString = "\\s*!Series_sample_id\\s*=\\s*(\\w*)";
-                Pattern pattern = Pattern.compile(patternString);
+                Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
@@ -76,35 +87,72 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 line = reader.readLine();
             }
         } catch (IOException exc) {
-            LOGGER.error("Exception occurred when reading dataset {}, {}", dataset, exc);
+            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, exc);
         }
         return result;
     }
 
-    public Set<PublicationDataset> getReanalysisDataset(String sampleId) {
+    List<String> getDatasetFromSample(String accession) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
+                .queryParam("acc", accession)
+                .queryParam("targ", "self")
+                .queryParam("form", "text");
+        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
+        List<String> result = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
+            String line = reader.readLine();
+            while (line != null) {
+                Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    result.add(matcher.group(1));
+                }
+                line = reader.readLine();
+            }
+        } catch (IOException exc) {
+            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, exc);
+        }
+        return result;
+    }
+
+    Set<PublicationDataset> getReanalysisDataset(String sampleId) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
                 .queryParam("acc", sampleId)
                 .queryParam("targ", "self")
                 .queryParam("form", "text");
         ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
         Set<PublicationDataset> dataset = new HashSet<>();
+        Set<String> datasets = new HashSet<>();
         try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
             String line = reader.readLine();
+            Pattern pattern = Pattern.compile("\\s*Reanalyzed by:\\s*(\\w*)");
             while (line != null) {
-                String patternString = "\\s*Reanalyzed by:\\s*(\\w*)";
-                Pattern pattern = Pattern.compile(patternString);
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    PublicationDataset publicationDataset = new PublicationDataset();
-                    publicationDataset.setDatabaseID(DATASET_NAME);
-                    publicationDataset.setDatasetID(matcher.group(1));
-                    publicationDataset.setOmicsType(Constants.REANALYZED_TYPE);
-                    dataset.add(publicationDataset);
+                    if (matcher.group(1).contains("GSE")) {
+                        // In case the sample reanalyse a dataset
+                        datasets.add(matcher.group(1));
+                    } else if (matcher.group(1).contains("GSM")) {
+                        // In case the sample reanalyse another sample
+                        List<String> accessions = getDatasetFromSample(matcher.group(1));
+                        for (String accession : accessions) {
+                            if (accession.contains("GSE")) {
+                                datasets.add(accession);
+                            }
+                        }
+                    }
                 }
                 line = reader.readLine();
             }
         } catch (IOException exc) {
             LOGGER.error("Exception occurred when reading sample id {}, {}", sampleId, exc);
+        }
+        for (String accession : datasets) {
+            PublicationDataset publicationDataset = new PublicationDataset();
+            publicationDataset.setDatabaseID(DATASET_NAME);
+            publicationDataset.setDatasetID(accession);
+            publicationDataset.setOmicsType(Constants.REANALYZED_TYPE);
+            dataset.add(publicationDataset);
         }
         return dataset;
     }

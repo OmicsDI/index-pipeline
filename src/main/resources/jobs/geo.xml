@@ -19,11 +19,11 @@
     <import resource="../context/db-job-repository.xml"/>
     <import resource="../context/mongo-db-context.xml" />
 
-    <batch:job id="ddiMultiomicsJob" xmlns="http://www.springframework.org/schema/batch">
+    <batch:job id="ddiGeoJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="multiomicsAnnotationStep" parent="parentStep">
+        <batch:step id="geoAnnotationStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="multiomicsStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.GeoEnrichmentTasklet">
+                <bean:bean id="geoStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.GeoEnrichmentTasklet">
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="datasetService" ref="datasetService" />
                 </bean:bean>

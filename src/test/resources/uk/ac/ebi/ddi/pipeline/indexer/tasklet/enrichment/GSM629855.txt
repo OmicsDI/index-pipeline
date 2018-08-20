@@ -1,0 +1,60 @@
+^SAMPLE = GSM629855
+!Sample_title = second_trimester_amniotic_fluid_euploid_female1_trisomy18study
+!Sample_geo_accession = GSM629855
+!Sample_status = Public on Dec 03 2010
+!Sample_submission_date = Nov 28 2010
+!Sample_last_update_date = Oct 24 2011
+!Sample_type = RNA
+!Sample_channel_count = 1
+!Sample_source_name_ch1 = cell free mRNA from second trimester amniotic fluid, euploid control
+!Sample_organism_ch1 = Homo sapiens
+!Sample_taxid_ch1 = 9606
+!Sample_characteristics_ch1 = rna source: cell free mRNA from second trimester amniotic fluid
+!Sample_characteristics_ch1 = karyotype: 46,XX
+!Sample_molecule_ch1 = total RNA
+!Sample_extract_protocol_ch1 = RNA was extracted from 10 mL amniotic fluid supernatant with 30 mL TRIzol LS Reagent (Invitrogen, Carlsbad, CA) and 8 mL chloroform. After RNA extraction, RNA was purified and DNA was removed using the RNeasy® Maxi Kit, including the DNase step according to the manufacturer’s protocol (QIAGEN, Valencia, CA).  RNA was precipitated using 3M NaOAc and 100% ethanol, and 80% ethanol was added after 4 hours incubation at -20 °C. cDNA, synthesized from extracted RNA, was amplified and purified using the WT-Ovation™ Pico RNA Amplification System (NuGEN, San Carlos, CA) and the DNA Clean & Concentrator™-25 (Zymo Research, Orange, CA).
+!Sample_label_ch1 = biotin
+!Sample_label_protocol_ch1 = Samples were labeled using the FL-Ovation™ cDNA Biotin Module V2 (NuGEN, San Carlos, CA).
+!Sample_hyb_protocol = A minimum of 5ug of cDNA from each sample was hybridized to Affymetrix U133 Plus 2.0 microarrays.  Arrays were washed and stained with streptavidin-phycoerythrin.
+!Sample_scan_protocol = Arrays were scanned on a GeneArray Scanner, using the GeneChip Microarray Suite 5.0 (Affymetrix, Santa Clara, CA).
+!Sample_description = gene expression data from normal second trimester fetus
+!Sample_data_processing = Normalization was performed with the threestep command from the AffyPLM package in BioConductor, using ideal-mismatch background/signal adjustment, quantile normalization, and the Tukey biweight summary method.  Identification of individual differentially-expressed genes was performed via two-sided t-tests using the multtest package in BioConductor, with the Benjamini-Hochberg false-discovery rate adjustment for multiple testing.
+!Sample_platform_id = GPL570
+!Sample_contact_name = Donna,K,Slonim
+!Sample_contact_email = Donna.Slonim@tufts.edu
+!Sample_contact_department = Computer Science
+!Sample_contact_institute = Tufts University
+!Sample_contact_address = 161 College Ave.
+!Sample_contact_city = Medford
+!Sample_contact_state = MA
+!Sample_contact_zip/postal_code = 01845
+!Sample_contact_country = USA
+!Sample_supplementary_file = ftp://ftp.ncbi.nlm.nih.gov/geo/samples/GSM629nnn/GSM629855/suppl/GSM629855.CEL.gz
+!Sample_relation = Reanalyzed by: GSM821262
+!Sample_series_id = GSE25634
+!Sample_data_row_count = 54675
+#ID_REF = 
+#VALUE = Log-scale expression values produced by the Tukey-biweight summary method from the AffyPLM package in BioConductor.
+!sample_table_begin
+ID_REF	VALUE
+1007_s_at	2.857991491
+1053_at	1.610530883
+117_at	4.030885358
+121_at	4.167363212
+1255_g_at	5.457082168
+1294_at	3.076474831
+1316_at	2.980063762
+1320_at	1.205692886
+1405_i_at	1.377571323
+1431_at	2.249756807
+1438_at	0.24194498
+1487_at	4.172622371
+1494_f_at	-0.06511711
+1552256_a_at	0.457382693
+1552257_a_at	1.722216666
+1552258_at	2.397975748
+1552261_at	2.853296792
+1552263_at	-0.469638412
+1552264_a_at	1.277304558
+1552266_at	-0.009335668
+!sample_table_end

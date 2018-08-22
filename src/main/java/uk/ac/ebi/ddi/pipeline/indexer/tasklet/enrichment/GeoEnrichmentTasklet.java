@@ -21,10 +21,7 @@ import uk.ac.ebi.ddi.service.db.utils.Constants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,13 +55,13 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     void process(Dataset dataset) {
         try {
+            Set<PublicationDataset> allPubDatasets = new HashSet<>();
             List<String> sampleIds = getSampleIds(dataset.getAccession());
             for (String sampleId : sampleIds) {
-                Set<PublicationDataset> pubDatasets = getReanalysisDataset(sampleId);
-                if (pubDatasets.size() == 0) {
-                    continue;
-                }
-                datasetAnnotationService.addDatasetSimilars(dataset, pubDatasets, Constants.REANALYZED_TYPE);
+                allPubDatasets.addAll(getReanalysisDataset(sampleId));
+            }
+            if (allPubDatasets.size() > 0) {
+                datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
             }
         } catch (Exception e) {
             LOGGER.error("Exception occurred when processing dataset {}", dataset);

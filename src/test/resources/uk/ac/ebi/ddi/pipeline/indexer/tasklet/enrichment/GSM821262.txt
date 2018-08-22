@@ -1,0 +1,64 @@
+^SAMPLE = GSM821262
+!Sample_title = second_trimester_euploid_AF_normalAFstudy_female1
+!Sample_geo_accession = GSM821262
+!Sample_status = Public on Jan 11 2012
+!Sample_submission_date = Oct 24 2011
+!Sample_last_update_date = Jan 11 2012
+!Sample_type = RNA
+!Sample_channel_count = 1
+!Sample_source_name_ch1 = second_trimester_euploid_AF_normalAFstudy_female
+!Sample_organism_ch1 = Homo sapiens
+!Sample_taxid_ch1 = 9606
+!Sample_characteristics_ch1 = gender: female
+!Sample_characteristics_ch1 = developmental stage: fetus
+!Sample_characteristics_ch1 = rna source: cell free mRNA from second trimester amniotic fluid
+!Sample_molecule_ch1 = total RNA
+!Sample_extract_protocol_ch1 = RNA was extracted from 10 mL AF with 30 mL TRIzol LS Reagent (Invitrogen, Carlsbad, CA) and 8 mL chloroform. After RNA extraction, RNA was purified and DNA was removed using the RNeasy® Maxi Kit, including the DNase step according to the manufacturer’s protocol (QIAGEN, Valencia, CA).  RNA was precipitated using 3M NaOAc and 100% ethanol, and 80% ethanol was added after 4 hours incubation at -20 °C. cDNA, synthesized from extracted RNA, was amplified and purified using the WT-Ovation™ Pico RNA Amplification System (NuGEN, San Carlos, CA) and the DNA Clean & Concentrator™-25 (Zymo Research, Orange, CA).
+!Sample_label_ch1 = biotin
+!Sample_label_protocol_ch1 = Samples were labeled using the FL-Ovation™ cDNA Biotin Module V2 (NuGEN, San Carlos, CA).
+!Sample_hyb_protocol = Arrays were washed and stained with streptavidin-phycoerythrin.
+!Sample_scan_protocol = Arrays were scanned on a GeneArray Scanner, using the GeneChip Microarray Suite 5.0 (Affymetrix, Santa Clara, CA).
+!Sample_description = femaleAF1
+!Sample_description = gene expression data from normal second trimester fetus
+!Sample_data_processing = Normalization was performed with the threestep command from the AffyPLM package in BioConductor, using ideal-mismatch background/signal adjustment, quantile normalization, and the Tukey biweight summary method.  To obtain detection calls consistent with those produced by Affymetrix' 5.0 software, we used the mas5calls function from the Bioconductor affy package.
+!Sample_platform_id = GPL570
+!Sample_contact_name = Donna,K,Slonim
+!Sample_contact_email = Donna.Slonim@tufts.edu
+!Sample_contact_department = Computer Science
+!Sample_contact_institute = Tufts University
+!Sample_contact_address = 161 College Ave.
+!Sample_contact_city = Medford
+!Sample_contact_state = MA
+!Sample_contact_zip/postal_code = 01845
+!Sample_contact_country = USA
+!Sample_supplementary_file = ftp://ftp.ncbi.nlm.nih.gov/geo/samples/GSM821nnn/GSM821262/suppl/GSM821262_femaleAF1.cel.gz
+!Sample_relation = Reanalysis of: GSM629855
+!Sample_series_id = GSE33168
+!Sample_data_row_count = 54675
+#ID_REF = 
+#VALUE = Log-scale expression values produced by the Tukey-biweight summary method from the AffyPLM package.
+#ABS_CALL = 
+#DETECTION P-VALUE = 
+!sample_table_begin
+ID_REF	VALUE	ABS_CALL	DETECTION P-VALUE
+1007_s_at	2.529070188	A	0.218983229
+1053_at	1.348458348	A	0.715252888
+117_at	3.637289849	P	0.019303461
+121_at	3.78028724	P	0.021866375
+1255_g_at	5.042910942	P	0.021866375
+1294_at	2.735816215	A	0.458815762
+1316_at	2.648822467	A	0.089405078
+1320_at	0.953851964	A	0.795977945
+1405_i_at	1.105968938	A	0.611217611
+1431_at	1.949115712	A	0.150527117
+1438_at	0.001218881	A	0.795977945
+1487_at	3.783764278	P	0.014936519
+1494_f_at	-0.23182974	A	0.47938033
+1552256_a_at	0.265050025	A	0.893388436
+1552257_a_at	1.445250207	A	0.123873163
+1552258_at	2.091547275	A	0.077429964
+1552261_at	2.536907547	A	0.091157283
+1552263_at	-0.554601853	A	0.394837628
+1552264_a_at	1.059986073	A	0.296855833
+1552266_at	-0.197467567	A	0.73325383
+!sample_table_end

@@ -46,11 +46,13 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        LOGGER.info("Starting");
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         for (Dataset dataset : datasets) {
             LOGGER.debug("Processing dataset {}", dataset);
             process(dataset);
         }
+        LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
     }
 

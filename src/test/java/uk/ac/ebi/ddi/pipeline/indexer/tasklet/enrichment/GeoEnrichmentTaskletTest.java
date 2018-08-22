@@ -49,7 +49,7 @@ public class GeoEnrichmentTaskletTest {
     }
 
     @Test
-    public void test_GetReanalysisDataset_ReanalysisAsSample_MustReturn_5_Reanalysis() throws Exception {
+    public void test_GetReanalysisDataset_ReanalysisAsSample_MustReturn_1_Reanalysis() throws Exception {
         String resGSM629855 = TestUtils.getResource(this.getClass(), "GSM629855.txt");
         when(restTemplate.getForEntity(
                 eq("https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM629855&targ=self&form=text"), any()))

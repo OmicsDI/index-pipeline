@@ -21,7 +21,12 @@ import uk.ac.ebi.ddi.service.db.utils.Constants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +35,8 @@ import java.util.regex.Pattern;
 public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private DDIDatasetAnnotationService datasetAnnotationService;
+
+    private static final int MAX_PARALLEL = 5;
 
     private IDatasetService datasetService;
 
@@ -45,10 +52,12 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting");
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
-        for (Dataset dataset : datasets) {
-            LOGGER.debug("Processing dataset {}", dataset);
+        ForkJoinPool customThreadPool = new ForkJoinPool(MAX_PARALLEL);
+        AtomicInteger counter = new AtomicInteger(0);
+        customThreadPool.submit(() -> datasets.parallelStream().forEach(dataset -> {
+            LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
             process(dataset);
-        }
+        })).get();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
     }

@@ -25,7 +25,7 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-<!--        <batch:step id="generateBaselineXML" parent="parentStep" next="generateRelativeXML">
+        <batch:step id="generateBaselineXML" parent="parentStep" next="generateRelativeXML">
             <batch:tasklet>
                 <bean:bean id="generateBaselineXMLStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyeExpressionAtlasXML">
                     <bean:property name="experimentFileName" value="${ddi.common.expressionatlas.baseline.experiment.file}"/>
@@ -75,19 +75,9 @@
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>-->
+        </batch:step>
 
-<!--        <batch:step id="annotationFiles" parent="parentStep" next="cleanStep">
-            <batch:tasklet>
-                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ExpressionAtlasAnnotationTasklet">
-                    <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}"/>
-                    <bean:property name="originalDatabase" value="${ddi.common.arrayexpress.database.name}" />
-                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                </bean:bean>
-            </batch:tasklet>
-        </batch:step>-->
-
-        <batch:step id="annotationFiles" parent="parentStep">
+        <batch:step id="annotationFiles" parent="parentStep" next="cleanStep">
             <batch:tasklet>
                 <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ExpressionAtlasAnnotationTasklet">
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}"/>
@@ -96,6 +86,16 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
+
+<!--        <batch:step id="annotationFiles" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ExpressionAtlasAnnotationTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}"/>
+                    <bean:property name="originalDatabase" value="${ddi.common.arrayexpress.database.name}" />
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>-->
 
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>

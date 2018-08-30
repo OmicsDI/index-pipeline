@@ -97,7 +97,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <!--<batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.expressionatlas.database.index}" />
@@ -116,7 +116,7 @@
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>-->
+        </batch:step>
 
         <batch:listeners>
             <batch:listener ref="jobListener"/>

@@ -1,0 +1,1 @@
+db.datasets.dataset.update({"database":"LINCS","additional.omics_type":"UNKNOWN"},{"$set":{"additional.omics_type":["Transcriptomics"]}},false,true)

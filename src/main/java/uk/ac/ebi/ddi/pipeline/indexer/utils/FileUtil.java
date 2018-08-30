@@ -227,4 +227,29 @@ public final class FileUtil {
 
         return true;
     }
+
+    /**
+     * Write object to file for future recover
+     * @param file
+     * @param object
+     */
+    public static void writeObjectToFile(File file, Serializable object) throws IOException {
+        try (FileOutputStream cacheFile = new FileOutputStream(file)) {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(cacheFile);
+            objectOutputStream.writeObject(object);
+        }
+    }
+
+    /**
+     * Load object from file
+     * @param file
+     * @return
+     */
+    public static <T> T loadObjectFromFile(File file) throws IOException, ClassNotFoundException {
+        try (FileInputStream fileIn = new FileInputStream(file)) {
+            ObjectInputStream objectIn = new ObjectInputStream(fileIn);
+            Object obj = objectIn.readObject();
+            return (T) obj;
+        }
+    }
 }

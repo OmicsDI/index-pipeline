@@ -13,15 +13,20 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.FileUtil;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.publication.PublicationDataset;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.utils.Constants;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,30 +36,48 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private DDIDatasetAnnotationService datasetAnnotationService;
 
+    private static final int MAX_PARALLEL = 5;
+
     private IDatasetService datasetService;
 
     private static final String DATASET_NAME = "GEO";
 
     private static final String NCBI_ENDPOINT = "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi";
 
+    private File processedFile = new File(System.getProperty("user.home"), "GeoEnrichmentTasklet.processed");
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoEnrichmentTasklet.class);
 
     private RestTemplate restTemplate = new RestTemplate();
 
+    private ConcurrentHashMap<String, String> processedDatasets;
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting");
-        List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
-        for (Dataset dataset : datasets) {
-            LOGGER.debug("Processing dataset {}", dataset);
-            process(dataset);
+        if (processedFile.exists()) {
+            processedDatasets = FileUtil.loadObjectFromFile(processedFile);
+        } else {
+            processedDatasets = new ConcurrentHashMap<>();
         }
+        List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
+        ForkJoinPool customThreadPool = new ForkJoinPool(MAX_PARALLEL);
+        AtomicInteger counter = new AtomicInteger(0);
+        customThreadPool.submit(() -> datasets.parallelStream().forEach(dataset -> {
+            LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
+            process(dataset);
+        })).get();
+        processedFile.delete();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
     }
 
     void process(Dataset dataset) {
         try {
+            if (isDatasetProcessed(dataset.getAccession())) {
+                LOGGER.info("Dataset {} processed, ignoring...", dataset.getAccession());
+                return;
+            }
             Set<PublicationDataset> allPubDatasets = new HashSet<>();
             List<String> sampleIds = getSampleIds(dataset.getAccession());
             for (String sampleId : sampleIds) {
@@ -63,9 +86,19 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             if (allPubDatasets.size() > 0) {
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
             }
+            datasetProcessed(dataset.getAccession());
         } catch (Exception e) {
             LOGGER.error("Exception occurred when processing dataset {}", dataset);
         }
+    }
+
+    synchronized boolean isDatasetProcessed(String accession) {
+        return processedDatasets.containsKey(accession);
+    }
+
+    synchronized void datasetProcessed(String accession) throws IOException {
+        processedDatasets.put(accession, accession);
+        FileUtil.writeObjectToFile(processedFile, processedDatasets);
     }
 
     List<String> getSampleIds(String accession) {

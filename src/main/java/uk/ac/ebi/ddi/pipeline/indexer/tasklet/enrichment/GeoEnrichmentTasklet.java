@@ -193,7 +193,6 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             PublicationDataset publicationDataset = new PublicationDataset();
             publicationDataset.setDatabaseID(DATASET_NAME);
             publicationDataset.setDatasetID(accession);
-            publicationDataset.setOmicsType(Constants.REANALYZED_TYPE);
             dataset.add(publicationDataset);
         }
         return dataset;

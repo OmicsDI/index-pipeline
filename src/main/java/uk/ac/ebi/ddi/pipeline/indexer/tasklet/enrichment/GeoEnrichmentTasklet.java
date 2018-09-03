@@ -85,6 +85,16 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             }
             if (allPubDatasets.size() > 0) {
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
+                for (PublicationDataset publicationDataset : allPubDatasets) {
+                    Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(), DATASET_NAME);
+                    if (refDataset != null) {
+                        PublicationDataset pub = new PublicationDataset();
+                        pub.setDatabaseID(DATASET_NAME);
+                        pub.setDatasetID(dataset.getAccession());
+                        datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
+                                Constants.REANALYSIS_TYPE);
+                    }
+                }
             }
             datasetProcessed(dataset.getAccession());
         } catch (Exception e) {

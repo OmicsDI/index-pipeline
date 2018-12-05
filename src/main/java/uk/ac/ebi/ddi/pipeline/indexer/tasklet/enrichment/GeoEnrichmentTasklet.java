@@ -46,6 +46,13 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private File processedFile = new File(System.getProperty("user.home"), "GeoEnrichmentTasklet.processed");
 
+    private File downloadDir = new File(System.getProperty("user.home"), "GeoEnrichmentDownloaded");
+
+    /**
+     * Add -DfromDownloadedFiles=true to command line to active read data from downloaded files
+     */
+    private boolean readFromDownloadedFiles = Boolean.parseBoolean(System.getProperty("fromDownloadedFiles"));
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoEnrichmentTasklet.class);
 
     private RestTemplate restTemplate = new RestTemplate();
@@ -55,6 +62,9 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting");
+        if (!downloadDir.exists()) {
+            downloadDir.mkdirs();
+        }
         if (processedFile.exists()) {
             processedDatasets = FileUtil.loadObjectFromFile(processedFile);
         } else {
@@ -85,10 +95,20 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             }
             if (allPubDatasets.size() > 0) {
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
+                for (PublicationDataset publicationDataset : allPubDatasets) {
+                    Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(), DATASET_NAME);
+                    if (refDataset != null) {
+                        PublicationDataset pub = new PublicationDataset();
+                        pub.setDatabaseID(DATASET_NAME);
+                        pub.setDatasetID(dataset.getAccession());
+                        datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
+                                Constants.REANALYSIS_TYPE);
+                    }
+                }
             }
             datasetProcessed(dataset.getAccession());
         } catch (Exception e) {
-            LOGGER.error("Exception occurred when processing dataset {}", dataset);
+            LOGGER.error("Exception occurred when processing dataset {}, {}", dataset, e);
         }
     }
 
@@ -125,13 +145,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     }
 
     List<String> getDatasetFromSample(String accession) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
-                .queryParam("acc", accession)
-                .queryParam("targ", "self")
-                .queryParam("form", "text");
-        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
         List<String> result = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(accession)))) {
             String line = reader.readLine();
             while (line != null) {
                 Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
@@ -141,21 +156,16 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 }
                 line = reader.readLine();
             }
-        } catch (IOException exc) {
-            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, exc);
+        } catch (IOException | ClassNotFoundException e) {
+            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, e);
         }
         return result;
     }
 
     Set<PublicationDataset> getReanalysisDataset(String sampleId) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
-                .queryParam("acc", sampleId)
-                .queryParam("targ", "self")
-                .queryParam("form", "text");
-        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
         Set<PublicationDataset> dataset = new HashSet<>();
         Set<String> datasets = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(sampleId)))) {
             String line = reader.readLine();
             Pattern pattern = Pattern.compile("\\s*Reanalyzed by:\\s*(\\w*)");
             while (line != null) {
@@ -176,17 +186,34 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 }
                 line = reader.readLine();
             }
-        } catch (IOException exc) {
+        } catch (IOException | ClassNotFoundException exc) {
             LOGGER.error("Exception occurred when reading sample id {}, {}", sampleId, exc);
         }
         for (String accession : datasets) {
             PublicationDataset publicationDataset = new PublicationDataset();
             publicationDataset.setDatabaseID(DATASET_NAME);
             publicationDataset.setDatasetID(accession);
-            publicationDataset.setOmicsType(Constants.REANALYZED_TYPE);
             dataset.add(publicationDataset);
         }
         return dataset;
+    }
+
+    private String getFileContent(String accessionId) throws IOException, ClassNotFoundException {
+        File downloadedFile = new File(downloadDir, accessionId);
+        if (readFromDownloadedFiles) {
+            if (downloadedFile.exists()) {
+                LOGGER.info("File {} downloaded & restored instead of fetching from NCBI API",
+                        downloadedFile.getAbsolutePath());
+                return FileUtil.loadObjectFromFile(downloadedFile);
+            }
+        }
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
+                .queryParam("acc", accessionId)
+                .queryParam("targ", "self")
+                .queryParam("form", "text");
+        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
+        FileUtil.writeObjectToFile(downloadedFile, response.getBody());
+        return response.getBody();
     }
 
     @Override

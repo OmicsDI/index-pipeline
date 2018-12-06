@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
@@ -46,12 +47,10 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private File processedFile = new File(System.getProperty("user.home"), "GeoEnrichmentTasklet.processed");
 
-    private File downloadDir = new File(System.getProperty("user.home"), "GeoEnrichmentDownloaded");
+    @Value("${ddi.common.storage.path}")
+    private String downloadPath;
 
-    /**
-     * Add -DfromDownloadedFiles=true to command line to active read data from downloaded files
-     */
-    private boolean readFromDownloadedFiles = Boolean.parseBoolean(System.getProperty("fromDownloadedFiles"));
+    private File downloadDir;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoEnrichmentTasklet.class);
 
@@ -62,6 +61,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting");
+        downloadDir = new File(downloadPath);
         if (!downloadDir.exists()) {
             downloadDir.mkdirs();
         }
@@ -200,12 +200,10 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private String getFileContent(String accessionId) throws IOException, ClassNotFoundException {
         File downloadedFile = new File(downloadDir, accessionId);
-        if (readFromDownloadedFiles) {
-            if (downloadedFile.exists()) {
-                LOGGER.info("File {} downloaded & restored instead of fetching from NCBI API",
-                        downloadedFile.getAbsolutePath());
-                return FileUtil.loadObjectFromFile(downloadedFile);
-            }
+        if (downloadedFile.exists()) {
+            LOGGER.info("File {} downloaded & restored instead of fetching from NCBI API",
+                    downloadedFile.getAbsolutePath());
+            return FileUtil.loadObjectFromFile(downloadedFile);
         }
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
                 .queryParam("acc", accessionId)

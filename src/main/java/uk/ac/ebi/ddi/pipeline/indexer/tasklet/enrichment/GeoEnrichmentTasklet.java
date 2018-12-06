@@ -121,14 +121,10 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         FileUtil.writeObjectToFile(processedFile, processedDatasets);
     }
 
-    List<String> getSampleIds(String accession) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
-                .queryParam("acc", accession)
-                .queryParam("targ", "self")
-                .queryParam("form", "text");
-        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
+    List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {
+        String response = getFileContent(accession);
         List<String> result = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new StringReader(response.getBody()))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(response))) {
             String line = reader.readLine();
             while (line != null) {
                 Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");

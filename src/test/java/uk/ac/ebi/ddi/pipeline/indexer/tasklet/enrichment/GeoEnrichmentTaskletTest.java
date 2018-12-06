@@ -31,7 +31,7 @@ public class GeoEnrichmentTaskletTest {
     private GeoEnrichmentTasklet enrichmentTasklet = new GeoEnrichmentTasklet();
 
     @Test
-    public void test_GetSampleIds_MustReturn_142_Samples() throws IOException {
+    public void test_GetSampleIds_MustReturn_142_Samples() throws IOException, ClassNotFoundException {
         String res = TestUtils.getResource(this.getClass(), "GSE9309.txt");
         when(restTemplate.getForEntity(anyString(), any())).thenReturn(new ResponseEntity<>(res, HttpStatus.OK));
         List<String> samples = enrichmentTasklet.getSampleIds("GSE9309");

@@ -1,5 +1,6 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -8,8 +9,10 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
@@ -36,8 +39,6 @@ import java.util.regex.Pattern;
 public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private DDIDatasetAnnotationService datasetAnnotationService;
-
-    private static final int MAX_PARALLEL = 5;
 
     private IDatasetService datasetService;
 
@@ -70,8 +71,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         } else {
             processedDatasets = new ConcurrentHashMap<>();
         }
-        List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
-        ForkJoinPool customThreadPool = new ForkJoinPool(MAX_PARALLEL);
+        List<Dataset> datasets = Collections.singletonList(datasetService.read("GSE19418", DATASET_NAME));
+        ForkJoinPool customThreadPool = new ForkJoinPool();
         AtomicInteger counter = new AtomicInteger(0);
         customThreadPool.submit(() -> datasets.parallelStream().forEach(dataset -> {
             LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
@@ -103,6 +104,16 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                         pub.setDatasetID(dataset.getAccession());
                         datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
                                 Constants.REANALYSIS_TYPE);
+                    } else {
+                        List<Dataset> secondaries =
+                                datasetService.getBySecondaryAccession(publicationDataset.getDatasetID());
+                        for (Dataset secondary : secondaries) {
+                            PublicationDataset pub = new PublicationDataset();
+                            pub.setDatabaseID(DATASET_NAME);
+                            pub.setDatasetID(dataset.getAccession());
+                            datasetAnnotationService.addGEODatasetSimilars(secondary, Collections.singleton(pub),
+                                    Constants.REANALYSIS_TYPE);
+                        }
                     }
                 }
             }
@@ -124,16 +135,22 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {
         String response = getFileContent(accession);
         List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
         try (BufferedReader reader = new BufferedReader(new StringReader(response))) {
             String line = reader.readLine();
             while (line != null) {
-                Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
                 }
                 line = reader.readLine();
             }
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return result;
+            }
+            throw e;
+
         } catch (IOException exc) {
             LOGGER.error("Exception occurred when reading dataset {}, {}", accession, exc);
         }
@@ -142,16 +159,21 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     List<String> getDatasetFromSample(String accession) {
         List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
         try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(accession)))) {
             String line = reader.readLine();
             while (line != null) {
-                Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
                 }
                 line = reader.readLine();
             }
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return result;
+            }
+            throw e;
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.error("Exception occurred when reading dataset {}, {}", accession, e);
         }
@@ -182,6 +204,11 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 }
                 line = reader.readLine();
             }
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return dataset;
+            }
+            throw e;
         } catch (IOException | ClassNotFoundException exc) {
             LOGGER.error("Exception occurred when reading sample id {}, {}", sampleId, exc);
         }

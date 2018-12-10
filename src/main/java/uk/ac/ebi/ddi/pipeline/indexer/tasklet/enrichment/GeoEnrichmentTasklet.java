@@ -28,8 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,13 +69,12 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         } else {
             processedDatasets = new ConcurrentHashMap<>();
         }
-        List<Dataset> datasets = Collections.singletonList(datasetService.read("GSE19418", DATASET_NAME));
-        ForkJoinPool customThreadPool = new ForkJoinPool();
+        List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         AtomicInteger counter = new AtomicInteger(0);
-        customThreadPool.submit(() -> datasets.parallelStream().forEach(dataset -> {
+        datasets.stream().parallel().forEach(dataset -> {
             LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
             process(dataset);
-        })).get();
+        });
         processedFile.delete();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;

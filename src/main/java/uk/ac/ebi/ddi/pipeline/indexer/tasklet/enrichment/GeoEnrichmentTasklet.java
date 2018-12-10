@@ -123,7 +123,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     synchronized void datasetProcessed(String accession) throws IOException {
         processedDatasets.put(accession, accession);
-        FileUtil.writeObjectToFile(processedFile, processedDatasets);
+        FileUtil.writeObjectToFile(processedFile, processedDatasets, true);
     }
 
     List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {

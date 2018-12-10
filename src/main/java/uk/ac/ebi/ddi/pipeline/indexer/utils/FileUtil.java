@@ -233,7 +233,11 @@ public final class FileUtil {
      * @param file
      * @param object
      */
-    public static void writeObjectToFile(File file, Serializable object) throws IOException {
+    public static synchronized void writeObjectToFile(File file, Serializable object, boolean overwrite)
+            throws IOException {
+        if (!overwrite && file.exists()) {
+            return;
+        }
         try (FileOutputStream cacheFile = new FileOutputStream(file)) {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(cacheFile);
             objectOutputStream.writeObject(object);

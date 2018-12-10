@@ -8,8 +8,14 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
@@ -20,13 +26,8 @@ import uk.ac.ebi.ddi.service.db.model.publication.PublicationDataset;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.utils.Constants;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,8 +37,6 @@ import java.util.regex.Pattern;
 public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private DDIDatasetAnnotationService datasetAnnotationService;
-
-    private static final int MAX_PARALLEL = 5;
 
     private IDatasetService datasetService;
 
@@ -56,7 +55,20 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    private ConcurrentHashMap<String, String> processedDatasets;
+    private HashMap<String, String> processedDatasets = new HashMap<>();
+
+    private static final int RETRIES = 5;
+    private RetryTemplate template = new RetryTemplate();
+
+    public GeoEnrichmentTasklet() {
+        SimpleRetryPolicy policy =
+                new SimpleRetryPolicy(RETRIES, Collections.singletonMap(HttpClientErrorException.class, true));
+        template.setRetryPolicy(policy);
+        ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(2000);
+        backOffPolicy.setMultiplier(1.6);
+        template.setBackOffPolicy(backOffPolicy);
+    }
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -67,16 +79,13 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         }
         if (processedFile.exists()) {
             processedDatasets = FileUtil.loadObjectFromFile(processedFile);
-        } else {
-            processedDatasets = new ConcurrentHashMap<>();
         }
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
-        ForkJoinPool customThreadPool = new ForkJoinPool(MAX_PARALLEL);
         AtomicInteger counter = new AtomicInteger(0);
-        customThreadPool.submit(() -> datasets.parallelStream().forEach(dataset -> {
+        datasets.stream().parallel().forEach(dataset -> {
             LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
             process(dataset);
-        })).get();
+        });
         processedFile.delete();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
@@ -103,6 +112,16 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                         pub.setDatasetID(dataset.getAccession());
                         datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
                                 Constants.REANALYSIS_TYPE);
+                    } else {
+                        List<Dataset> secondaries =
+                                datasetService.getBySecondaryAccession(publicationDataset.getDatasetID());
+                        for (Dataset secondary : secondaries) {
+                            PublicationDataset pub = new PublicationDataset();
+                            pub.setDatabaseID(DATASET_NAME);
+                            pub.setDatasetID(dataset.getAccession());
+                            datasetAnnotationService.addGEODatasetSimilars(secondary, Collections.singleton(pub),
+                                    Constants.REANALYSIS_TYPE);
+                        }
                     }
                 }
             }
@@ -118,16 +137,16 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     synchronized void datasetProcessed(String accession) throws IOException {
         processedDatasets.put(accession, accession);
-        FileUtil.writeObjectToFile(processedFile, processedDatasets);
+        FileUtil.writeObjectToFile(processedFile, processedDatasets, true);
     }
 
     List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {
         String response = getFileContent(accession);
         List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
         try (BufferedReader reader = new BufferedReader(new StringReader(response))) {
             String line = reader.readLine();
             while (line != null) {
-                Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
@@ -142,10 +161,10 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     List<String> getDatasetFromSample(String accession) {
         List<String> result = new ArrayList<>();
+        Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
         try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(accession)))) {
             String line = reader.readLine();
             while (line != null) {
-                Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
@@ -196,18 +215,37 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private String getFileContent(String accessionId) throws IOException, ClassNotFoundException {
         File downloadedFile = new File(downloadDir, accessionId);
-        if (downloadedFile.exists()) {
-            LOGGER.info("File {} downloaded & restored instead of fetching from NCBI API",
-                    downloadedFile.getAbsolutePath());
-            return FileUtil.loadObjectFromFile(downloadedFile);
+        try {
+            if (downloadedFile.exists()) {
+                LOGGER.info("File {} was downloaded & restored instead of fetching from NCBI API", accessionId);
+                return FileUtil.loadObjectFromFile(downloadedFile);
+            }
+        } catch (EOFException ignore) {
+            LOGGER.info("File {} was downloaded but damaged, re-fetching the file", accessionId);
         }
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
                 .queryParam("acc", accessionId)
                 .queryParam("targ", "self")
                 .queryParam("form", "text");
-        ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
-        FileUtil.writeObjectToFile(downloadedFile, response.getBody());
-        return response.getBody();
+        return template.execute(context -> {
+            HttpStatus status;
+            try {
+                ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    FileUtil.writeObjectToFile(downloadedFile, response.getBody(), true);
+                    return response.getBody();
+                }
+                status = response.getStatusCode();
+            } catch (HttpStatusCodeException e) {
+                if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                    return "";
+                }
+                status = e.getStatusCode();
+            }
+            String retryTimes = context.getRetryCount() + 1 + "/" + RETRIES;
+            LOGGER.info("Retrying " + retryTimes + " to fetch dataset: {}, status: {}", accessionId, status.value());
+            throw new HttpClientErrorException(status);
+        });
     }
 
     @Override

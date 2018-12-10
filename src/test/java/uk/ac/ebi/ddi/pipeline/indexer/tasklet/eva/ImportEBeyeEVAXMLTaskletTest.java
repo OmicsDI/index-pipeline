@@ -14,10 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Yasset Perez-Riverol (ypriverol@gmail.com)
- * @date 17/11/2015
- */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:jobs/eva/ddi-indexer-test-eva-import.xml"})
 public class ImportEBeyeEVAXMLTaskletTest {

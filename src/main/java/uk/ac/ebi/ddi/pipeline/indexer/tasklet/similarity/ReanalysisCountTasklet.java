@@ -11,6 +11,7 @@ import uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts;
  * Created by gaur on 02/08/17.
  */
 public class ReanalysisCountTasklet extends AbstractTasklet {
+
     SimilarityCounts similarityCounts;
 
     @Override

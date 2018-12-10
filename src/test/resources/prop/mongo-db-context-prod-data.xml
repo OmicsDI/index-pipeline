@@ -60,7 +60,7 @@
     <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
     <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
     <bean id="mostAccessedDatasetsService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
-
-
-
+    <bean id ="datasetCountService" class = "uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService" />
+    <bean id = "similarityCount" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
+    <bean id="statisticsService" class="uk.ac.ebi.ddi.similarityCalculator.StatisticsService" />
 </beans>

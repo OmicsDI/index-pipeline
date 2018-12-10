@@ -1,6 +1,5 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -55,7 +54,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    private ConcurrentHashMap<String, String> processedDatasets;
+    private HashMap<String, String> processedDatasets = new HashMap<>();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -66,8 +65,6 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         }
         if (processedFile.exists()) {
             processedDatasets = FileUtil.loadObjectFromFile(processedFile);
-        } else {
-            processedDatasets = new ConcurrentHashMap<>();
         }
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         AtomicInteger counter = new AtomicInteger(0);

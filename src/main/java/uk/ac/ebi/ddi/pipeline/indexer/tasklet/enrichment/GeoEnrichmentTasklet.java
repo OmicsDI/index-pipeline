@@ -137,7 +137,9 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     synchronized void datasetProcessed(String accession) throws IOException {
         processedDatasets.put(accession, accession);
-        FileUtil.writeObjectToFile(processedFile, processedDatasets, true);
+        if (processedDatasets.size() % 100 == 0) {
+            FileUtil.writeObjectToFile(processedFile, processedDatasets, true);
+        }
     }
 
     List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {
@@ -217,7 +219,6 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         File downloadedFile = new File(downloadDir, accessionId);
         try {
             if (downloadedFile.exists()) {
-                LOGGER.info("File {} was downloaded & restored instead of fetching from NCBI API", accessionId);
                 return FileUtil.loadObjectFromFile(downloadedFile);
             }
         } catch (EOFException ignore) {

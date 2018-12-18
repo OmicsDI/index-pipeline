@@ -127,7 +127,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             }
             datasetProcessed(dataset.getAccession());
         } catch (Exception e) {
-            LOGGER.error("Exception occurred when processing dataset {}, {}", dataset, e);
+            LOGGER.error("Exception occurred when processing dataset {}", dataset, e);
         }
     }
 
@@ -156,7 +156,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 line = reader.readLine();
             }
         } catch (IOException exc) {
-            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, exc);
+            LOGGER.error("Exception occurred when reading dataset {}", accession, exc);
         }
         return result;
     }
@@ -174,7 +174,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 line = reader.readLine();
             }
         } catch (IOException | ClassNotFoundException e) {
-            LOGGER.error("Exception occurred when reading dataset {}, {}", accession, e);
+            LOGGER.error("Exception occurred when reading dataset {}", accession, e);
         }
         return result;
     }
@@ -204,7 +204,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 line = reader.readLine();
             }
         } catch (IOException | ClassNotFoundException exc) {
-            LOGGER.error("Exception occurred when reading sample id {}, {}", sampleId, exc);
+            LOGGER.error("Exception occurred when reading sample id {}", sampleId, exc);
         }
         for (String accession : datasets) {
             PublicationDataset publicationDataset = new PublicationDataset();

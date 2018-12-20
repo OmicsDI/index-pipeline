@@ -31,6 +31,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -105,15 +106,21 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             if (publicationDataset.getDatasetID().equals(dataset.getAccession())) {
                 continue;
             }
-            Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(), DATASET_NAME);
+            Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(),
+                    publicationDataset.getDatabase());
             if (refDataset != null) {
                 result.add(publicationDataset);
             } else {
                 List<Dataset> secondaries =
                         datasetService.getBySecondaryAccession(publicationDataset.getDatasetID());
+                if (secondaries.isEmpty()) {
+                    LOGGER.info("Adding related datasets to {} with type Reanalyzed by, " +
+                            "but none of them were in our database, {}", dataset.getAccession(),
+                            allPubDatasets.stream().map(PublicationDataset::getDatasetID).collect(Collectors.toList()));
+                }
                 for (Dataset secondary : secondaries) {
                     PublicationDataset pub = new PublicationDataset();
-                    pub.setDatabaseID(DATASET_NAME);
+                    pub.setDatabaseID(secondary.getDatabase());
                     pub.setDatasetID(secondary.getAccession());
                     result.add(pub);
                 }
@@ -133,13 +140,13 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             for (String sampleId : sampleIds) {
                 allPubDatasets.addAll(getReanalysisDataset(sampleId));
             }
+            allPubDatasets = reanalysedDatasetCorrection(allPubDatasets, dataset);
             if (allPubDatasets.size() > 0) {
-                allPubDatasets = reanalysedDatasetCorrection(allPubDatasets, dataset);
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
                 for (PublicationDataset publicationDataset : allPubDatasets) {
-                    Dataset refDataset = new Dataset(publicationDataset.getDatasetID(), DATASET_NAME);
+                    Dataset refDataset = new Dataset(publicationDataset.getDatasetID(), publicationDataset.getDatabase());
                     PublicationDataset pub = new PublicationDataset();
-                    pub.setDatabaseID(DATASET_NAME);
+                    pub.setDatabaseID(dataset.getDatabase());
                     pub.setDatasetID(dataset.getAccession());
                     datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
                             Constants.REANALYSIS_TYPE);

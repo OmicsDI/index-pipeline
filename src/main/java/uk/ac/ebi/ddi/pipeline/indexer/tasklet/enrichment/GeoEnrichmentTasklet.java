@@ -2,21 +2,17 @@ package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
@@ -26,8 +22,12 @@ import uk.ac.ebi.ddi.service.db.model.publication.PublicationDataset;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.service.db.utils.Constants;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,20 +49,26 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     @Value("${ddi.common.storage.path}")
     private String downloadPath;
 
+    private static final String TASK_WORKING_DIR = "geo-raw-dataset";
+
+    private static final int PARALLEL = Math.min(12, Runtime.getRuntime().availableProcessors());
+
     private File downloadDir;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeoEnrichmentTasklet.class);
-
-    private RestTemplate restTemplate = new RestTemplate();
 
     private HashMap<String, String> processedDatasets = new HashMap<>();
 
     private static final int RETRIES = 5;
     private RetryTemplate template = new RetryTemplate();
 
+    private Pattern seriesSamplePattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
+    private Pattern sampleSeriesPattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
+    private Pattern reanalysedPattern = Pattern.compile("\\s*Reanalyzed by:\\s*(\\w*)");
+
     public GeoEnrichmentTasklet() {
         SimpleRetryPolicy policy =
-                new SimpleRetryPolicy(RETRIES, Collections.singletonMap(HttpClientErrorException.class, true));
+                new SimpleRetryPolicy(RETRIES, Collections.singletonMap(Exception.class, true));
         template.setRetryPolicy(policy);
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
         backOffPolicy.setInitialInterval(2000);
@@ -73,7 +79,7 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting");
-        downloadDir = new File(downloadPath);
+        downloadDir = new File(downloadPath, TASK_WORKING_DIR);
         if (!downloadDir.exists()) {
             downloadDir.mkdirs();
         }
@@ -82,16 +88,41 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         }
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         AtomicInteger counter = new AtomicInteger(0);
-        datasets.stream().parallel().forEach(dataset -> {
-            LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
+        ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
+        customThreadPool.submit(() -> datasets.stream().parallel().forEach(dataset -> {
+            LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(),
+                    datasets.size());
             process(dataset);
-        });
+        })).get();
         processedFile.delete();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
     }
 
-    void process(Dataset dataset) {
+    private Set<PublicationDataset> reanalysedDatasetCorrection(Set<PublicationDataset> allPubDatasets, Dataset dataset) {
+        Set<PublicationDataset> result = new HashSet<>();
+        for (PublicationDataset publicationDataset : allPubDatasets) {
+            if (publicationDataset.getDatasetID().equals(dataset.getAccession())) {
+                continue;
+            }
+            Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(), DATASET_NAME);
+            if (refDataset != null) {
+                result.add(publicationDataset);
+            } else {
+                List<Dataset> secondaries =
+                        datasetService.getBySecondaryAccession(publicationDataset.getDatasetID());
+                for (Dataset secondary : secondaries) {
+                    PublicationDataset pub = new PublicationDataset();
+                    pub.setDatabaseID(DATASET_NAME);
+                    pub.setDatasetID(secondary.getAccession());
+                    result.add(pub);
+                }
+            }
+        }
+        return result;
+    }
+
+    private void process(Dataset dataset) {
         try {
             if (isDatasetProcessed(dataset.getAccession())) {
                 LOGGER.info("Dataset {} processed, ignoring...", dataset.getAccession());
@@ -103,26 +134,15 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
                 allPubDatasets.addAll(getReanalysisDataset(sampleId));
             }
             if (allPubDatasets.size() > 0) {
+                allPubDatasets = reanalysedDatasetCorrection(allPubDatasets, dataset);
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
                 for (PublicationDataset publicationDataset : allPubDatasets) {
-                    Dataset refDataset = datasetService.read(publicationDataset.getDatasetID(), DATASET_NAME);
-                    if (refDataset != null) {
-                        PublicationDataset pub = new PublicationDataset();
-                        pub.setDatabaseID(DATASET_NAME);
-                        pub.setDatasetID(dataset.getAccession());
-                        datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
-                                Constants.REANALYSIS_TYPE);
-                    } else {
-                        List<Dataset> secondaries =
-                                datasetService.getBySecondaryAccession(publicationDataset.getDatasetID());
-                        for (Dataset secondary : secondaries) {
-                            PublicationDataset pub = new PublicationDataset();
-                            pub.setDatabaseID(DATASET_NAME);
-                            pub.setDatasetID(dataset.getAccession());
-                            datasetAnnotationService.addGEODatasetSimilars(secondary, Collections.singleton(pub),
-                                    Constants.REANALYSIS_TYPE);
-                        }
-                    }
+                    Dataset refDataset = new Dataset(publicationDataset.getDatasetID(), DATASET_NAME);
+                    PublicationDataset pub = new PublicationDataset();
+                    pub.setDatabaseID(DATASET_NAME);
+                    pub.setDatasetID(dataset.getAccession());
+                    datasetAnnotationService.addGEODatasetSimilars(refDataset, Collections.singleton(pub),
+                            Constants.REANALYSIS_TYPE);
                 }
             }
             datasetProcessed(dataset.getAccession());
@@ -131,82 +151,67 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         }
     }
 
-    synchronized boolean isDatasetProcessed(String accession) {
+    private synchronized boolean isDatasetProcessed(String accession) {
         return processedDatasets.containsKey(accession);
     }
 
-    synchronized void datasetProcessed(String accession) throws IOException {
+    private synchronized void datasetProcessed(String accession) throws IOException {
         processedDatasets.put(accession, accession);
         if (processedDatasets.size() % 100 == 0) {
             FileUtil.writeObjectToFile(processedFile, processedDatasets, true);
         }
     }
 
-    List<String> getSampleIds(String accession) throws IOException, ClassNotFoundException {
-        String response = getFileContent(accession);
+    List<String> getSampleIds(String accession) throws IOException {
         List<String> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\s*!Series_sample_id\\s*=\\s*(\\w*)");
-        try (BufferedReader reader = new BufferedReader(new StringReader(response))) {
-            String line = reader.readLine();
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
+        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                Matcher matcher = seriesSamplePattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
                 }
-                line = reader.readLine();
             }
-        } catch (IOException exc) {
-            LOGGER.error("Exception occurred when reading dataset {}", accession, exc);
         }
         return result;
     }
 
-    List<String> getDatasetFromSample(String accession) {
+    private List<String> getDatasetFromSample(String accession) throws IOException {
         List<String> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\s*!Sample_series_id\\s*=\\s*(\\w*)");
-        try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(accession)))) {
-            String line = reader.readLine();
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
+
+        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                Matcher matcher = sampleSeriesPattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
                 }
-                line = reader.readLine();
             }
-        } catch (IOException | ClassNotFoundException e) {
-            LOGGER.error("Exception occurred when reading dataset {}", accession, e);
         }
         return result;
     }
 
-    Set<PublicationDataset> getReanalysisDataset(String sampleId) {
+    Set<PublicationDataset> getReanalysisDataset(String sampleId) throws IOException {
         Set<PublicationDataset> dataset = new HashSet<>();
-        Set<String> datasets = new HashSet<>();
-        try (BufferedReader reader = new BufferedReader(new StringReader(getFileContent(sampleId)))) {
-            String line = reader.readLine();
-            Pattern pattern = Pattern.compile("\\s*Reanalyzed by:\\s*(\\w*)");
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
+        Set<String> datasetIds = new HashSet<>();
+        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(sampleId)))) {
+            for(String line; (line = br.readLine()) != null; ) {
+                Matcher matcher = reanalysedPattern.matcher(line);
                 if (matcher.find()) {
                     if (matcher.group(1).contains("GSE")) {
-                        // In case the sample reanalyse a dataset
-                        datasets.add(matcher.group(1));
+                        // In case the sample is reanalysed by a dataset
+                        datasetIds.add(matcher.group(1));
                     } else if (matcher.group(1).contains("GSM")) {
-                        // In case the sample reanalyse another sample
+                        // In case the sample is reanalysed by another sample
                         List<String> accessions = getDatasetFromSample(matcher.group(1));
                         for (String accession : accessions) {
                             if (accession.contains("GSE")) {
-                                datasets.add(accession);
+                                datasetIds.add(accession);
                             }
                         }
                     }
                 }
-                line = reader.readLine();
             }
-        } catch (IOException | ClassNotFoundException exc) {
-            LOGGER.error("Exception occurred when reading sample id {}", sampleId, exc);
         }
-        for (String accession : datasets) {
+        for (String accession : datasetIds) {
             PublicationDataset publicationDataset = new PublicationDataset();
             publicationDataset.setDatabaseID(DATASET_NAME);
             publicationDataset.setDatasetID(accession);
@@ -215,37 +220,18 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         return dataset;
     }
 
-    private String getFileContent(String accessionId) throws IOException, ClassNotFoundException {
+    private File getDatasetFile(String accessionId) throws IOException {
         File downloadedFile = new File(downloadDir, accessionId);
-        try {
-            if (downloadedFile.exists()) {
-                return FileUtil.loadObjectFromFile(downloadedFile);
-            }
-        } catch (EOFException ignore) {
-            LOGGER.info("File {} was downloaded but damaged, re-fetching the file", accessionId);
+        if (downloadedFile.exists()) {
+            return downloadedFile;
         }
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(NCBI_ENDPOINT)
                 .queryParam("acc", accessionId)
                 .queryParam("targ", "self")
                 .queryParam("form", "text");
         return template.execute(context -> {
-            HttpStatus status;
-            try {
-                ResponseEntity<String> response = restTemplate.getForEntity(builder.build().toString(), String.class);
-                if (response.getStatusCode() == HttpStatus.OK) {
-                    FileUtil.writeObjectToFile(downloadedFile, response.getBody(), true);
-                    return response.getBody();
-                }
-                status = response.getStatusCode();
-            } catch (HttpStatusCodeException e) {
-                if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
-                    return "";
-                }
-                status = e.getStatusCode();
-            }
-            String retryTimes = context.getRetryCount() + 1 + "/" + RETRIES;
-            LOGGER.info("Retrying " + retryTimes + " to fetch dataset: {}, status: {}", accessionId, status.value());
-            throw new HttpClientErrorException(status);
+            FileUtils.copyURLToFile(builder.build().toUri().toURL(), downloadedFile);
+            return downloadedFile;
         });
     }
 

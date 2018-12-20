@@ -92,11 +92,12 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
             if (superSerialAccessions.size() == 0) {
                 return;
             }
+            Dataset originalDataset = datasetService.read(dataset.getId());
             LOGGER.info("Found subseries of dataset {}: {}", dataset.getAccession(), superSerialAccessions);
             superSerialAccessions.stream()
                     .map(x -> String.format("%s~%s", x, getLink(x)))
-                    .forEach(x -> DatasetUtils.addAdditionalField(dataset, "additional_accession", x));
-            datasetService.save(dataset);
+                    .forEach(x -> DatasetUtils.addAdditionalField(originalDataset, "additional_accession", x));
+            datasetService.save(originalDataset);
         } catch (IOException e) {
             LOGGER.error("Exception occurred when processing dataset {}", dataset.getAccession(), e);
         }

@@ -14,7 +14,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%msg%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -24,6 +24,7 @@
     <logger name="uk.ac.ebi.ddi.xml" level="INFO" />
     <logger name="uk.ac.ebi.ddi.extservices" level="INFO" />
     <logger name="uk.ac.ebi.ddi" level="INFO" />
+    <logger name="org.apache.http" level="ERROR" />
 
     <root level="INFO">
         <appender-ref ref="FILE"/>

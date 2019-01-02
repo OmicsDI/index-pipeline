@@ -1,27 +1,27 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
+import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.DataType;
-import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
+import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
-
-import org.springframework.util.Assert;
-import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -39,30 +39,33 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
 
     DataType dataType;
 
+    private static final int PARALLEL = Math.min(3, Runtime.getRuntime().availableProcessors());
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
-        List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
-        datasets = datasets.parallelStream()
+        List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName)
+                .parallelStream()
                 .filter(x -> x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
                         x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()))
                 .collect(Collectors.toList());
-
-        datasets.parallelStream().forEach( dataset -> {
-            Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            EnrichedDataset enrichedDataset = null;
-            try {
-                enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(annotationService, existingDataset, false);
-                dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
-                logger.debug(enrichedDataset.getEnrichedAttributes().toString());
-                datasetAnnotationService.enrichedDataset(existingDataset);
-                } catch (DDIException | RestClientException | UnsupportedEncodingException | JSONException e) {
-                    e.printStackTrace();
-                }
-        });
-
+        ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
+        customThreadPool.submit(() -> datasets.parallelStream().forEach(this::process)).get();
         return RepeatStatus.FINISHED;
 
+    }
+
+    private void process(Dataset dataset) {
+        Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+        try {
+            EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(
+                    annotationService, existingDataset, false);
+            dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
+            logger.debug(enrichedDataset.getEnrichedAttributes().toString());
+            datasetAnnotationService.enrichedDataset(existingDataset);
+        } catch (DDIException | RestClientException | UnsupportedEncodingException | JSONException e) {
+            logger.error("Exception occurred when processing dataset {}", dataset.getAccession(), e);
+        }
     }
 
     @Override

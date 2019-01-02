@@ -32,17 +32,20 @@ public class ExpressionAtlasAnnotationTasklet extends AnnotationXMLTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-
+        //int i = 0;
         if(databaseName != null){
             List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
-            datasets.parallelStream().forEach( dataset -> {
+            datasets.parallelStream().mapToInt( dataset -> {
+                int i = 0;
                 try {
+                    //to run annotations for all datasets comment inserted to include all
                     if(dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType())){
                         Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
                         Dataset originalDataset = datasetAnnotationService.getDataset(dataset.getAccession(), originalDatabase);
                         exitingDataset = DatasetAnnotationFieldsService.refineDates(exitingDataset);
                         exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
                         if(originalDataset != null){
+                            i++;
                             DatasetAnnotationFieldsService.addInformationFromOriginal(originalDataset, exitingDataset);
                             Map<String, Set<String>> similars = new HashMap<>();
                             Set<String> values = new HashSet<>();
@@ -51,12 +54,13 @@ public class ExpressionAtlasAnnotationTasklet extends AnnotationXMLTasklet{
                             datasetAnnotationService.addDatasetReanalysisSimilars(exitingDataset, similars);
                         }
                         datasetAnnotationService.annotateDataset(exitingDataset);
+                    System.out.println("counts is " + i);
                     }
                 }catch (RestClientException e){
                     logger.debug(e.getMessage());
                 }
-
-            });
+                return i;
+            }).sum();
         }
         return RepeatStatus.FINISHED;
     }

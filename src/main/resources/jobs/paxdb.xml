@@ -168,7 +168,8 @@
         <bean:constructor-arg index="1" value="${ddi.common.original.directory}/${ddi.common.paxdb.database.index}"/>
         <bean:constructor-arg index="2" value="#{currentDate}"/>
     </bean:bean>
-
+    <bean:bean id="similarityCount" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
+    <bean:bean id="datasetCountService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService"/>
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
 

@@ -1,4 +1,5 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.eva;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.ena;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +15,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/eva/ddi-indexer-test-eva-import.xml"})
-public class ImportEBeyeEVAXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/ena/ddi-indexer-test-ena-import.xml"})
+public class ImportENATaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
@@ -61,4 +61,5 @@ public class ImportEBeyeEVAXMLTaskletTest {
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
     }
+
 }

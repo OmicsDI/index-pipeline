@@ -1,4 +1,5 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.statistics;
+
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -7,17 +8,15 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts;
 
-/**
- * Created by gaur on 02/08/17.
- */
-public class ReanalysisCountTasklet extends AbstractTasklet {
+public class DatasetDownloadCountTasklet extends AbstractTasklet {
 
-    SimilarityCounts similarityCounts;
+
+    SimilarityCounts similarityCount;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
-            similarityCounts.saveReanalysisCount();
+            similarityCount.addDatasetDownloadCount();
         }
         catch(Exception ex)
         {
@@ -26,18 +25,16 @@ public class ReanalysisCountTasklet extends AbstractTasklet {
         return RepeatStatus.FINISHED;
     }
 
-    public SimilarityCounts getSimilarityCounts() {
-        return similarityCounts;
+    public SimilarityCounts getSimilarityCount() {
+        return similarityCount;
     }
 
-    public void setSimilarityCounts(SimilarityCounts similarityCounts) {
-        this.similarityCounts = similarityCounts;
+    public void setSimilarityCount(SimilarityCounts similarityCount) {
+        this.similarityCount = similarityCount;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        Assert.notNull(similarityCounts, "The similarity count object can't be null");
+        Assert.notNull(similarityCount, "The similarity counts object can't be null");
     }
 }
-
-

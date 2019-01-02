@@ -139,7 +139,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.prod.directory}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.gpmdb.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -148,7 +148,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.gpmdb.prod.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.gpmdb.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.gpmdb.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />

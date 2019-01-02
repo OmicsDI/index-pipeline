@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.eva;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.dbgap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +16,8 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/eva/ddi-indexer-test-eva-import.xml"})
-public class ImportEBeyeEVAXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/dbgap/ddi-indexer-test-dbgap-import.xml"})
+public class ImportEBeyeDBGapXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";

@@ -7,17 +7,14 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts;
 
-/**
- * Created by gaur on 02/08/17.
- */
-public class ReanalysisCountTasklet extends AbstractTasklet {
+public class EBISearchPubmedLeftTasklet extends AbstractTasklet {
 
     SimilarityCounts similarityCounts;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
-            similarityCounts.saveReanalysisCount();
+            similarityCounts.saveLeftSearchcounts();
         }
         catch(Exception ex)
         {
@@ -39,5 +36,3 @@ public class ReanalysisCountTasklet extends AbstractTasklet {
         Assert.notNull(similarityCounts, "The similarity count object can't be null");
     }
 }
-
-

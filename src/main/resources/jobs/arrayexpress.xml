@@ -67,7 +67,6 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
         <batch:step id="annotationFiles" parent="parentStep" next="cleanStep">
             <batch:tasklet>
                 <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
@@ -97,7 +96,6 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
         <batch:listeners>
             <batch:listener ref="jobListener"/>
         </batch:listeners>

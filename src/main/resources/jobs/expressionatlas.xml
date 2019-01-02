@@ -87,6 +87,16 @@
             </batch:tasklet>
         </batch:step>
 
+<!--        <batch:step id="annotationFiles" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ExpressionAtlasAnnotationTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}"/>
+                    <bean:property name="originalDatabase" value="${ddi.common.arrayexpress.database.name}" />
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>-->
+
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">

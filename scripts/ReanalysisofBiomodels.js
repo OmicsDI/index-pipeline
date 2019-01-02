@@ -1,10 +1,10 @@
-var reanalysis = db.datasets.dataset.aggregate([{"$match":{"database":"BioModels Database",
+var reanalysis = db.datasets.dataset.aggregate([{"$match":{"database":"BioModels",
     "crossReferences.biomodels__db":{"$exists":true}}}]);
     
 reanalysis.forEach(function(all_data){
     all_data.crossReferences.biomodels__db.forEach(function(input_data){
     print(input_data);
-    var dataset = db.datasets.dataset.findOne({"accession":input_data,"database":"BioModels Database"})
+    var dataset = db.datasets.dataset.findOne({"accession":input_data,"database":"BioModels"})
     if(dataset != null){
     print(dataset.accession);
         var sim_data = {accession :all_data.accession,
@@ -14,7 +14,7 @@ reanalysis.forEach(function(all_data){
     };
     var similar_datasets = {relationType : "Reanalysis of",
     similarDataset : { "$ref" : "datasets.dataset",
-    "$id" : db.datasets.dataset.findOne({"accession":dataset.accession,"database":"BioModels Database"})._id} };
+    "$id" : db.datasets.dataset.findOne({"accession":dataset.accession,"database":"BioModels"})._id} };
     print(similar_datasets);
     sim_data.similars.push(similar_datasets);
     print(sim_data);

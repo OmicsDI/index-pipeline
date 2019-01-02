@@ -1,4 +1,5 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.eva;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.statistics;
+
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +15,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertEquals;
 
-
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/eva/ddi-indexer-test-eva-import.xml"})
-public class ImportEBeyeEVAXMLTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/statistics/ddi-indexer-test-dataset-dowwnload-count.xml"})
+public class DatasetDownloadTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
@@ -28,7 +28,7 @@ public class ImportEBeyeEVAXMLTaskletTest {
 
 
     @Autowired
-    @Qualifier("ddiImportJob")
+    @Qualifier("ddiDatasetDownloadCountJob")
     private Job job;
 
 

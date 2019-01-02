@@ -40,39 +40,37 @@
         <property name="mapKeyDotReplacement" value="__"/>
     </bean>
 
+    <bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
+    <bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
+    <bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
+    <bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.database.DatabaseService" />
+    <bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
 
+    <bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
+    <bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
+    <bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
+    <bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
+    <bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
+    <bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
+    <bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
+    <bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
 
-<bean id="synonymsService" class="uk.ac.ebi.ddi.service.db.service.enrichment.SynonymsService"/>
-<bean id="termInDBService" class="uk.ac.ebi.ddi.service.db.service.similarity.TermInDBService"/>
-<bean id="datasetService"  class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetService" />
-<bean id="databaseService" class="uk.ac.ebi.ddi.service.db.service.database.DatabaseService" />
-<bean id="datasetStatusService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetStatusService"/>
-
-<bean id="publicationService" class="uk.ac.ebi.ddi.service.db.service.publication.PublicationDatasetService" />
-<bean id="similarsService"    class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetSimilarsService" />
-<bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
-<bean id="expOutputDatasetService" class="uk.ac.ebi.ddi.service.db.service.similarity.ExpOutputDatasetService"/>
-<bean id="ddiExpDataProcessService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
-<bean id="ddiExpDataImportService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIExpDataImportService"/>
-<bean id="ddiDatasetSimilarityService" class="uk.ac.ebi.ddi.annotation.service.crossreferences.DDIDatasetSimilarityService"/>
-<bean id="enrichmentInfoService" class="uk.ac.ebi.ddi.service.db.service.enrichment.EnrichmentInfoService"/>
-
-<bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
-<bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
-<bean id="mostAccessedDatasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
-<bean id="similarityCounts" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
-<bean id="citationClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.europmc.CitationClient">
-    <constructor-arg name="config" ref="ebeyeWsConfig"/>
-</bean>
-<bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
-    <constructor-arg name="config" ref="ebeyeWsConfig"/>
-</bean>
-    <bean id="domainWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
+    <bean id="datasetAnnotationService" class="uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService"/>
+    <bean id="databaseAnnotationService" class="uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService" />
+    <bean id="mostAccessedDatasetService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
+    <bean id="similarityCounts" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
+    <bean id="citationClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.europmc.CitationClient">
         <constructor-arg name="config" ref="ebeyeWsConfig"/>
     </bean>
-<bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
-<bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
-<bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
+    <bean id="datasetWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.dataset.DatasetWsClient">
+        <constructor-arg name="config" ref="ebeyeWsConfig"/>
+    </bean>
+        <bean id="domainWsClient" class="uk.ac.ebi.ddi.ebe.ws.dao.client.domain.DomainWsClient">
+            <constructor-arg name="config" ref="ebeyeWsConfig"/>
+        </bean>
+    <bean id="ebeyeWsConfig" class="uk.ac.ebi.ddi.ebe.ws.dao.config.EbeyeWsConfigProd"/>
+    <bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
+    <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
     <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
     <bean id="statisticsService" class="uk.ac.ebi.ddi.similarityCalculator.StatisticsService" />
 </beans>

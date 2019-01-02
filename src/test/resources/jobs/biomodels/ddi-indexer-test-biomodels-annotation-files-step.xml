@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:bean="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+		                   http://www.springframework.org/schema/batch
+                           http://www.springframework.org/schema/batch/spring-batch.xsd
+		                   http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <import resource="classpath*:context/common-context.xml"/>
+    <import resource="classpath*:jobs/biomodels.xml"/>
+    <import resource="classpath*:context/mongo-db-context.xml" />
+
+    <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
+
+        <batch:step id="annotationFiles" parent="parentStep" next="enrichmentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationBioprojectsTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.BioprojectsAnnotationTasklet">
+                    <bean:property name="databaseName" value="GEO"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichmentStep" parent="parentStep" next="cleanStep">
+            <batch:tasklet>
+                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName" value="GEO" />
+                    <bean:property name="annotationService" ref="annotationService"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="dataType" >
+                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.GENOMICS_DATA"/>
+                    </bean:property>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="cleanStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.bioprojects.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+
+    <batch:step id="parentStep" abstract="true">
+        <batch:listeners>
+            <batch:listener ref="executionContextPromotionListener"/>
+            <batch:listener ref="throwablePromotionListener"/>
+        </batch:listeners>
+    </batch:step>
+
+    <!--listener for promoting properties in step execution context to job execution context-->
+    <bean:bean id="executionContextPromotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+        <bean:property name="keys">
+            <bean:array>
+                <bean:value>public.path.fragment</bean:value>
+                <!-- added by getAndStoreOrigPublicationDateTaskletStep; used by genPublicSearchParamsStep -->
+            </bean:array>
+        </bean:property>
+        <bean:property name="strict" value="false"/>
+    </bean:bean>
+
+    <bean id="geoClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.GeoClient">
+        <constructor-arg index="0" value="${ddi.common.original.directory}ncbi/Geo"/>
+    </bean>
+
+    <bean:bean id="bioprojectsClient" class="uk.ac.ebi.ddi.api.readers.bioprojects.ws.client.BioprojectsClient">
+        <constructor-arg index="0" value="${ddi.common.original.directory}ncbi/"/>
+        <constructor-arg index="1" ref="geoClient"/>
+    </bean:bean>
+
+    <bean:bean id="bioprojectsGenerator" class="uk.ac.ebi.ddi.api.readers.bioprojects.GenerateBioprojectsOmicsXML">
+        <bean:constructor-arg index="0" ref="bioprojectsClient"/>
+        <bean:constructor-arg index="1" ref="datasetService"/>
+        <bean:constructor-arg index="2" value="${ddi.common.original.directory}${ddi.common.bioprojects.database.index}"/>
+        <bean:constructor-arg index="3" value="#{currentDate}"/>
+        <bean:constructor-arg index="4" value="GEO,dbGaP"/>
+    </bean:bean>
+
+    <!--load property files-->
+    <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
+
+</beans>

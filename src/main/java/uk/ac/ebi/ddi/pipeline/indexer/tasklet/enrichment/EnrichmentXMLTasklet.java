@@ -52,7 +52,6 @@ public class EnrichmentXMLTasklet extends AbstractTasklet {
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
         customThreadPool.submit(() -> datasets.parallelStream().forEach(this::process)).get();
         return RepeatStatus.FINISHED;
-
     }
 
     private void process(Dataset dataset) {

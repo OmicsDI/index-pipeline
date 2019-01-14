@@ -25,10 +25,12 @@ public class EmailContentRunner {
         springTemplateEngine.afterPropertiesSet();
 
         // submission
-        final SubmissionCompleteSummary summary = new SubmissionCompleteSummary("PXT000121", null, "Test project name", "Yasset Perez-Riverol", "yperez@@ebi.ac.uk", "reviewerpassword", "TEST-BIOSD-ID");
-        final SubmissionEmailContentGenerator submissionEmailContentGenerator = new SubmissionEmailContentGenerator(springTemplateEngine, "pride-submission-email.html", summary);
+        final SubmissionCompleteSummary summary = new SubmissionCompleteSummary(
+                "PXT000121", null, "Test project name",
+                "Yasset Perez-Riverol", "yperez@@ebi.ac.uk",
+                "reviewerpassword", "TEST-BIOSD-ID");
+        final SubmissionEmailContentGenerator submissionEmailContentGenerator = new SubmissionEmailContentGenerator(
+                        springTemplateEngine, "pride-submission-email.html", summary);
         System.out.println(submissionEmailContentGenerator.generate());
-
-
     }
 }

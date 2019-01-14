@@ -14,7 +14,7 @@ import java.io.*;
  * @date 29/09/15
  */
 public class FileSystemPersisterFactory {
-    public static final Logger logger = LoggerFactory.getLogger(FileSystemPersisterFactory.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(FileSystemPersisterFactory.class);
 
     /**
      * central location for all the persisted files
@@ -24,7 +24,7 @@ public class FileSystemPersisterFactory {
 
     public FileSystemPersisterFactory(Resource locationPrefix) {
         this.locationPrefix = locationPrefix;
-        logger.info("Created factory at " + locationPrefix);
+        LOGGER.info("Created factory at " + locationPrefix);
     }
 
     public FileSystemPersister getInstance(String key) throws IOException {
@@ -74,18 +74,15 @@ public class FileSystemPersisterFactory {
          */
         public synchronized void persist(String property, Object obj) throws IOException {
             if (obj instanceof Serializable) {
-
                 try (
                     FileOutputStream fos = new FileOutputStream(location.getAbsolutePath() + File.separator + property);
-                    ObjectOutputStream out = new ObjectOutputStream(fos)
-                ){
+                    ObjectOutputStream out = new ObjectOutputStream(fos)) {
                     out.writeObject(obj);
                     out.flush();
-                    out.close();
                 }
             } else {
                 String msg = "Object is not serializable, cannot be persisted to the local file system storage";
-                logger.error(msg);
+                LOGGER.error(msg);
                 throw new IllegalArgumentException(msg);
             }
 
@@ -97,11 +94,9 @@ public class FileSystemPersisterFactory {
         public synchronized Object load(String property) throws IOException, ClassNotFoundException {
             File serializedObject = new File(location.getAbsolutePath() + File.separator + property);
             if (serializedObject.exists()) {
-
                 try (
                         FileInputStream fis = new FileInputStream(serializedObject);
-                        ObjectInputStream ois = new ObjectInputStream(fis)
-                    ){
+                        ObjectInputStream ois = new ObjectInputStream(fis)) {
                     return ois.readObject();
                 }
             } else {

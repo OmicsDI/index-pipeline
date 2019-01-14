@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(GenerationArrayExpressXML.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GenerationArrayExpressXML.class);
 
     private String outputFile;
 
@@ -43,8 +43,8 @@ public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        File omicsDIFile = new File (outputFile);
-        OmicsXMLFile experiments = new OmicsXMLFile(new File (experimentFileName));
+        File omicsDIFile = new File(outputFile);
+        OmicsXMLFile experiments = new OmicsXMLFile(new File(experimentFileName));
         System.out.println(experiments.getAllEntries().size());
         List<Entry> genes = FastOmicsDIReader.getInstance().read(new File(geneFileName));
         System.out.println(genes.size());

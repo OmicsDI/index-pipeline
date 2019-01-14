@@ -20,7 +20,7 @@ import java.util.Calendar;
  * @date 29/09/15
  */
 public class DateDirectoryGenerator {
-    public static final Logger logger = LoggerFactory.getLogger(DateDirectoryGenerator.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(DateDirectoryGenerator.class);
 
     private Resource targetDirectory;
 
@@ -30,7 +30,7 @@ public class DateDirectoryGenerator {
 
     public File generate(long date) throws IOException {
         File targetDir = targetDirectory.getFile();
-        logger.info("Generating dated directory in " + targetDir.getAbsolutePath());
+        LOGGER.info("Generating dated directory in " + targetDir.getAbsolutePath());
         Assert.state(targetDir.isDirectory() && targetDir.exists(), "Target directory must be a valid directory");
 
         File newDir = generateNewDirectoryName(date, targetDir);
@@ -38,7 +38,7 @@ public class DateDirectoryGenerator {
             boolean created = newDir.mkdirs();
             if (!created) {
                 String msg = "Failed to create directory " + newDir.getAbsolutePath();
-                logger.error(msg);
+                LOGGER.error(msg);
                 throw new IOException(msg);
             }
         }

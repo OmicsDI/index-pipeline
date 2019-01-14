@@ -16,21 +16,21 @@ import java.io.IOException;
  *         Date: 15/05/12
  */
 public class CleanTasklet extends AbstractTasklet {
-    public static final Logger logger = LoggerFactory.getLogger(CleanTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CleanTasklet.class);
 
     private FileSystemPersisterFactory fileSystemPersisterFactory;
     private String key;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("Cleaning up temporary files for key=" + key);
+        LOGGER.info("Cleaning up temporary files for key=" + key);
 
         //tasklet to delete temporary directory where all persistent files gets written
         try {
             fileSystemPersisterFactory.getInstance(key).clear();
         } catch (IOException e) {
             String msg = "Failed to clean file system persister for key: " + key + " because of: " + e.getMessage();
-            logger.error(msg);
+            LOGGER.error(msg);
 //            throw new UnexpectedJobExecutionException(msg, e);
         }
 

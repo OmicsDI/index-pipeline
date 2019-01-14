@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -13,15 +15,14 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 public class ClaimDatasetTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClaimDatasetTasklet.class);
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
             datasetAnnotationService.updateDatasetClaim();
-        }
-        catch(Exception ex)
-        {
-            logger.debug(ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("Exception occurred, ", ex);
         }
         return RepeatStatus.FINISHED;
     }

@@ -20,10 +20,9 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
  * <p>
  * Created by ypriverol (ypriverol@gmail.com) on 09/03/2017.
  */
-public class GenerateFromAPIOmicsDITasklet extends AbstractTasklet{
+public class GenerateFromAPIOmicsDITasklet extends AbstractTasklet {
 
     private IGenerator generator;
-
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {

@@ -24,11 +24,13 @@ import java.util.zip.ZipFile;
  */
 public final class FileUtil {
 
-    public static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
 
-    static public String DOT = ".";
+    public static final String DOT = ".";
+
     private FileUtil() {
     }
+
     /**
      * Get file extension for a given file
      *
@@ -44,7 +46,7 @@ public final class FileUtil {
         int mid = fileName.lastIndexOf(DOT);
         String fileNameExt = null;
         if (mid > 0) {
-            fileNameExt = fileName.substring(mid + 1, fileName.length()).toLowerCase();
+            fileNameExt = fileName.substring(mid + 1).toLowerCase();
         }
 
         return fileNameExt;
@@ -86,9 +88,7 @@ public final class FileUtil {
     }
 
     public static String tail(File file, int numberOfChars) throws IOException {
-        RandomAccessFile fileHandler = null;
-        try {
-            fileHandler = new RandomAccessFile(file, "r");
+        try (RandomAccessFile fileHandler = new RandomAccessFile(file, "r")) {
             long fileLength = file.length() - 1;
             StringBuilder sb = new StringBuilder();
 
@@ -99,9 +99,6 @@ public final class FileUtil {
             }
 
             return sb.reverse().toString();
-        } finally {
-            if (fileHandler != null)
-                fileHandler.close();
         }
     }
 
@@ -209,22 +206,20 @@ public final class FileUtil {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            LOGGER.debug(e.getMessage());
         }
 
         URL url = new URL(urlStr);
         URLConnection connection = url.openConnection();
-        InputStream is = connection.getInputStream();
+        try (InputStream is = connection.getInputStream();
+             FileOutputStream fileOutput = new FileOutputStream(new File(localFile))) {
+            byte[] buffer = new byte[2048];
+            int bufferLength; //used to store a temporary size of the buffer
 
-        FileOutputStream fileOutput = new FileOutputStream(new File(localFile));
-        byte[] buffer = new byte[2048];
-        int bufferLength; //used to store a temporary size of the buffer
-
-        while ( (bufferLength = is.read(buffer)) > 0 )
-            fileOutput.write(buffer, 0, bufferLength);
-
-        fileOutput.close();
-
+            while ((bufferLength = is.read(buffer)) > 0) {
+                fileOutput.write(buffer, 0, bufferLength);
+            }
+        }
         return true;
     }
 

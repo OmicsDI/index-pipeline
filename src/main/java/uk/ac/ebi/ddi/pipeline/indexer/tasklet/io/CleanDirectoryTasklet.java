@@ -12,7 +12,7 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 05/05/2016
  */
-public class CleanDirectoryTasklet extends AbstractTasklet{
+public class CleanDirectoryTasklet extends AbstractTasklet {
 
     Resource inputDirectory;
 

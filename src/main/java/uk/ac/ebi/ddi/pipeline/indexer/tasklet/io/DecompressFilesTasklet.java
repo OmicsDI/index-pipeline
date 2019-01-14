@@ -12,7 +12,6 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.FileUtil;
 
-
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -29,7 +28,7 @@ import java.util.zip.ZipInputStream;
  */
 public class DecompressFilesTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(DecompressFilesTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(DecompressFilesTasklet.class);
 
     public static final String ZIP_FILE_EXTENSION = "zip";
     public static final String GZIP_FILE_EXTENSION = "gz";
@@ -44,30 +43,31 @@ public class DecompressFilesTasklet extends AbstractTasklet {
         File targetDir = targetDirectory.getFile();
         File originDir = originalDirectory.getFile();
 
-        Assert.state(targetDir.exists() && targetDir.isDirectory(), "Target output directory must exists");
+        Assert.state(targetDir.exists() && targetDir.isDirectory(),
+                "Target output directory must exists");
 
-        if(originDir.isDirectory() && originDir.listFiles().length > 0){
-
-            for (File compressedFile : originDir.listFiles()) {
-                logger.info("Decompressing " + compressedFile.getAbsolutePath());
+        if (originDir.isDirectory()) {
+            File[] files = originDir.listFiles();
+            if (files == null) {
+                return RepeatStatus.FINISHED;
+            }
+            for (File compressedFile : files) {
+                LOGGER.info("Decompressing {}", compressedFile.getAbsolutePath());
 
                 String fileExtension = FileUtil.getFileExtension(compressedFile).toLowerCase();
 
-                File decompressedFile;
                 switch (fileExtension) {
                     case ZIP_FILE_EXTENSION:
-                        decompressedFile = unzip(compressedFile, targetDir);
+                        unzip(compressedFile, targetDir);
                         break;
                     case GZIP_FILE_EXTENSION:
-                        decompressedFile = gunzip(compressedFile, targetDir);
+                        gunzip(compressedFile, targetDir);
                         break;
                     default:
                         break;
                 }
-
                 deleteOriginalCompressedFile(compressedFile);
             }
-
         }
         return RepeatStatus.FINISHED;
     }
@@ -80,8 +80,6 @@ public class DecompressFilesTasklet extends AbstractTasklet {
         File decompressedFile = null;
         FileInputStream fileInputStream = new FileInputStream(file);
         try (ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(fileInputStream))) {
-
-
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 decompressedFile = new File(targetDir.getAbsolutePath() + File.separator + zipEntry.getName());
@@ -89,22 +87,17 @@ public class DecompressFilesTasklet extends AbstractTasklet {
                 //create directories if required.
                 decompressedFile.getParentFile().mkdirs();
 
-                if (zipEntry.isDirectory()) {
-//                    (new File(targetDir.getAbsolutePath() + File.separator + zipEntry.getName())).mkdir();
-                    // ToDo: do something?
-                } else {
-
+                if (!zipEntry.isDirectory()) {
                     int count;
-                    byte buffer[] = new byte[BUFFER_SIZE];
+                    byte[] buffer = new byte[BUFFER_SIZE];
 
 //                    decompressedFile = new File(targetDir.getAbsolutePath() + File.separator + zipEntry.getName());
                     FileOutputStream fileOutputStream = new FileOutputStream(decompressedFile);
 
-
-                    try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream, BUFFER_SIZE)) {
+                    try (BufferedOutputStream stream = new BufferedOutputStream(fileOutputStream, BUFFER_SIZE)) {
                         while ((count = zipInputStream.read(buffer, 0, BUFFER_SIZE)) != -1) {
-                            bufferedOutputStream.write(buffer, 0, count);
-                            bufferedOutputStream.flush();
+                            stream.write(buffer, 0, count);
+                            stream.flush();
                         }
                     }
                 }
@@ -119,7 +112,7 @@ public class DecompressFilesTasklet extends AbstractTasklet {
             boolean deleted = FileUtils.deleteQuietly(compressedFile);
             if (!deleted) {
                 String msg = "Failed to delete compressed file " + compressedFile.getAbsolutePath();
-                logger.error(msg);
+                LOGGER.error(msg);
                 throw new UnexpectedJobExecutionException(msg);
             }
         }
@@ -134,7 +127,7 @@ public class DecompressFilesTasklet extends AbstractTasklet {
 
 
         int count;
-        byte buffer[] = new byte[BUFFER_SIZE];
+        byte[] buffer = new byte[BUFFER_SIZE];
 
         String newFileName = file.getName().substring(0, file.getName().lastIndexOf("."));
         decompressedFile = new File(targetDir.getAbsolutePath() + File.separator + newFileName);

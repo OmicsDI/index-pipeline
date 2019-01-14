@@ -18,9 +18,9 @@ import uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd;
  * @date 29/09/15
  */
 
-public class GenerateEBeyeMwXMLTasklet extends AbstractTasklet{
+public class GenerateEBeyeMwXMLTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(GenerateEBeyeMwXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GenerateEBeyeMwXMLTasklet.class);
 
     private String outputDirectory;
 
@@ -29,7 +29,7 @@ public class GenerateEBeyeMwXMLTasklet extends AbstractTasklet{
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-
+        //Todo: why comment?
         //GenerateMWEbeFiles.generateMWXMLfiles(configProd, taxWsConfigProd, outputDirectory);
 
         return RepeatStatus.FINISHED;

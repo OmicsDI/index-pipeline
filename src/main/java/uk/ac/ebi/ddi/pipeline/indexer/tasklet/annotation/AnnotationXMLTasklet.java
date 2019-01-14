@@ -10,7 +10,7 @@ import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.publication.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 
@@ -22,9 +22,9 @@ import java.util.concurrent.ForkJoinPool;
  * @date 19/10/15
  */
 
-public class AnnotationXMLTasklet extends AbstractTasklet{
+public class AnnotationXMLTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 
     String databaseName;
 
@@ -49,12 +49,12 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
     private void process(Dataset dataset) {
         try {
             Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
+            exitingDataset = DatasetAnnotationFieldsUtils.addpublicationDate(exitingDataset);
             exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
             exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
             datasetAnnotationService.annotateDataset(exitingDataset);
-        } catch (Exception ex){
-            logger.error("Exception occurred when processing dataset {}", dataset.getAccession(), ex);
+        } catch (Exception ex) {
+            LOGGER.error("Exception occurred when processing dataset {}", dataset.getAccession(), ex);
         }
     }
 

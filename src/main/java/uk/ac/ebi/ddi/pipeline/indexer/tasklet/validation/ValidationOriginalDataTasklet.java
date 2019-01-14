@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 01/10/15
  */
-public class ValidationOriginalDataTasklet extends AbstractTasklet{
+public class ValidationOriginalDataTasklet extends AbstractTasklet {
 
     private String directory;
 
@@ -39,27 +39,31 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
 
         List<File> files = new ArrayList<>();
         File inFile = new File(directory);
-        if(inFile.exists() && inFile.isDirectory()){
+        if (inFile.exists() && inFile.isDirectory()) {
             File[] fileList = inFile.listFiles();
-            for(File a: fileList){
-                if (OmicsXMLFile.hasFileHeader(a)){
+            if (fileList == null) {
+                return RepeatStatus.FINISHED;
+            }
+            for (File a: fileList) {
+                if (OmicsXMLFile.hasFileHeader(a)) {
                     files.add(a);
                 }
             }
             Map<File, List<Tuple>> errors = new HashMap<>();
-            for(File file: files){
+            for (File file: files) {
                 List<Tuple> error = OmicsXMLFile.validateSchema(file);
                 error.addAll(OmicsXMLFile.validateSemantic(file));
-                if(errors.containsKey(file)){
+                if (errors.containsKey(file)) {
                     error.addAll(errors.get(file));
                 }
                 errors.put(file, error);
             }
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 PrintStream reportFile = new PrintStream(new File(directory + "/" + reportName));
-                for(File file: errors.keySet()){
-                    for (Tuple error: errors.get(file))
+                for (File file: errors.keySet()) {
+                    for (Tuple error: errors.get(file)) {
                         reportFile.println(file.getAbsolutePath() + "|" + error.getKey() + "|" + error.getValue());
+                    }
                 }
                 reportFile.close();
             }

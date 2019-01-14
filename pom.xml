@@ -22,10 +22,12 @@
 
         <ddi.px.reader.version>1.0-SNAPSHOT</ddi.px.reader.version>
         <ddi.xml.validator.version>1.1-SNAPSHOT</ddi.xml.validator.version>
-        <ddi.annotation.version>1.2.1-SNAPSHOT</ddi.annotation.version>
+        <ddi.annotation.version>1.2.2-SNAPSHOT</ddi.annotation.version>
         <ddi.mw.reader.version>1.0-SNAPSHOT</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.0-SNAPSHOT</ddi.massive.reader.version>
         <ddi.api.readers.version>1.0-SNAPSHOT</ddi.api.readers.version>
+        <maven.checkstyle.version>2.17</maven.checkstyle.version>
+        <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
     </properties>
     <dependencies>
 
@@ -44,7 +46,7 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-service-db</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.ddi.api.readers</groupId>
@@ -361,6 +363,24 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.version}</version>
+                <executions>
+                    <execution>
+                        <id>checkstyle</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <failOnViolation>true</failOnViolation>
+                            <consoleOutput>true</consoleOutput>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

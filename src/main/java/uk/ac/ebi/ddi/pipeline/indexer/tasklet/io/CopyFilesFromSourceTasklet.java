@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +24,11 @@ import java.util.List;
  * @author Yasset Perez-Riverol
  * @version $Id$
  */
+
+@Getter
+@Setter
 public class CopyFilesFromSourceTasklet extends AbstractTasklet {
-    public static final Logger logger = LoggerFactory.getLogger(CopyFilesFromSourceTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CopyFilesFromSourceTasklet.class);
 
     private Resource sourceDirectory;
     private Resource targetDirectory;
@@ -31,48 +36,33 @@ public class CopyFilesFromSourceTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         List<File> sourceFiles = new ArrayList<>();
-        if(sourceDirectory.exists() && sourceDirectory.getFile().isDirectory() && sourceDirectory.getFile().listFiles() != null){
-            sourceFiles = Arrays.asList(sourceDirectory.getFile().listFiles());
+        if (sourceDirectory.exists() && sourceDirectory.getFile().isDirectory()) {
+            File[] files = sourceDirectory.getFile().listFiles();
+            if (files != null) {
+                sourceFiles = Arrays.asList(files);
+            }
         }
 
-        if (sourceFiles == null || sourceFiles.isEmpty()) {
-            logger.warn("Skipping file copy, since there are no files listed!");
+        if (sourceFiles.isEmpty()) {
+            LOGGER.warn("Skipping file copy, since there are no files listed!");
         } else {
             // there are files to copy, so let's try to get on with the job
             File target = targetDirectory.getFile();
 
             for (File sourceFile : sourceFiles) {
-                if(sourceFile.isFile()){
-                    Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
-                    logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
-
+                if (sourceFile.isFile()) {
+                    Assert.state(sourceFile.exists(),
+                            "Source must be an existing file: " + sourceFile.getAbsolutePath());
+                    LOGGER.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
                     FileUtils.copyFileToDirectory(sourceFile, target);
                 }
-
             }
         }
-
         return RepeatStatus.FINISHED;
-    }
-
-    public void setTargetDirectory(Resource targetDirectory) {
-        this.targetDirectory = targetDirectory;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(targetDirectory, "Target directory can not be null");
-    }
-
-    public Resource getSourceDirectory() {
-        return sourceDirectory;
-    }
-
-    public void setSourceDirectory(Resource sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
-    }
-
-    public Resource getTargetDirectory() {
-        return targetDirectory;
     }
 }

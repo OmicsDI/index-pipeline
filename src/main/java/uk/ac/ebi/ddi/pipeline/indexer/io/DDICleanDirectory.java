@@ -1,10 +1,12 @@
 package uk.ac.ebi.ddi.pipeline.indexer.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
-import org.springframework.core.io.Resource;
 
 /**
  * This code is licensed under the Apache License, Version 2.0 (the
@@ -21,28 +23,38 @@ import org.springframework.core.io.Resource;
  */
 public class DDICleanDirectory {
 
-    public static void cleanDirectory(String directoryName){
+    private static final Logger LOGGER = LoggerFactory.getLogger(DDICleanDirectory.class);
+
+    public static void cleanDirectory(String directoryName) {
         File inputDirectory = new File(directoryName);
-        if(inputDirectory.isDirectory() && inputDirectory.listFiles().length > 0){
-            Arrays.asList(inputDirectory.listFiles()).stream().forEach(file -> {
+        if (inputDirectory.isDirectory()) {
+            File[] files = inputDirectory.listFiles();
+            if (files == null) {
+                return;
+            }
+            for (File file : files) {
                 try {
                     Files.deleteIfExists(file.toPath());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("An error occurred when delete file {}, ", file.getAbsolutePath(), e);
                 }
-            });
+            }
         }
     }
 
     public static void cleanDirectory(Resource inputDirectory) throws IOException {
-        if(inputDirectory != null && inputDirectory.getFile().isDirectory() && inputDirectory.getFile().listFiles().length > 0){
-            Arrays.asList(inputDirectory.getFile().listFiles()).stream().forEach(file -> {
+        if (inputDirectory != null && inputDirectory.getFile().isDirectory()) {
+            File[] files = inputDirectory.getFile().listFiles();
+            if (files == null) {
+                return;
+            }
+            for (File file : files) {
                 try {
                     Files.deleteIfExists(file.toPath());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.error("An error occurred when delete file {}, ", file.getAbsolutePath(), e);
                 }
-            });
+            }
         }
     }
 }

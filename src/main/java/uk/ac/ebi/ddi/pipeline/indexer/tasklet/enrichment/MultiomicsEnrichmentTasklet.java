@@ -61,11 +61,14 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet {
         List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets().parallelStream()
                 .filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty())
                 .collect(Collectors.toList());
+
         Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream()
                 .collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
+
         publicationMap.entrySet().parallelStream().forEach(publication -> {
             boolean multiomics = publication.getValue().parallelStream()
                     .collect(Collectors.groupingBy(PublicationDataset::getOmicsType, Collectors.toSet())).size() > 1;
+
             if (multiomics) {
                 publication.getValue().parallelStream().forEach(x -> {
                     Dataset dataset = datasetAnnotationService.getDataset(x.getDatasetID(), x.getDatabase());

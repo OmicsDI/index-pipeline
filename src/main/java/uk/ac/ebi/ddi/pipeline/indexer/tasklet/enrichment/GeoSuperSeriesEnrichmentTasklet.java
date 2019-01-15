@@ -30,7 +30,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Find all subseries of all GEO datasets and save it as secondary accession
+ */
 @Getter
 @Setter
 public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {

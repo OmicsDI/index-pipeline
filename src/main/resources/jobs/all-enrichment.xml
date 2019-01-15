@@ -28,8 +28,12 @@
 
         <batch:step id="enrichmentDataStep" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="EnrichmentTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.OverWriteEnrichmentXMLTasklet">
+                <bean:bean id="EnrichmentTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="databaseName" >
+                        <util:constant static-field="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet.ALL_DATABASES" />
+                    </bean:property>
+                    <bean:property name="overwrite" value="true" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="annotationService" ref="annotationService" />
                 </bean:bean>

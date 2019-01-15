@@ -39,19 +39,24 @@ public class SimilarsEnrichmentTasklet extends AbstractTasklet {
         List<PublicationDataset> datasetList = datasetAnnotationService.getPublicationDatasets().parallelStream()
                 .filter(x -> x.getOmicsType() != null && !x.getOmicsType().isEmpty())
                 .collect(Collectors.toList());
+
         Map<String, Set<PublicationDataset>> publicationMap = datasetList.parallelStream()
                 .collect(Collectors.groupingBy(PublicationDataset::getPubmedId, Collectors.toSet()));
-        publicationMap.entrySet().parallelStream().forEach(publication -> publication.getValue().forEach(x -> {
-            List<PublicationDataset> similars = publication.getValue().stream()
-                     .filter(dat -> !dat.getDatasetID().equals(x.getDatasetID()))
-                     .collect(Collectors.toList());
-            Map<String, Set<String>> similarMap = similars.parallelStream()
-                     .collect(Collectors.groupingBy(
-                             PublicationDataset::getDatabase,
-                             Collectors.mapping(PublicationDataset::getDatasetID, Collectors.toSet())));
-            //Todo: why commented this
-//            datasetAnnotationService.updateDatasetSimilars(x.getDatasetID(), x.getDatabase(), similarMap);
-        }));
+
+        publicationMap.entrySet().parallelStream().forEach(
+                publication -> publication.getValue().forEach(x -> {
+                    List<PublicationDataset> similars = publication.getValue().stream()
+                            .filter(dat -> !dat.getDatasetID().equals(x.getDatasetID()))
+                            .collect(Collectors.toList());
+
+                    Map<String, Set<String>> similarMap = similars.stream()
+                            .collect(Collectors.groupingBy(
+                                    PublicationDataset::getDatabase,
+                                    Collectors.mapping(PublicationDataset::getDatasetID, Collectors.toSet())));
+                    //Todo: why commented this
+//                    datasetAnnotationService.updateDatasetSimilars(x.getDatasetID(), x.getDatabase(), similarMap);
+                })
+        );
         return RepeatStatus.FINISHED;
     }
 

@@ -95,9 +95,7 @@
                     <bean:property name="databaseName" value="${ddi.common.biomodels.database.name}" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.MODELS_DATA"/>
-                    </bean:property>
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

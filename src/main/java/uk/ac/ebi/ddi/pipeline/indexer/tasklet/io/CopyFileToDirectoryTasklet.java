@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +23,11 @@ import java.io.IOException;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  */
 
+@Getter
+@Setter
 public class CopyFileToDirectoryTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(CopyFileToDirectoryTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CopyFileToDirectoryTasklet.class);
 
     private File sourceFile;
     private Resource targetDirectory;
@@ -32,37 +36,22 @@ public class CopyFileToDirectoryTasklet extends AbstractTasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws IOException {
 
         if (sourceFile == null) {
-            logger.warn("Skipping file copy, since there are no files listed!");
+            LOGGER.warn("Skipping file copy, since there are no files listed!");
         } else {
             // there are files to copy, so let's try to get on with the job
             File target = targetDirectory.getFile();
 
             DDICleanDirectory.cleanDirectory(targetDirectory);
 
-            Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
-            logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
+            Assert.state(sourceFile.isFile() && sourceFile.exists(),
+                    "Source must be an existing file: " + sourceFile.getAbsolutePath());
+            LOGGER.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
 
             FileUtils.copyFileToDirectory(sourceFile, target);
 
         }
 
         return RepeatStatus.FINISHED;
-    }
-
-    public File getSourceFile() {
-        return sourceFile;
-    }
-
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
-
-    public Resource getTargetDirectory() {
-        return targetDirectory;
-    }
-
-    public void setTargetDirectory(Resource targetDirectory) {
-        this.targetDirectory = targetDirectory;
     }
 
     @Override

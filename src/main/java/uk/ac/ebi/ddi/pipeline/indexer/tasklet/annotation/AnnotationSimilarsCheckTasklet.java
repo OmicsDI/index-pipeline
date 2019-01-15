@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -25,7 +27,10 @@ import java.util.List;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 15/07/2016.
  */
-public class AnnotationSimilarsCheckTasklet extends AbstractTasklet{
+
+@Getter
+@Setter
+public class AnnotationSimilarsCheckTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
@@ -33,34 +38,32 @@ public class AnnotationSimilarsCheckTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<DatasetSimilars> datasetSimilars = datasetAnnotationService.getDatasetSimilars();
-        if(datasetSimilars != null && !datasetSimilars.isEmpty()){
-            for(int i = 0; i < datasetSimilars.size(); i++){
-                DatasetSimilars dataset = datasetSimilars.get(i);
-                for(SimilarDataset datasetSimilar: dataset.getSimilars()){
+        if (datasetSimilars != null && !datasetSimilars.isEmpty()) {
+            for (int i = 0; i < datasetSimilars.size(); i++) {
+                DatasetSimilars ds = datasetSimilars.get(i);
+                for (SimilarDataset dsSimilar: ds.getSimilars()) {
                     boolean match = false;
-                    for (DatasetSimilars datasetSimilarOld : datasetSimilars) {
-                        if (datasetSimilarOld.getAccession().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getAccession()) && datasetSimilarOld.getDatabase().equalsIgnoreCase(datasetSimilar.getSimilarDataset().getDatabase())) {
+                    for (DatasetSimilars prev : datasetSimilars) {
+                        if (prev.getAccession().equalsIgnoreCase(dsSimilar.getSimilarDataset().getAccession())
+                                && prev.getDatabase().equalsIgnoreCase(dsSimilar.getSimilarDataset().getDatabase())) {
                             match = true;
+                            break;
                         }
                     }
-                    if(!match){
-                        datasetAnnotationService.addDatasetSimilars(datasetSimilar.getSimilarDataset().getAccession(), datasetSimilar.getSimilarDataset().getDatabase(),new SimilarDataset(datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase()),DatasetSimilarsType.getReverseRelationType(datasetSimilar.getRelationType())));
+                    if (!match) {
+                        datasetAnnotationService.addDatasetSimilars(
+                                dsSimilar.getSimilarDataset().getAccession(),
+                                dsSimilar.getSimilarDataset().getDatabase(),
+                                new SimilarDataset(
+                                        datasetAnnotationService.getDataset(ds.getAccession(), ds.getDatabase()),
+                                        DatasetSimilarsType.getReverseRelationType(dsSimilar.getRelationType()))
+                        );
                     }
                 }
 
             }
         }
         return RepeatStatus.FINISHED;
-    }
-
-
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

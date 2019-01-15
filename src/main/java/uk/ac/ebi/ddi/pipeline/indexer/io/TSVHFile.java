@@ -7,7 +7,8 @@ import java.util.*;
  * A Tab-Separated, Variable-Header, universal representation and parsing class.
  * <p/>
  * Use Case 1: We want to parse a tab-separated file into memory.
- * -> Create an instance of TSVHFile calling the static factory method: TSVHFile tsvhFile = TSVHFile.parseFile(newReadmeFile);
+ * -> Create an instance of TSVHFile calling the static factory method:
+ *                                  TSVHFile tsvhFile = TSVHFile.parseFile(newReadmeFile);
  * -> Access the header Map<column_name,pos> using tsvhFile.getHeader()
  * -> Access the items using tsvhFile.getItemsIterator()
  * -> Each item has methods for getting the column value using the name of the column
@@ -107,7 +108,9 @@ public class TSVHFile {
             while (iterator.hasNext()) {
                 line = new StringBuilder();
                 for (String columnValue : iterator.next().getAllColumnValues()) {
-                    if (columnValue == null) columnValue = "-";
+                    if (columnValue == null) {
+                        columnValue = "-";
+                    }
                     line.append(columnValue).append(TAB);
                 }
                 if (line.length() > 0) { // deletes last TAB
@@ -191,6 +194,4 @@ public class TSVHFile {
             throw new UnsupportedOperationException();
         }
     }
-
-
 }

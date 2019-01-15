@@ -1,6 +1,10 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -18,7 +22,9 @@ import java.util.List;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 26/10/15
  */
-public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet {
 
     Resource inputDirectory;
 
@@ -26,10 +32,12 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
 
     String pattern;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CopyFilesWithPatternFromSourceTasklet.class);
+
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(inputDirectory, "The input Directory can't be null!");
-        Assert.notNull(outputDirectory," The output Directory can't be null!");
+        Assert.notNull(outputDirectory, " The output Directory can't be null!");
         Assert.notNull(pattern, "The pattern can be null!!!");
     }
 
@@ -37,12 +45,15 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<File> sourceFiles = new ArrayList<>();
-        if(inputDirectory.exists() && inputDirectory.getFile().isDirectory()){
-            sourceFiles = Arrays.asList(inputDirectory.getFile().listFiles());
+        if (inputDirectory.exists() && inputDirectory.getFile().isDirectory()) {
+            File[] files = inputDirectory.getFile().listFiles();
+            if (files != null) {
+                sourceFiles = Arrays.asList(files);
+            }
         }
 
         if (sourceFiles.isEmpty()) {
-            logger.warn("Skipping file copy, since there are no files listed!");
+            LOGGER.warn("Skipping file copy, since there are no files listed!");
         } else {
             // there are files to copy, so let's try to get on with the job
             File target = outputDirectory.getFile();
@@ -52,38 +63,15 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet{
             DDICleanDirectory.cleanDirectory(outputDirectory);
 
             for (File sourceFile : sourceFiles) {
-                if(sourceFile.isFile() && sourceFile.getName().contains(pattern)){
-                    Assert.state(sourceFile.isFile() && sourceFile.exists(), "Source must be an existing file: " + sourceFile.getAbsolutePath());
-                    logger.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
+                if (sourceFile.isFile() && sourceFile.getName().contains(pattern)) {
+                    Assert.state(sourceFile.isFile() && sourceFile.exists(),
+                            "Source must be an existing file: " + sourceFile.getAbsolutePath());
+                    LOGGER.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
                     FileUtils.copyFileToDirectory(sourceFile, target);
                 }
             }
         }
 
         return RepeatStatus.FINISHED;
-    }
-
-    public Resource getInputDirectory() {
-        return inputDirectory;
-    }
-
-    public void setInputDirectory(Resource inputDirectory) {
-        this.inputDirectory = inputDirectory;
-    }
-
-    public Resource getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(Resource outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public String getPattern() {
-        return pattern;
-    }
-
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
     }
 }

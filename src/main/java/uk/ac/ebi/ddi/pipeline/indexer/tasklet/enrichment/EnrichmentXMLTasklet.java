@@ -1,13 +1,13 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
-import org.json.JSONException;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
-import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.model.EnrichedDataset;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
@@ -16,9 +16,7 @@ import uk.ac.ebi.ddi.annotation.utils.DataType;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
-import uk.ac.ebi.ddi.xml.validator.exception.DDIException;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -27,9 +25,11 @@ import java.util.stream.Collectors;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 09/12/2015
  */
-public class EnrichmentXMLTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class EnrichmentXMLTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(EnrichmentXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(EnrichmentXMLTasklet.class);
 
     String databaseName;
 
@@ -39,7 +39,7 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
 
     DataType dataType;
 
-    private static final int PARALLEL = Math.min(3, Runtime.getRuntime().availableProcessors());
+    private static final int PARALLEL = Math.min(6, Runtime.getRuntime().availableProcessors());
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -52,7 +52,6 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
         customThreadPool.submit(() -> datasets.parallelStream().forEach(this::process)).get();
         return RepeatStatus.FINISHED;
-
     }
 
     private void process(Dataset dataset) {
@@ -61,47 +60,14 @@ public class EnrichmentXMLTasklet extends AbstractTasklet{
             EnrichedDataset enrichedDataset = DatasetAnnotationEnrichmentService.enrichment(
                     annotationService, existingDataset, false);
             dataset = DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, enrichedDataset);
-            logger.debug(enrichedDataset.getEnrichedAttributes().toString());
             datasetAnnotationService.enrichedDataset(existingDataset);
-        } catch (DDIException | RestClientException | UnsupportedEncodingException | JSONException e) {
-            logger.error("Exception occurred when processing dataset {}", dataset.getAccession(), e);
+        } catch (Exception e) {
+            LOGGER.error("Exception occurred when processing dataset {}", dataset.getAccession(), e);
         }
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(databaseName, "Input databaseName can not be null");
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public DDIAnnotationService getAnnotationService() {
-        return annotationService;
-    }
-
-    public void setAnnotationService(DDIAnnotationService annotationService) {
-        this.annotationService = annotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public DataType getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
     }
 }

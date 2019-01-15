@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,12 +75,8 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
             downloadDir.mkdirs();
         }
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
-        AtomicInteger counter = new AtomicInteger(0);
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
-        customThreadPool.submit(() -> datasets.stream().parallel().forEach(dataset -> {
-            LOGGER.info("Processing dataset " + dataset.getAccession() + ", {}/{}", counter.getAndIncrement(), datasets.size());
-            process(dataset);
-        })).get();
+        customThreadPool.submit(() -> datasets.stream().parallel().forEach(this::process)).get();
         LOGGER.info("Finished");
         return RepeatStatus.FINISHED;
     }
@@ -110,9 +105,9 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
     }
 
     private List<String> getAllSuperSerialAccessions(String accessionId) throws IOException {
-        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accessionId)))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accessionId)))) {
             List<String> superSerialDatasets = new ArrayList<>();
-            for(String line; (line = br.readLine()) != null; ) {
+            for (String line; (line = br.readLine()) != null;) {
                 Matcher matcher = superSerial.matcher(line);
                 if (matcher.find()) {
                     superSerialDatasets.add(matcher.group(1));

@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -16,8 +18,9 @@ import java.util.Set;
 /** If a similar datasets is removed from the Sdataset Table it should be updated in the
  *  similars dataset Table.
  **/
-
-public class CleanEmptySimilarTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class CleanEmptySimilarTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
@@ -25,34 +28,26 @@ public class CleanEmptySimilarTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<DatasetSimilars> datasetSimilars = datasetAnnotationService.getDatasetSimilars();
-        if(datasetSimilars != null && !datasetSimilars.isEmpty()){
+        if (datasetSimilars != null && !datasetSimilars.isEmpty()) {
             for (DatasetSimilars dataset : datasetSimilars) {
                 Set<SimilarDataset> toRemove = new HashSet<>();
                 Set<SimilarDataset> newSimilars = new HashSet<>();
                 for (SimilarDataset datasetSimilar : dataset.getSimilars()) {
-                    if (datasetSimilar.getSimilarDataset() == null)
+                    if (datasetSimilar.getSimilarDataset() == null) {
                         toRemove.add(datasetSimilar);
-                    else
+                    } else {
                         newSimilars.add(datasetSimilar);
+                    }
                 }
                 if (toRemove.size() == dataset.getSimilars().size()) {
                     datasetAnnotationService.removeSimilar(dataset);
                 } else if (!toRemove.isEmpty()) {
-                    datasetAnnotationService.updateDatasetSimilars(dataset.getAccession(), dataset.getDatabase(), newSimilars);
+                    datasetAnnotationService.updateDatasetSimilars(
+                            dataset.getAccession(), dataset.getDatabase(), newSimilars);
                 }
             }
         }
         return RepeatStatus.FINISHED;
-    }
-
-
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

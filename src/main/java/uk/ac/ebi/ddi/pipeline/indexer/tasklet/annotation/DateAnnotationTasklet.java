@@ -1,12 +1,14 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
@@ -26,7 +28,9 @@ import java.util.List;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 13/07/2016.
  */
-public class DateAnnotationTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class DateAnnotationTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
@@ -36,33 +40,18 @@ public class DateAnnotationTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<Database> databases = databaseAnnotationService.getDatabases();
-        if(databases != null && !databases.isEmpty()){
-            databases.parallelStream().forEach(database ->{
+        if (databases != null && !databases.isEmpty()) {
+            databases.parallelStream().forEach(database -> {
                 List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(database.getName());
-                datasets.parallelStream().forEach( dataset -> {
-                    Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                    existingDataset = DatasetAnnotationFieldsService.refineDates(existingDataset);
+                datasets.parallelStream().forEach(dataset -> {
+                    Dataset existingDataset = datasetAnnotationService.getDataset(
+                            dataset.getAccession(), dataset.getDatabase());
+                    existingDataset = DatasetAnnotationFieldsUtils.refineDates(existingDataset);
                     datasetAnnotationService.updateDataset(existingDataset);
                 });
             });
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public DDIDatabaseAnnotationService getDatabaseAnnotationService() {
-        return databaseAnnotationService;
-    }
-
-    public void setDatabaseAnnotationService(DDIDatabaseAnnotationService databaseAnnotationService) {
-        this.databaseAnnotationService = databaseAnnotationService;
     }
 
     @Override

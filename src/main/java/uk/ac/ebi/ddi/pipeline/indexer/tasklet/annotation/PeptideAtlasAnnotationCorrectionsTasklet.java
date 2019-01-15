@@ -1,11 +1,13 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 
@@ -24,11 +26,11 @@ import java.util.List;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 15/07/2016.
  */
-public class PeptideAtlasAnnotationCorrectionsTasklet extends AbstractTasklet{
-
+@Getter
+@Setter
+public class PeptideAtlasAnnotationCorrectionsTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
-
 
     String databaseName;
 
@@ -36,30 +38,15 @@ public class PeptideAtlasAnnotationCorrectionsTasklet extends AbstractTasklet{
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
-        if(datasets != null && !datasets.isEmpty()){
-            datasets.parallelStream().forEach(dataset ->{
-                Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-                existingDataset = DatasetAnnotationFieldsService.refinePeptideAtlasKeyword(existingDataset);
+        if (datasets != null && !datasets.isEmpty()) {
+            datasets.parallelStream().forEach(dataset -> {
+                Dataset existingDataset = datasetAnnotationService.getDataset(
+                        dataset.getAccession(), dataset.getDatabase());
+                existingDataset = DatasetAnnotationFieldsUtils.refinePeptideAtlasKeyword(existingDataset);
                 datasetAnnotationService.updateDataset(existingDataset);
             });
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
     }
 
     @Override

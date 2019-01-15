@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.database;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -36,9 +38,12 @@ import java.util.stream.Collectors;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 26/05/2016.
  */
-public class DatasetExportTasklet extends AbstractTasklet{
 
-    public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
+@Getter
+@Setter
+public class DatasetExportTasklet extends AbstractTasklet {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 
     Resource outputDirectory;
 
@@ -60,103 +65,49 @@ public class DatasetExportTasklet extends AbstractTasklet{
         datasets = datasets.parallelStream()
                 .filter(x ->  x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType()) ||
                         x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.UPDATED.getType()) ||
-                        x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.ENRICHED.getType())
-                )
+                        x.getCurrentStatus().equalsIgnoreCase(DatasetCategory.ENRICHED.getType()))
                 .collect(Collectors.toList());
 
         Database database = databaseService.getDatabaseInfo(databaseName);
         try {
-            datasets.stream().forEach(dataset -> {
-                if(datasetAnnotationService.getMergedDatasetCount(dataset.getDatabase(), dataset.getAccession()) == 0) {
-                    Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+            datasets.forEach(ds -> {
+                if (datasetAnnotationService.getMergedDatasetCount(ds.getDatabase(), ds.getAccession()) == 0) {
+                    Dataset existingDataset = datasetAnnotationService.getDataset(ds.getAccession(), ds.getDatabase());
                     Entry entry = DatasetUtils.tansformDatasetToEntry(existingDataset);
                     listToPrint.add(entry);
 
                     //shorten description per EBI Search request
                     String description = entry.getDescription();
-                    if (null != description ) {
+                    if (null != description) {
                         //entry.setDescription(description.substring(0, 100) + "...");&& description.length() > 100
                         entry.setDescription(description);
                     }
                 }
                 if (listToPrint.size() == numberEntries) {
                     try {
-                        DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
+                        DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(),
+                                database.getDescription(), databaseName, database.getReleaseTag());
                         listToPrint.clear();
                         counterFiles[0]++;
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Exception occurred when processing dataset {}, ", ds.getAccession(), e);
                     }
                 }
             });
             // This must be printed before leave because it contains the end members of the list.
             if (!listToPrint.isEmpty()) {
-                DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(), database.getDescription(), databaseName, database.getReleaseTag());
+                DDIFile.writeList(listToPrint, filePrefix, counterFiles[0], outputDirectory.getFile(),
+                        database.getDescription(), databaseName, database.getReleaseTag());
             }
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-            logger.error("exception thrown in dataset exportlet tasklet" + ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("Exception occurred, ", ex);
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public void setInputDirectory(Resource outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(outputDirectory, "Input Directory can not be null");
         Assert.notNull(datasetAnnotationService, "Annotation Service can't be null");
-
-    }
-
-    public Resource getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(Resource outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public DDIDatabaseAnnotationService getDatabaseService() {
-        return databaseService;
-    }
-
-    public void setDatabaseService(DDIDatabaseAnnotationService databaseService) {
-        this.databaseService = databaseService;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public String getFilePrefix() {
-        return filePrefix;
-    }
-
-    public void setFilePrefix(String filePrefix) {
-        this.filePrefix = filePrefix;
-    }
-
-    public int getNumberEntries() {
-        return numberEntries;
-    }
-
-    public void setNumberEntries(int numberEntries) {
-        this.numberEntries = numberEntries;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
     }
 }

@@ -100,7 +100,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
         return RepeatStatus.FINISHED;
     }
 
-    private Set<PublicationDataset> reanalysedDatasetCorrection(Set<PublicationDataset> allPubDatasets, Dataset dataset) {
+    private Set<PublicationDataset> reanalysedDatasetCorrection(Set<PublicationDataset> allPubDatasets,
+                                                                Dataset dataset) {
         Set<PublicationDataset> result = new HashSet<>();
         for (PublicationDataset publicationDataset : allPubDatasets) {
             if (publicationDataset.getDatasetID().equals(dataset.getAccession())) {
@@ -144,7 +145,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
             if (allPubDatasets.size() > 0) {
                 datasetAnnotationService.addGEODatasetSimilars(dataset, allPubDatasets, Constants.REANALYZED_TYPE);
                 for (PublicationDataset publicationDataset : allPubDatasets) {
-                    Dataset refDataset = new Dataset(publicationDataset.getDatasetID(), publicationDataset.getDatabase());
+                    Dataset refDataset = new Dataset(
+                            publicationDataset.getDatasetID(), publicationDataset.getDatabase());
                     PublicationDataset pub = new PublicationDataset();
                     pub.setDatabaseID(dataset.getDatabase());
                     pub.setDatasetID(dataset.getAccession());
@@ -171,8 +173,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
 
     List<String> getSampleIds(String accession) throws IOException {
         List<String> result = new ArrayList<>();
-        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
-            for(String line; (line = br.readLine()) != null; ) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
+            for (String line; (line = br.readLine()) != null;) {
                 Matcher matcher = seriesSamplePattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
@@ -185,8 +187,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     private List<String> getDatasetFromSample(String accession) throws IOException {
         List<String> result = new ArrayList<>();
 
-        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
-            for(String line; (line = br.readLine()) != null; ) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(accession)))) {
+            for (String line; (line = br.readLine()) != null;) {
                 Matcher matcher = sampleSeriesPattern.matcher(line);
                 if (matcher.find()) {
                     result.add(matcher.group(1));
@@ -199,8 +201,8 @@ public class GeoEnrichmentTasklet extends AbstractTasklet {
     Set<PublicationDataset> getReanalysisDataset(String sampleId) throws IOException {
         Set<PublicationDataset> dataset = new HashSet<>();
         Set<String> datasetIds = new HashSet<>();
-        try(BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(sampleId)))) {
-            for(String line; (line = br.readLine()) != null; ) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getDatasetFile(sampleId)))) {
+            for (String line; (line = br.readLine()) != null;) {
                 Matcher matcher = reanalysedPattern.matcher(line);
                 if (matcher.find()) {
                     if (matcher.group(1).contains("GSE")) {

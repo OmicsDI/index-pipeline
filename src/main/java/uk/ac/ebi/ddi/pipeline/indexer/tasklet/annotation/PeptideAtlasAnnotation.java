@@ -1,12 +1,13 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.web.client.RestClientException;
 import uk.ac.ebi.ddi.annotation.service.crossreferences.CrossReferencesProteinDatabasesService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.Set;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 19/06/2016.
  */
+@Getter
+@Setter
 public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
 
     private List<String> databases;
@@ -35,32 +38,24 @@ public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
 
         List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(databaseName);
 
-        datasets.parallelStream().forEach( dataset -> {
+        datasets.parallelStream().forEach(dataset -> {
             Dataset existing = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
             existing = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, existing);
-            existing = DatasetAnnotationFieldsService.cleanRepository(existing, databaseName);
-            existing = DatasetAnnotationFieldsService.addCrossReferenceAnnotation(existing);
-            existing = DatasetAnnotationFieldsService.replaceTextCase(existing);
-            try{
-                existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(datasetAnnotationService, existing);
-                Map<String, Set<String>> similars = DatasetAnnotationFieldsService.getCrossSimilars(existing, databases);
-                if(!similars.isEmpty())
+            existing = DatasetAnnotationFieldsUtils.cleanRepository(existing, databaseName);
+            existing = DatasetAnnotationFieldsUtils.addCrossReferenceAnnotation(existing);
+            existing = DatasetAnnotationFieldsUtils.replaceTextCase(existing);
+            try {
+                existing = CrossReferencesProteinDatabasesService.annotatePXCrossReferences(
+                        datasetAnnotationService, existing);
+                Map<String, Set<String>> similars = DatasetAnnotationFieldsUtils.getCrossSimilars(existing, databases);
+                if (!similars.isEmpty()) {
                     datasetAnnotationService.addDatasetReanalysisSimilars(existing, similars);
-            }catch(RestClientException ex){
-                logger.debug(ex.getMessage());
+                }
+                datasetAnnotationService.updateDataset(existing);
+            } catch (Exception ex) {
+                LOGGER.error("Exception occurred when processing dataset {}, ", dataset.getAccession(), ex);
             }
-            datasetAnnotationService.updateDataset(existing);
-
-
         });
         return RepeatStatus.FINISHED;
-    }
-
-    public List<String> getDatabases() {
-        return databases;
-    }
-
-    public void setDatabases(List<String> databases) {
-        this.databases = databases;
     }
 }

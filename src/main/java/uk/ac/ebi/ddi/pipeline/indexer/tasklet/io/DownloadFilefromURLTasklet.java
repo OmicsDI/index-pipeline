@@ -1,5 +1,9 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -15,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.cert.X509Certificate;
 
 /**
  * This code is licensed under the Apache License, Version 2.0 (the
@@ -29,26 +34,26 @@ import java.net.URLConnection;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 07/06/2016.
  */
-public class DownloadFilefromURLTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class DownloadFilefromURLTasklet extends AbstractTasklet {
 
     String originalFileURL;
 
     String targetFileName;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFilefromURLTasklet.class);
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         // Create a new trust manager that trust all certificates
         TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    public X509Certificate[] getAcceptedIssuers() {
                         return null;
                     }
-                    public void checkClientTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                    public void checkServerTrusted(
-                            java.security.cert.X509Certificate[] certs, String authType) {
-                    }
+                    public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+                    public void checkServerTrusted(X509Certificate[] certs, String authType) { }
                 }
         };
 
@@ -57,24 +62,22 @@ public class DownloadFilefromURLTasklet extends AbstractTasklet{
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            LOGGER.debug("Exception occurred, ", e);
         }
 
         URL url = new URL(originalFileURL);
         URLConnection connection = url.openConnection();
-        InputStream is = connection.getInputStream();
+        try (InputStream is = connection.getInputStream();
+            FileOutputStream fileOutput = new FileOutputStream(new File(targetFileName))) {
 
-        FileOutputStream fileOutput = new FileOutputStream(new File(targetFileName));
-        byte[] buffer = new byte[2048];
-        int bufferLength; //used to store a temporary size of the buffer
+            byte[] buffer = new byte[2048];
+            int bufferLength; //used to store a temporary size of the buffer
 
-        while ( (bufferLength = is.read(buffer)) > 0 )
-            fileOutput.write(buffer, 0, bufferLength);
-
-        fileOutput.close();
-
+            while ((bufferLength = is.read(buffer)) > 0) {
+                fileOutput.write(buffer, 0, bufferLength);
+            }
+        }
         return RepeatStatus.FINISHED;
-
     }
 
     @Override
@@ -82,21 +85,5 @@ public class DownloadFilefromURLTasklet extends AbstractTasklet{
 
         Assert.notNull(originalFileURL, "The original URL Can't be null");
         Assert.notNull(targetFileName,  "The taget File Can be null");
-    }
-
-    public String getOriginalFileURL() {
-        return originalFileURL;
-    }
-
-    public void setOriginalFileURL(String originalFileURL) {
-        this.originalFileURL = originalFileURL;
-    }
-
-    public String getTargetFileName() {
-        return targetFileName;
-    }
-
-    public void setTargetFileName(String targetFileName) {
-        this.targetFileName = targetFileName;
     }
 }

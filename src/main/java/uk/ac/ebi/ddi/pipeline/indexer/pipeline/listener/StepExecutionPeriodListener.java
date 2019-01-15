@@ -10,19 +10,18 @@ import java.sql.Timestamp;
 
 
 public class StepExecutionPeriodListener implements StepExecutionListener {
-    public static final Logger logger = LoggerFactory.getLogger(StepExecutionPeriodListener.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(StepExecutionPeriodListener.class);
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        logger.info("StepExecution - " + stepExecution.getStepName() + " begins at: "
+        LOGGER.info("StepExecution - " + stepExecution.getStepName() + " begins at: "
                 + new Timestamp(System.currentTimeMillis()));
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        logger.info("StepExecution - " + stepExecution.getStepName() + " ends at: "
+        LOGGER.info("StepExecution - " + stepExecution.getStepName() + " ends at: "
                 + new Timestamp(System.currentTimeMillis()));
         return null;
     }
-
 }

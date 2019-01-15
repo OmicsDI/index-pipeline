@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -30,8 +32,9 @@ import java.util.List;
  * <p>
  * Created by yperez (ypriverol@gmail.com) on 20/10/2016.
  */
-public class AnnotateStrainTasklet extends AbstractTasklet{
-
+@Getter
+@Setter
+public class AnnotateStrainTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
 
@@ -39,17 +42,17 @@ public class AnnotateStrainTasklet extends AbstractTasklet{
 
     UniProtTaxonomy taxonomyService = UniProtTaxonomy.getInstance();
 
-
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
 
         List<Database> databases = databaseAnnotationService.getDatabases();
 
-        if(databases != null && !databases.isEmpty()){
-            databases.parallelStream().forEach(database ->{
+        if (databases != null && !databases.isEmpty()) {
+            databases.parallelStream().forEach(database -> {
                 List<Dataset> datasets = datasetAnnotationService.getAllDatasetsByDatabase(database.getName());
-                datasets.stream().forEach( dataset -> {
-                    Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
+                datasets.forEach(dataset -> {
+                    Dataset existingDataset = datasetAnnotationService.getDataset(
+                            dataset.getAccession(), dataset.getDatabase());
                     existingDataset = taxonomyService.annotateParentForNonRanSpecies(existingDataset);
                     datasetAnnotationService.updateDataset(existingDataset);
                 });
@@ -61,21 +64,5 @@ public class AnnotateStrainTasklet extends AbstractTasklet{
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(datasetAnnotationService, "The dataset annotation object can't be null");
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public DDIDatabaseAnnotationService getDatabaseAnnotationService() {
-        return databaseAnnotationService;
-    }
-
-    public void setDatabaseAnnotationService(DDIDatabaseAnnotationService databaseAnnotationService) {
-        this.databaseAnnotationService = databaseAnnotationService;
     }
 }

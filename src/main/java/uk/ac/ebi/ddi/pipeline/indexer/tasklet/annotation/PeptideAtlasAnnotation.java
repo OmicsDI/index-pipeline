@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -25,6 +27,8 @@ import java.util.Set;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 19/06/2016.
  */
+@Getter
+@Setter
 public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
 
     private List<String> databases;
@@ -53,13 +57,5 @@ public class PeptideAtlasAnnotation extends AnnotationXMLTasklet {
             }
         });
         return RepeatStatus.FINISHED;
-    }
-
-    public List<String> getDatabases() {
-        return databases;
-    }
-
-    public void setDatabases(List<String> databases) {
-        this.databases = databases;
     }
 }

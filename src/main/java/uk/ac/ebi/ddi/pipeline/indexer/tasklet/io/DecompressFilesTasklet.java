@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,8 @@ import java.util.zip.ZipInputStream;
  * @author Yasset PErez-Riverol
  * @version $Id$
  */
+@Getter
+@Setter
 public class DecompressFilesTasklet extends AbstractTasklet {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(DecompressFilesTasklet.class);
@@ -151,17 +155,5 @@ public class DecompressFilesTasklet extends AbstractTasklet {
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(originalDirectory, "Original directory with the compress files");
         Assert.notNull(targetDirectory, "Targeted directory for the output cannot be empty");
-    }
-
-    public void setTargetDirectory(Resource targetDirectory) {
-        this.targetDirectory = targetDirectory;
-    }
-
-    public void setDeleteOriginal(boolean deleteOriginal) {
-        this.deleteOriginal = deleteOriginal;
-    }
-
-    public void setOriginalDirectory(Resource originalDirectory) {
-        this.originalDirectory = originalDirectory;
     }
 }

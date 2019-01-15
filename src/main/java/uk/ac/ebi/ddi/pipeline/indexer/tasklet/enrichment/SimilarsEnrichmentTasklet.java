@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 13/06/2016.
  */
+@Setter
+@Getter
 public class SimilarsEnrichmentTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
@@ -54,13 +58,5 @@ public class SimilarsEnrichmentTasklet extends AbstractTasklet {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(datasetAnnotationService, "The object can't be null");
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 }

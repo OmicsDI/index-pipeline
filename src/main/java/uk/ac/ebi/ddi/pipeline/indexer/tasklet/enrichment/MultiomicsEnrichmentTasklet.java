@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 26/05/2016.
  */
+@Getter
+@Setter
 public class MultiomicsEnrichmentTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
@@ -76,13 +80,6 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet {
             }
         });
         return RepeatStatus.FINISHED;
-    }
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

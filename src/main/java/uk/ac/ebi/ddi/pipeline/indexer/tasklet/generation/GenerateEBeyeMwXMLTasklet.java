@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -17,7 +19,8 @@ import uk.ac.ebi.ddi.api.readers.mw.ws.client.MWWsConfigProd;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 29/09/15
  */
-
+@Getter
+@Setter
 public class GenerateEBeyeMwXMLTasklet extends AbstractTasklet {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(GenerateEBeyeMwXMLTasklet.class);
@@ -40,21 +43,5 @@ public class GenerateEBeyeMwXMLTasklet extends AbstractTasklet {
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(outputDirectory, "Output directory cannot be null.");
         Assert.notNull(configProd, "configProd can't be null.");
-    }
-
-    public MWWsConfigProd getConfigProd() {
-        return configProd;
-    }
-
-    public void setConfigProd(MWWsConfigProd configProd) {
-        this.configProd = configProd;
-    }
-
-    public String getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(String outputDirectory) {
-        this.outputDirectory = outputDirectory;
     }
 }

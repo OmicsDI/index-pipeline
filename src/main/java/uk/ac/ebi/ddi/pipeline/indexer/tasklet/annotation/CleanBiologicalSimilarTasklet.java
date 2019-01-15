@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -25,6 +27,8 @@ import java.util.List;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 26/07/2016.
  */
+@Getter
+@Setter
 public class CleanBiologicalSimilarTasklet extends AbstractTasklet {
 
     DDIDatasetSimilarityService ddiExpDataProcessService;
@@ -56,7 +60,7 @@ public class CleanBiologicalSimilarTasklet extends AbstractTasklet {
                         }
                     }
                 }
-
+                //Todo: what is this
 //                Set<SimilarDataset> toRemove = new HashSet<>();
 //                Set<SimilarDataset> newSimilars = new HashSet<>();
 //                for(SimilarDataset datasetSimilar: dataset.getSimilars()){
@@ -74,15 +78,6 @@ public class CleanBiologicalSimilarTasklet extends AbstractTasklet {
             }
         }
         return RepeatStatus.FINISHED;
-    }
-
-
-    public DDIDatasetSimilarityService getDdiExpDataProcessService() {
-        return ddiExpDataProcessService;
-    }
-
-    public void setDdiExpDataProcessService(DDIDatasetSimilarityService ddiExpDataProcessService) {
-        this.ddiExpDataProcessService = ddiExpDataProcessService;
     }
 
     @Override

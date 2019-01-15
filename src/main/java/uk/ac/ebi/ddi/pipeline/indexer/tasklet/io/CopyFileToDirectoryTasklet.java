@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.io;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ import java.io.IOException;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  */
 
+@Getter
+@Setter
 public class CopyFileToDirectoryTasklet extends AbstractTasklet {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(CopyFileToDirectoryTasklet.class);
@@ -48,22 +52,6 @@ public class CopyFileToDirectoryTasklet extends AbstractTasklet {
         }
 
         return RepeatStatus.FINISHED;
-    }
-
-    public File getSourceFile() {
-        return sourceFile;
-    }
-
-    public void setSourceFile(File sourceFile) {
-        this.sourceFile = sourceFile;
-    }
-
-    public Resource getTargetDirectory() {
-        return targetDirectory;
-    }
-
-    public void setTargetDirectory(Resource targetDirectory) {
-        this.targetDirectory = targetDirectory;
     }
 
     @Override

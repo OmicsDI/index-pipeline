@@ -1,14 +1,12 @@
 package uk.ac.ebi.ddi.pipeline.indexer.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 29/09/15
  */
-@Setter
-@Getter
+@Data
 public class DataSource {
 
     private String name;
@@ -31,17 +29,5 @@ public class DataSource {
         this.pattern = pattern;
         this.singleFile = singleFile;
         this.typeConnection = typeConnection;
-    }
-
-    @Override
-    public String toString() {
-        return "DataSource{" +
-                "name='" + name + '\'' +
-                ", originalURL='" + originalURL + '\'' +
-                ", dataURL='" + dataURL + '\'' +
-                ", pattern='" + pattern + '\'' +
-                ", singleFile=" + singleFile +
-                ", typeConnection='" + typeConnection + '\'' +
-                '}';
     }
 }

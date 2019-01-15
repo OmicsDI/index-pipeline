@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -21,7 +23,8 @@ import java.util.concurrent.ForkJoinPool;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 19/10/15
  */
-
+@Getter
+@Setter
 public class AnnotationXMLTasklet extends AbstractTasklet {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
@@ -56,18 +59,6 @@ public class AnnotationXMLTasklet extends AbstractTasklet {
         } catch (Exception ex) {
             LOGGER.error("Exception occurred when processing dataset {}", dataset.getAccession(), ex);
         }
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ArrayExpressAnnotationTasklet extends AnnotationXMLTasklet {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ArrayExpressAnnotationTasklet.class);
 
-    NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
+    private NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {

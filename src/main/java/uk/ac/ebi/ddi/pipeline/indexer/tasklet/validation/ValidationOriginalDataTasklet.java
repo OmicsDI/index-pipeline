@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -22,6 +24,8 @@ import java.util.Map;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 01/10/15
  */
+@Getter
+@Setter
 public class ValidationOriginalDataTasklet extends AbstractTasklet {
 
     private String directory;
@@ -69,21 +73,5 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet {
             }
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public String getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(String directory) {
-        this.directory = directory;
-    }
-
-    public String getReportName() {
-        return reportName;
-    }
-
-    public void setReportName(String reportName) {
-        this.reportName = reportName;
     }
 }

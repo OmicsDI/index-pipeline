@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -15,6 +17,8 @@ import java.io.IOException;
  * @author dani@ebi.ac.uk
  *         Date: 15/05/12
  */
+@Getter
+@Setter
 public class CleanTasklet extends AbstractTasklet {
     public static final Logger LOGGER = LoggerFactory.getLogger(CleanTasklet.class);
 
@@ -41,13 +45,5 @@ public class CleanTasklet extends AbstractTasklet {
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(fileSystemPersisterFactory, "FileSystemPersister cannot be empty");
         Assert.notNull(key, "Key cannot be empty");
-    }
-
-    public void setFileSystemPersisterFactory(FileSystemPersisterFactory fileSystemPersisterFactory) {
-        this.fileSystemPersisterFactory = fileSystemPersisterFactory;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }

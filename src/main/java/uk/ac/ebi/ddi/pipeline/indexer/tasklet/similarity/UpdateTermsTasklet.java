@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 25/11/2015
  */
+@Getter
+@Setter
 public class UpdateTermsTasklet extends AbstractTasklet {
 
     String databaseName;
@@ -51,37 +55,5 @@ public class UpdateTermsTasklet extends AbstractTasklet {
             DatasetAnnotationEnrichmentService.importTermsToDatabase(dataset, dataType, ddiExpDataImportService);
         });
         return RepeatStatus.FINISHED;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public void setDataType(DataType dataType) {
-        this.dataType = dataType;
-    }
-
-    public DDIExpDataImportService getDdiExpDataImportService() {
-        return ddiExpDataImportService;
-    }
-
-    public void setDdiExpDataImportService(DDIExpDataImportService ddiExpDataImportService) {
-        this.ddiExpDataImportService = ddiExpDataImportService;
-    }
-
-    public DataType getDataType() {
-        return dataType;
     }
 }

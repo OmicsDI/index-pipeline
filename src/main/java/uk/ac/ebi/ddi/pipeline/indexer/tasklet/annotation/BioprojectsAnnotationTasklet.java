@@ -18,7 +18,7 @@ import java.util.concurrent.ForkJoinPool;
  */
 public class BioprojectsAnnotationTasklet extends AnnotationXMLTasklet {
 
-    NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
+    private NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
 
     private static final int PARALLEL = Math.min(3, Runtime.getRuntime().availableProcessors());
 

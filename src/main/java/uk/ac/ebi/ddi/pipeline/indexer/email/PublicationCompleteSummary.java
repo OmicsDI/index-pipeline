@@ -1,11 +1,14 @@
 package uk.ac.ebi.ddi.pipeline.indexer.email;
 
+import lombok.Getter;
+
 /**
  * Summary of the publication details, including FTP URL etc
  *
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 18/08/2015
  */
+@Getter
 public class PublicationCompleteSummary {
     private final String projectAccession;
     private final String projectTitle;
@@ -29,33 +32,5 @@ public class PublicationCompleteSummary {
         this.projectTitle = projectTitle;
         this.projectAccession = projectAccession;
         this.bioSamplesId = bioSamplesId;
-    }
-
-    public String getProjectAccession() {
-        return projectAccession;
-    }
-
-    public String getProjectTitle() {
-        return projectTitle;
-    }
-
-    public String getProjectUrl() {
-        return projectUrl;
-    }
-
-    public String getFtpUrl() {
-        return ftpUrl;
-    }
-
-    public String getSubmitterName() {
-        return submitterName;
-    }
-
-    public String getPubmedId() {
-        return pubmedId;
-    }
-
-    public String getBioSamplesId() {
-        return bioSamplesId;
     }
 }

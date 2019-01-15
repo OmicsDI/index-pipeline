@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -11,6 +13,8 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 10/11/15
  */
+@Getter
+@Setter
 public class GenerateEBeyeMassiveXMLTasklet extends AbstractTasklet {
 
     private String outputDirectory;
@@ -25,23 +29,8 @@ public class GenerateEBeyeMassiveXMLTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        //Todo: What is this pipeline?
         //IGenerator generator = GenerateMassiveEbeFiles.generateMWXMLfiles(massiveConfig, outputDirectory);
         return RepeatStatus.FINISHED;
-    }
-
-    public String getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(String outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public MassiveWsConfigProd getMassiveConfig() {
-        return massiveConfig;
-    }
-
-    public void setMassiveConfig(MassiveWsConfigProd massiveConfig) {
-        this.massiveConfig = massiveConfig;
     }
 }

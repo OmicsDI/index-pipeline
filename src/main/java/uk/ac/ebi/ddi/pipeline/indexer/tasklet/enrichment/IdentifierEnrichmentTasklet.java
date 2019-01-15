@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -35,6 +37,8 @@ import java.util.stream.Stream;
  *
  * Created by azorin (azorin@ebi.ac.uk) on 22/01/2018.
  */
+@Getter
+@Setter
 public class IdentifierEnrichmentTasklet extends AbstractTasklet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentifierEnrichmentTasklet.class);
@@ -101,14 +105,6 @@ public class IdentifierEnrichmentTasklet extends AbstractTasklet {
         enrichmentInfoService.updateIdentifiers(result);
 
         return RepeatStatus.FINISHED;
-    }
-
-    public IEnrichmentInfoService getEnrichmentInfoService() {
-        return enrichmentInfoService;
-    }
-
-    public void setEnrichmentInfoService(IEnrichmentInfoService enrichmentInfoService) {
-        this.enrichmentInfoService = enrichmentInfoService;
     }
 
     @Override

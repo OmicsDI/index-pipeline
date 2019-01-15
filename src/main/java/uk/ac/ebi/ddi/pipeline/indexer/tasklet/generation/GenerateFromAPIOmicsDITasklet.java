@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -20,6 +22,8 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
  * <p>
  * Created by ypriverol (ypriverol@gmail.com) on 09/03/2017.
  */
+@Getter
+@Setter
 public class GenerateFromAPIOmicsDITasklet extends AbstractTasklet {
 
     private IGenerator generator;
@@ -33,13 +37,5 @@ public class GenerateFromAPIOmicsDITasklet extends AbstractTasklet {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(generator, "generator can't be null");
-    }
-
-    public IGenerator getGenerator() {
-        return generator;
-    }
-
-    public void setGenerator(IGenerator generator) {
-        this.generator = generator;
     }
 }

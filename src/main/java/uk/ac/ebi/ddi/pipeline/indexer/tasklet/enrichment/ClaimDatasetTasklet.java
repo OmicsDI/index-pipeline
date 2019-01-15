@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -12,6 +14,8 @@ import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 /**
  * Created by gaur on 01/06/17.
  */
+@Getter
+@Setter
 public class ClaimDatasetTasklet extends AbstractTasklet {
 
     DDIDatasetAnnotationService datasetAnnotationService;
@@ -25,14 +29,6 @@ public class ClaimDatasetTasklet extends AbstractTasklet {
             LOGGER.error("Exception occurred, ", ex);
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public DDIDatasetAnnotationService getDatasetAnnotationService() {
-        return datasetAnnotationService;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

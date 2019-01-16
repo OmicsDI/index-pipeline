@@ -4,14 +4,6 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>log/ddi-indexer-pipeline.log</file>
-
-        <encoder>
-            <pattern>%msg%n</pattern>
-        </encoder>
-    </appender>
-
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
@@ -27,7 +19,6 @@
     <logger name="org.apache.http" level="ERROR" />
 
     <root level="INFO">
-        <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT"/>
     </root>
 

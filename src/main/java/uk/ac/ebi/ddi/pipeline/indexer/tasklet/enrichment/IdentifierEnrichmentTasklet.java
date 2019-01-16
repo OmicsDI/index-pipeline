@@ -45,14 +45,6 @@ public class IdentifierEnrichmentTasklet extends AbstractTasklet {
 
     IEnrichmentInfoService enrichmentInfoService;
 
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
-    }
-
     String filePath;
 
     @Override
@@ -63,42 +55,22 @@ public class IdentifierEnrichmentTasklet extends AbstractTasklet {
                 (path, basicAttributes) -> path.getFileName().toString().startsWith("PRJNA"));
 
         List<Identifier> result = new ArrayList<>();
-        LOGGER.debug("Processing {} files", files.count());
-
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-
         files.parallel().forEach(file -> {
             try {
                 File f = file.toFile();
-
                 Identifier id = new Identifier();
-
                 id.setAccession(f.getName().replace(".xml", ""));
-
                 DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
                 Document doc = dBuilder.parse(f);
-
                 String secondaryId = XMLUtils.readFirstElement(doc, "dbXREF/ID");
-
                 id.setAdditional_accessions(new ArrayList<>());
-
                 id.getAdditional_accessions().add(secondaryId);
-
                 result.add(id);
-
-                //dBuilder.reset();
-
             } catch (Exception ex) {
                 LOGGER.error("Exception occurred when processing file {}, ", file.toFile().getAbsolutePath(), ex);
             }
         });
-
-//        Identifier ID = new Identifier();
-//        ID.setAccession("enee");
-//        ID.setAdditional_accessions(new ArrayList<String>());
-//        ID.getAdditional_accessions().add("menee");
-//        result.add(ID);
 
         LOGGER.info("Found {} identifiers", result.size());
 

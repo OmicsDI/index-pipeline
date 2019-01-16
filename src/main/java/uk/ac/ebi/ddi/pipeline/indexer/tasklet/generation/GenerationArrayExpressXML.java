@@ -9,11 +9,11 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.arrayexpress.reader.ExperimentReader;
+import uk.ac.ebi.ddi.arrayexpress.reader.GenerateArrayExpressFile;
 import uk.ac.ebi.ddi.arrayexpress.reader.ProtocolReader;
 import uk.ac.ebi.ddi.arrayexpress.reader.model.experiments.Experiments;
 import uk.ac.ebi.ddi.arrayexpress.reader.model.protocols.Protocols;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-
 
 import java.io.File;
 
@@ -40,7 +40,7 @@ public class GenerationArrayExpressXML extends AbstractTasklet {
         File omicsDIFile = new File(outputFile);
         Experiments experiments = new ExperimentReader(new File(experimentFileName)).getExperiments();
         Protocols protocols = new ProtocolReader(new File(protocolFileName)).getProtocols();
-        uk.ac.ebi.ddi.arrayexpress.reader.generateArrayExpressFile.generate(experiments, protocols, omicsDIFile);
+        GenerateArrayExpressFile.generate(experiments, protocols, omicsDIFile);
 
         return RepeatStatus.FINISHED;
     }

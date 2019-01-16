@@ -80,9 +80,7 @@
                     <bean:property name="databaseName"             value="${ddi.common.jpost.database.name}" />
                     <bean:property name="annotationService"        ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.PROTEOMICS_DATA"/>
-                    </bean:property>
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

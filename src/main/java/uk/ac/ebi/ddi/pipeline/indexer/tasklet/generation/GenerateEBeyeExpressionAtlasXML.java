@@ -43,15 +43,14 @@ public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
 
     private String geneFileName;
 
-
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
         File omicsDIFile = new File(outputFile);
         OmicsXMLFile experiments = new OmicsXMLFile(new File(experimentFileName));
-        System.out.println(experiments.getAllEntries().size());
+        LOGGER.info("Total entries: {}", experiments.getAllEntries().size());
         List<Entry> genes = FastOmicsDIReader.getInstance().read(new File(geneFileName));
-        System.out.println(genes.size());
+        LOGGER.info("Total genes: {}", genes.size());
         GenerateExpressionAtlasFile.generate(experiments, genes, omicsDIFile);
         return RepeatStatus.FINISHED;
 

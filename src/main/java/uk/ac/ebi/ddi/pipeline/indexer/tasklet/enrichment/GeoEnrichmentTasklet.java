@@ -33,6 +33,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * This pipeline will find and insert the reanalysing relationship from GEO database to our database
+ */
+
 @Getter
 @Setter
 public class GeoEnrichmentTasklet extends AbstractTasklet {

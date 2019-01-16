@@ -101,6 +101,17 @@
         </batch:listeners>
     </batch:job>
 
+    <batch:job id="ddiAnnotationJob" xmlns="http://www.springframework.org/schema/batch">
+        <batch:step id="annotationFile" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationArrayExpressTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.ArrayExpressAnnotationTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.arrayexpress.database.name}"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
     <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
         <batch:step id="enrihmentStep" parent="parentStep">
             <batch:tasklet>

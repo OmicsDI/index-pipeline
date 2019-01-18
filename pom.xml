@@ -21,9 +21,9 @@
         <subethasmtp.wiser.version>1.2</subethasmtp.wiser.version>
 
         <ddi.px.reader.version>1.0-SNAPSHOT</ddi.px.reader.version>
-        <ddi.xml.validator.version>1.1-SNAPSHOT</ddi.xml.validator.version>
-        <ddi.annotation.version>1.3.0-SNAPSHOT</ddi.annotation.version>
-        <ddi.mw.reader.version>1.0-SNAPSHOT</ddi.mw.reader.version>
+        <ddi.xml.validator.version>1.1.1-SNAPSHOT</ddi.xml.validator.version>
+        <ddi.annotation.version>1.3.2-SNAPSHOT</ddi.annotation.version>
+        <ddi.mw.reader.version>1.1-SNAPSHOT</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.0-SNAPSHOT</ddi.massive.reader.version>
         <ddi.api.readers.version>1.0-SNAPSHOT</ddi.api.readers.version>
         <maven.checkstyle.version>2.17</maven.checkstyle.version>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi.api.readers</groupId>
             <artifactId>ddi-api-readers</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Dependencies to update and index the files from PX -->

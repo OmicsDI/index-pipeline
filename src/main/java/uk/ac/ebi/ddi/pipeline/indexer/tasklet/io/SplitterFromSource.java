@@ -17,7 +17,9 @@ import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
@@ -41,56 +43,59 @@ public class SplitterFromSource extends AbstractTasklet {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(inputDirectory, "inputDirectory can't be null!");
+        Assert.isTrue(inputDirectory.getFile().isDirectory(), "inputDirectory must be a directory");
         Assert.notNull(outputDirectory, "outputDirectory can't be null!");
         Assert.notNull(filePrefix, "File Prefix can't be null!");
         Assert.notNull(originalPrefix, "originalPrefix can't be null!");
     }
 
-    @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-
-        List<Entry> listToPrint = new ArrayList<>();
-        int counterFiles = 1;
-        OmicsXMLFile reader = null;
-
-        if (inputDirectory != null && inputDirectory.getFile() != null && inputDirectory.getFile().isDirectory()) {
-
-            DDICleanDirectory.cleanDirectory(outputDirectory);
-            File[] files = inputDirectory.getFile().listFiles();
-            if (files == null) {
-                LOGGER.warn("Source input is empty {}", inputDirectory.getFile().getAbsolutePath());
-                return RepeatStatus.FINISHED;
+    private void process(File file, AtomicInteger index, int total, AtomicInteger counterOutFiles,
+                         List<Entry> entries) {
+        try {
+            index.getAndIncrement();
+            if (!file.getName().contains(originalPrefix)) {
+                return;
             }
-            for (File file: files) {
-                try {
-                    if (file.getAbsolutePath().contains(originalPrefix)) {
-                        reader = new OmicsXMLFile(file);
-                        for (String id: reader.getEntryIds()) {
 
-                            LOGGER.info("The ID: {} will be enriched!!", id);
-                            Entry dataset = reader.getEntryById(id);
+            OmicsXMLFile reader = new OmicsXMLFile(file);
+            for (String id: reader.getEntryIds()) {
 
-                            listToPrint.add(dataset);
+                LOGGER.info("The ID: {} will be enriched!!", id);
+                Entry dataset = reader.getEntryById(id);
 
-                            if (listToPrint.size() == numberEntries) {
-                                DDIFile.writeList(reader, listToPrint, filePrefix, counterFiles,
-                                        outputDirectory.getFile());
-                                listToPrint.clear();
-                                counterFiles++;
-                            }
-                        }
-                        reader.close();
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Error Reading file: {}, ", file.getAbsolutePath(), e);
+                entries.add(dataset);
+
+                if (entries.size() == numberEntries) {
+                    DDIFile.writeList(reader, entries, filePrefix, counterOutFiles.get(), outputDirectory.getFile());
+                    entries.clear();
+                    counterOutFiles.getAndIncrement();
                 }
             }
-            // This must be printed before leave because it contains the end members of the list.
-            if (!listToPrint.isEmpty()) {
-                DDIFile.writeList(reader, listToPrint, filePrefix, counterFiles, outputDirectory.getFile());
-                listToPrint.clear();
+
+            if (index.get() == total && !entries.isEmpty()) {
+                DDIFile.writeList(reader, entries, filePrefix, counterOutFiles.get(), outputDirectory.getFile());
+                entries.clear();
+                counterOutFiles.getAndIncrement();
             }
+            reader.close();
+        } catch (Exception e) {
+            LOGGER.error("Error Reading file: {}, ", file.getAbsolutePath(), e);
         }
+    }
+
+    @Override
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        List<Entry> listToPrint = new ArrayList<>();
+        DDICleanDirectory.cleanDirectory(outputDirectory);
+        File[] files = inputDirectory.getFile().listFiles();
+        if (files == null) {
+            LOGGER.warn("Source input is empty {}", inputDirectory.getFile().getAbsolutePath());
+            return RepeatStatus.FINISHED;
+        }
+
+        AtomicInteger count = new AtomicInteger(0);
+        AtomicInteger counterOutFiles = new AtomicInteger(1);
+        Arrays.asList(files).forEach(file -> process(file, count, files.length, counterOutFiles, listToPrint));
         return RepeatStatus.FINISHED;
     }
 }

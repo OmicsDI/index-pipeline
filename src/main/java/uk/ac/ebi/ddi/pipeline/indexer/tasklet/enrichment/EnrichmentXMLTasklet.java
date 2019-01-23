@@ -49,7 +49,7 @@ public class EnrichmentXMLTasklet extends AbstractTasklet {
 
     private boolean overwrite = false;
 
-    private static final int PARALLEL = Math.min(6, Runtime.getRuntime().availableProcessors());
+    private static final int PARALLEL = Math.min(1, Runtime.getRuntime().availableProcessors());
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
@@ -75,15 +75,16 @@ public class EnrichmentXMLTasklet extends AbstractTasklet {
         Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
         try {
             Map<String, String> fields = new HashMap<>();
-            fields.put(Field.NAME.getName(), dataset.getName());
-            fields.put(Field.DESCRIPTION.getName(), dataset.getDescription());
-            fields.put(Field.DATA.getName(), DatasetUtils.getFirstAdditionalFieldValue(dataset, Field.DATA.getName()));
+            fields.put(Field.NAME.getName(), existingDataset.getName());
+            fields.put(Field.DESCRIPTION.getName(), existingDataset.getDescription());
+            fields.put(Field.DATA.getName(), DatasetUtils.getFirstAdditionalFieldValue(
+                    existingDataset, Field.DATA.getName()));
             fields.put(Field.SAMPLE.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    dataset, Field.SAMPLE.getName()));
+                    existingDataset, Field.SAMPLE.getName()));
             fields.put(Field.PUBMED_ABSTRACT.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    dataset, Field.PUBMED_ABSTRACT.getName()));
+                    existingDataset, Field.PUBMED_ABSTRACT.getName()));
             fields.put(Field.PUBMED_TITLE.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    dataset, Field.PUBMED_TITLE.getName()));
+                    existingDataset, Field.PUBMED_TITLE.getName()));
             EnrichedDataset enrichedDataset = annotationService.enrichment(
                     new DatasetTobeEnriched(dataset.getAccession(), dataset.getDatabase(), fields), overwrite);
 

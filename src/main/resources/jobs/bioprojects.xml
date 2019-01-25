@@ -89,7 +89,7 @@
         <batch:step id="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="GEO" />
+                    <bean:property name="databaseName" value="${ddi.common.geo.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}geo"/>
                     <bean:property name="filePrefix"      value="GEO_EBEYE" />
                     <bean:property name="numberEntries"   value="200" />

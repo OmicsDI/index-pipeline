@@ -9,22 +9,25 @@
 		                   http://www.springframework.org/schema/batch
                            http://www.springframework.org/schema/batch/spring-batch.xsd
 		                   http://www.springframework.org/schema/context
-                           http://www.springframework.org/schema/context/spring-context.xsd
-                           http://www.springframework.org/schema/util
-                           http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+                           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <description>This job is to save datasets download counts </description>
 
     <import resource="../context/common-context.xml"/>
     <import resource="../context/db-job-repository.xml"/>
     <import resource="../context/mongo-db-context.xml" />
+    <import resource="../context/elastic-search-context.xml" />
 
     <batch:job id="ddiDatasetDownloadCountJob" xmlns="http://www.springframework.org/schema/batch">
 
         <batch:step id="ddiDatasetDownloadCountStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="datasetDownloadStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.statistics.DatasetDownloadCountTasklet">
-                    <bean:property name="similarityCount" ref="similarityCount"/>
+                    <bean:property name="datasetService" ref="datasetService" />
+                    <bean:property name="elasticSearchClient" ref="elasticSearchWsClient" />
+                    <bean:property name="databases" ref="ddiDatasetDownloadCountDatabases" />
+                    <bean:property name="timeRanger" ref="timeRangeToFetchDownloads" />
+                    <bean:property name="overwrite" value="false" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -52,8 +55,39 @@
         </bean:property>
         <bean:property name="strict" value="false"/>
     </bean:bean>
-    <bean id="similarityCount" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
-    <bean id="datasetCountService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService"/>
+
+    <bean id="ddiDatasetDownloadCountDatabases" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.arrayexpress.database.name}" />
+                </bean>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.pride.database.name}" />
+                </bean>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.expressionatlas.database.name}" />
+                </bean>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.eva.database.name}" />
+                </bean>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.metaboligths.database.name}" />
+                </bean>
+                <bean class="java.lang.String">
+                    <constructor-arg value="${ddi.common.ena.database.name}" />
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+    
+    <bean id="timeRangeToFetchDownloads" class="uk.ac.ebi.ddi.pipeline.indexer.utils.TimeRanger"
+          factory-method="getTimeRanger">
+        <constructor-arg name="timeRangerType" type="uk.ac.ebi.ddi.pipeline.indexer.utils.TimeRangerType">
+            <util:constant static-field="uk.ac.ebi.ddi.pipeline.indexer.utils.TimeRangerType.LAST_10_DAYS" />
+        </constructor-arg>
+    </bean>
+
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
 

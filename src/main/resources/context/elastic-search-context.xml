@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress SpringSecurityFiltersConfiguredInspection -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Maven information an autowired classes -->
+    
+    
+    <bean id="elasticSearchWsConfig" class="uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsConfigProd">
+        <constructor-arg name="host" value="${ddi.common.elastic.app.host}"/>
+        <constructor-arg name="port" value="${ddi.common.elastic.app.port}"/>
+        <constructor-arg name="username" value="${ddi.common.elastic.app.user}"/>
+        <constructor-arg name="password" value="${ddi.common.elastic.app.password}"/>
+    </bean>
+
+    <bean id="elasticSearchWsClient" class="uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsClient">
+        <constructor-arg name="config" ref="elasticSearchWsConfig" />
+    </bean>
+</beans>

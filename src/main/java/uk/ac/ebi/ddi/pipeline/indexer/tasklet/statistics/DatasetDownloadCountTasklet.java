@@ -101,6 +101,8 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
             if (overwrite) {
                 totalDownloads = newDownloadsCount;
             }
+
+            LOGGER.info("Dataset {}: {} downloads", dataset.getAccession(), totalDownloads);
             dataset.getAdditional().put(Constants.DOWNLOAD_COUNT,
                     Collections.singleton(String.valueOf(totalDownloads)));
             dataset.getAdditional().put(Constants.DOWNLOAD_LAST_UPDATED,

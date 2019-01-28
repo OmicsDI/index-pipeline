@@ -7,7 +7,7 @@
 
     <import resource="classpath*:context/common-context.xml"/>
     <import resource="classpath*:prop/mongo-db-context-prod-data.xml"/>
-    <import resource="classpath*:jobs/datasetdownloadcount.xml"/>
+    <import resource="classpath*:jobs/dataset-downloads-count-all-times.xml"/>
     <import resource="classpath*:context/email-context.xml"/>
 
     <bean class="org.springframework.batch.test.JobLauncherTestUtils">

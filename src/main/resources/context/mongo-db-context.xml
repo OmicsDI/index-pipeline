@@ -72,5 +72,4 @@
     <bean id="citationService" class="uk.ac.ebi.ddi.service.db.service.similarity.CitationService"/>
     <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
     <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
-    <bean id="statisticsService" class="uk.ac.ebi.ddi.similarityCalculator.StatisticsService" />
 </beans>

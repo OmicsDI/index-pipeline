@@ -52,7 +52,7 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
         for (String database : databases) {
             LOGGER.info("Processing database {}", database);
             Map<String, Map<String, Map<String, Multiset<String>>>> dbDownloadInfo
-                    = elasticSearchClient.getDownloadingData(ElasticSearchWsConfigProd.DB.valueOf(database));
+                    = elasticSearchClient.getDownloadsData(ElasticSearchWsConfigProd.DB.valueOf(database));
             List<Dataset> datasets = datasetService.readDatasetHashCode(database);
 
             ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);

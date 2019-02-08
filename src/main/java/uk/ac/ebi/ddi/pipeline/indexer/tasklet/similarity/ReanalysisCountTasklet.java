@@ -1,5 +1,9 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -10,7 +14,11 @@ import uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts;
 /**
  * Created by gaur on 02/08/17.
  */
+@Getter
+@Setter
 public class ReanalysisCountTasklet extends AbstractTasklet {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReanalysisCountTasklet.class);
 
     SimilarityCounts similarityCounts;
 
@@ -18,20 +26,10 @@ public class ReanalysisCountTasklet extends AbstractTasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
             similarityCounts.saveReanalysisCount();
-        }
-        catch(Exception ex)
-        {
-            logger.debug(ex.getMessage());
+        } catch (Exception ex) {
+            LOGGER.error("Exception occurred, ", ex);
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public SimilarityCounts getSimilarityCounts() {
-        return similarityCounts;
-    }
-
-    public void setSimilarityCounts(SimilarityCounts similarityCounts) {
-        this.similarityCounts = similarityCounts;
     }
 
     @Override

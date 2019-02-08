@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -22,7 +24,9 @@ import java.util.Map;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 01/10/15
  */
-public class ValidationOriginalDataTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class ValidationOriginalDataTasklet extends AbstractTasklet {
 
     private String directory;
 
@@ -39,47 +43,35 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet{
 
         List<File> files = new ArrayList<>();
         File inFile = new File(directory);
-        if(inFile.exists() && inFile.isDirectory()){
+        if (inFile.exists() && inFile.isDirectory()) {
             File[] fileList = inFile.listFiles();
-            for(File a: fileList){
-                if (OmicsXMLFile.hasFileHeader(a)){
+            if (fileList == null) {
+                return RepeatStatus.FINISHED;
+            }
+            for (File a: fileList) {
+                if (OmicsXMLFile.hasFileHeader(a)) {
                     files.add(a);
                 }
             }
             Map<File, List<Tuple>> errors = new HashMap<>();
-            for(File file: files){
+            for (File file: files) {
                 List<Tuple> error = OmicsXMLFile.validateSchema(file);
                 error.addAll(OmicsXMLFile.validateSemantic(file));
-                if(errors.containsKey(file)){
+                if (errors.containsKey(file)) {
                     error.addAll(errors.get(file));
                 }
                 errors.put(file, error);
             }
-            if(!errors.isEmpty()){
+            if (!errors.isEmpty()) {
                 PrintStream reportFile = new PrintStream(new File(directory + "/" + reportName));
-                for(File file: errors.keySet()){
-                    for (Tuple error: errors.get(file))
+                for (File file: errors.keySet()) {
+                    for (Tuple error: errors.get(file)) {
                         reportFile.println(file.getAbsolutePath() + "|" + error.getKey() + "|" + error.getValue());
+                    }
                 }
                 reportFile.close();
             }
         }
         return RepeatStatus.FINISHED;
-    }
-
-    public String getDirectory() {
-        return directory;
-    }
-
-    public void setDirectory(String directory) {
-        this.directory = directory;
-    }
-
-    public String getReportName() {
-        return reportName;
-    }
-
-    public void setReportName(String reportName) {
-        this.reportName = reportName;
     }
 }

@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.email;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -23,8 +25,10 @@ import javax.mail.internet.MimeMessage;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 29/09/15
  */
+@Getter
+@Setter
 public class EmailTasklet extends AbstractTasklet {
-    public static final Logger logger = LoggerFactory.getLogger(EmailTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(EmailTasklet.class);
 
 
     private JavaMailSender mailSender;
@@ -37,13 +41,13 @@ public class EmailTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        logger.info("Generating submission summary email");
+        LOGGER.info("Generating submission summary email");
 
         // update message body template
         String emailBody = emailContentGenerator.generate();
         if (emailBody == null) {
             String msg = "Failed to generate the body for submission email";
-            logger.error(msg);
+            LOGGER.error(msg);
             throw new UnexpectedJobExecutionException(msg);
         }
 
@@ -59,7 +63,7 @@ public class EmailTasklet extends AbstractTasklet {
         message.setTo(mailTo);
         message.setFrom(mailFrom);
         message.setBcc(mailBcc);
-        if (mailCc!=null && !mailTo.equals(mailCc)) {
+        if (mailCc != null && !mailTo.equals(mailCc)) {
             message.setCc(mailCc);
         }
         message.setSubject(mailSubject);
@@ -69,7 +73,7 @@ public class EmailTasklet extends AbstractTasklet {
             this.mailSender.send(mimeMessage);
         } catch (MailException ex) {
             String msg = "Failed to send submission email";
-            logger.error(msg, ex);
+            LOGGER.error(msg, ex);
             throw new UnexpectedJobExecutionException(msg, ex);
         }
     }
@@ -82,33 +86,6 @@ public class EmailTasklet extends AbstractTasklet {
         Assert.notNull(mailFrom, "Mail from cannot be null");
         Assert.notNull(mailSubject, "Mail subject cannot be null");
         Assert.notNull(emailContentGenerator, "Email context generator cannot be null");
-    }
-
-    public void setMailSender(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-
-    public void setMailTo(String mailTo) {
-        this.mailTo = mailTo;
-    }
-
-    public void setMailFrom(String mailFrom) {
-        this.mailFrom = mailFrom;
-    }
-
-    public void setMailBcc(String mailBcc) {
-        this.mailBcc = mailBcc;
-    }
-
-    public void setMailSubject(String mailSubject) {
-        this.mailSubject = mailSubject;
-    }
-
-    public void setEmailContentGenerator(EmailContentGenerator emailContentGenerator) {
-        this.emailContentGenerator = emailContentGenerator;
-    }
-    public void setMailCc(String mailCc) {
-        this.mailCc = mailCc;
     }
 }
 

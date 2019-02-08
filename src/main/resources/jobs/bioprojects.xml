@@ -67,9 +67,7 @@
                     <bean:property name="databaseName" value="GEO" />
                     <bean:property name="annotationService" ref="annotationService"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
-                    <bean:property name="dataType" >
-                        <util:constant static-field="uk.ac.ebi.ddi.annotation.utils.DataType.GENOMICS_DATA"/>
-                    </bean:property>
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -91,7 +89,7 @@
         <batch:step id="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
-                    <bean:property name="databaseName" value="GEO" />
+                    <bean:property name="databaseName" value="${ddi.common.geo.database.name}" />
                     <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}geo"/>
                     <bean:property name="filePrefix"      value="GEO_EBEYE" />
                     <bean:property name="numberEntries"   value="200" />

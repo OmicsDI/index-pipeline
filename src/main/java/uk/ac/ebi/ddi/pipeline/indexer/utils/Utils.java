@@ -6,17 +6,16 @@ package uk.ac.ebi.ddi.pipeline.indexer.utils;
  */
 public class Utils {
 
+    private Utils() {
+    }
+
     public static String toTitleCase(String input) {
         StringBuilder titleCase = new StringBuilder();
         boolean nextTitleCase = true;
-        for (char c : input.toCharArray())
-        {
-            if (Character.isSpaceChar(c))
-            {
+        for (char c : input.toCharArray()) {
+            if (Character.isSpaceChar(c)) {
                 nextTitleCase = true;
-            }
-            else if (nextTitleCase)
-            {
+            } else if (nextTitleCase) {
                 c = Character.toTitleCase(c);
                 nextTitleCase = false;
             }

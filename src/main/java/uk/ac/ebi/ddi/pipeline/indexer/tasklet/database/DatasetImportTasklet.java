@@ -1,6 +1,8 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.database;
 
 import javafx.util.Pair;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -8,7 +10,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
@@ -17,6 +18,7 @@ import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -27,9 +29,11 @@ import java.util.stream.Collectors;
  * Some considerations, we would have only one provider by database. This must be considered in the future.
  *
  */
-public class DatasetImportTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class DatasetImportTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 
     Resource inputDirectory;
 
@@ -43,105 +47,69 @@ public class DatasetImportTasklet extends AbstractTasklet{
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        CopyOnWriteArrayList<javafx.util.Pair<String,String>> threadSafeList = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<javafx.util.Pair<String, String>> threadSafeList = new CopyOnWriteArrayList<>();
 
-        //debuggg
-        System.out.print(String.format("DataSet import, inputDirectory: %s ",inputDirectory.getURI()));
+        LOGGER.info("DataSet import, inputDirectory: {} ", inputDirectory.getURI());
 
-        Arrays.asList(inputDirectory.getFile().listFiles()).parallelStream().forEach(file ->{
-            try{
-                logger.debug("processing file:" + file);
+        File[] files = inputDirectory.getFile().listFiles();
+        if (files == null) {
+            LOGGER.warn("Input directory is empty, {}", inputDirectory.getFile().getAbsolutePath());
+            return RepeatStatus.FINISHED;
+        }
+
+        Arrays.asList(files).parallelStream().forEach(file -> {
+            try {
+                LOGGER.debug("processing file:" + file);
 
                 OmicsXMLFile omicsXMLFile = new OmicsXMLFile(file);
 
                 List<Entry> entries = omicsXMLFile.getAllEntries();
-                if(entries != null) {
-                    entries.parallelStream().forEach(dataEntry -> {
-                        try {
-                            System.out.println(dataEntry);
-                            String databaseName = omicsXMLFile.getDatabaseName() != null ? omicsXMLFile.getDatabaseName() : "NA";
-                            if ("" == databaseName) {
-                                databaseName = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
-                            }
+                for (Entry dataEntry : entries) {
+                    String db = omicsXMLFile.getDatabaseName() != null ? omicsXMLFile.getDatabaseName() : "NA";
+                    if ("".equals(db)) {
+                        db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
+                    }
 
+                    LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 
-                            logger.debug("inserting: " + dataEntry.getId() + " " + databaseName + "");
-
-                            datasetAnnotationService.insertDataset(dataEntry, databaseName);
-                            threadSafeList.add(new Pair<>(dataEntry.getId(), databaseName));
-                            logger.debug("Dataset: " + dataEntry.getId() + " " + databaseName + "has been added");
-                        } catch (Exception ex) {
-                            logger.info("Exception in dataset " + ex.getMessage() + " entry is " + dataEntry.getId());
-                        }
-                    });
+                    datasetAnnotationService.insertDataset(dataEntry, db);
+                    threadSafeList.add(new Pair<>(dataEntry.getId(), db));
+                    LOGGER.debug("Dataset: " + dataEntry.getId() + " " + db + "has been added");
                 }
-                else
-                {
-                    logger.info("entries are null");
-                }
-            }catch (Exception e){
-                logger.info("entries are null");
-                logger.info("Error Reading file : " + file +" with exception " + e.getMessage());
+            } catch (Exception e) {
+                LOGGER.info("Error Reading file : {}, ", file.getAbsolutePath(), e);
             }
         });
 
 
-        if(inputDirectory.getFile().listFiles() != null && inputDirectory.getFile().listFiles().length > 0){
-            OmicsXMLFile file = new OmicsXMLFile(inputDirectory.getFile().listFiles()[0]);
-            databaseAnnotationService.updateDatabase(databaseName,file.getDescription(), file.getReleaseDate(), file.getRelease(), null,null);
+        if (files.length > 0) {
+            OmicsXMLFile file = new OmicsXMLFile(files[0]);
+            databaseAnnotationService.updateDatabase(
+                    databaseName, file.getDescription(), file.getReleaseDate(), file.getRelease(), null, null);
         }
 
-        //Todo: Here we need to be carefully. We need to know when a dataset has been removed or not. For now we will consider a dataset
+        //Todo: Here we need to be carefully. We need to know when a dataset has been removed or not.
+        //                                      For now we will consider a dataset
         //Todo: as removed is they are not included in one of the releases.
 
         Set<String> databases = threadSafeList.parallelStream().map(Pair::getValue).collect(Collectors.toSet());
         CopyOnWriteArrayList<Pair<List<Dataset>, String>> datasets = new CopyOnWriteArrayList<>();
-        databases.parallelStream().forEach( database -> datasets.add( new Pair<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database)));
+        databases.parallelStream().forEach(database -> datasets.add(
+                new Pair<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database)));
 
         CopyOnWriteArrayList<Dataset> removed = new CopyOnWriteArrayList<>();
-        datasets.parallelStream().forEach(x -> x.getKey().parallelStream().forEach(dataset ->{
+        datasets.parallelStream().forEach(x -> x.getKey().parallelStream().forEach(dataset -> {
             Pair<String, String> pair = new Pair<>(dataset.getAccession(), dataset.getDatabase());
-            if(!threadSafeList.contains(pair)){
+            if (!threadSafeList.contains(pair)) {
                 removed.add(dataset);
             }
         }));
 
-        if(!updateStatus)
-            removed.stream().forEach( x -> datasetAnnotationService.updateDeleteStatus(x));
+        if (!updateStatus) {
+            removed.forEach(x -> datasetAnnotationService.updateDeleteStatus(x));
+        }
 
         return RepeatStatus.FINISHED;
-    }
-
-    public void setInputDirectory(Resource inputDirectory) {
-        this.inputDirectory = inputDirectory;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
-    }
-
-    public DDIDatabaseAnnotationService getDatabaseAnnotationService() {
-        return databaseAnnotationService;
-    }
-
-    public void setDatabaseAnnotationService(DDIDatabaseAnnotationService databaseAnnotationService) {
-        this.databaseAnnotationService = databaseAnnotationService;
-    }
-
-    public Boolean getUpdateStatus() {
-        return updateStatus;
-    }
-
-    public void setUpdateStatus(Boolean updateStatus) {
-        this.updateStatus = updateStatus;
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
     }
 
     @Override

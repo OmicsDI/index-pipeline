@@ -17,10 +17,12 @@ import java.util.List;
  */
 public class DDIFile {
 
-    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile, int postfix, File folder) throws IOException {
+    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile,
+                                 int postfix, File folder) throws IOException {
 
-        if(folder != null && folder.isDirectory()){
-            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+        if (folder != null && folder.isDirectory()) {
+            OutputStream outputFile = new FileOutputStream(
+                    folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
             OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
             Database database = new Database();
             database.setDescription(originalReader.getDescription());
@@ -32,8 +34,6 @@ public class DDIFile {
             outputXMLFile.marshall(database, outputFile);
             outputFile.close();
         }
-
-
     }
 
     public static void writeList(List<Entry> listToPrint, String prefixFile,
@@ -41,8 +41,9 @@ public class DDIFile {
                                  String databaseName,
                                  String databaseRelease) throws IOException {
 
-        if(folder != null && folder.isDirectory()){
-            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+        if (folder != null && folder.isDirectory()) {
+            OutputStream outputFile = new FileOutputStream(
+                    folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
             OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
             Database database = new Database();
             database.setDescription(databaseDescription);
@@ -54,14 +55,13 @@ public class DDIFile {
             outputXMLFile.marshall(database, outputFile);
             outputFile.close();
         }
-
-
     }
 
-    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile, String postfix, File folder) throws FileNotFoundException {
-
-        if(folder != null && folder.isDirectory()){
-            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, String prefixFile,
+                                 String postfix, File folder) throws FileNotFoundException {
+        if (folder != null && folder.isDirectory()) {
+            OutputStream outputFile = new FileOutputStream(
+                    folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
             OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
             Database database = new Database();
             database.setDescription(originalReader.getDescription());
@@ -72,11 +72,10 @@ public class DDIFile {
             database.setEntries(new Entries(listToPrint));
             outputXMLFile.marshall(database, outputFile);
         }
-
-
     }
 
-    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, File file) throws FileNotFoundException {
+    public static void writeList(OmicsXMLFile originalReader, List<Entry> listToPrint, File file)
+            throws FileNotFoundException {
 
         OutputStream outputFile = new FileOutputStream(file);
         OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
@@ -90,11 +89,12 @@ public class DDIFile {
         outputXMLFile.marshall(database, outputFile);
     }
 
+    public static void writeList(OmicsXMLFile originalReader, Entry dataset, String prefixFile,
+                                 String postfix, File folder) throws FileNotFoundException {
 
-    public static void writeList(OmicsXMLFile originalReader, Entry dataset, String prefixFile, String postfix, File folder) throws FileNotFoundException {
-
-        if(folder != null && folder.isDirectory()){
-            OutputStream outputFile = new FileOutputStream(folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
+        if (folder != null && folder.isDirectory()) {
+            OutputStream outputFile = new FileOutputStream(
+                    folder.getAbsolutePath() + "/" + prefixFile + "_" + postfix + ".xml");
             OmicsDataMarshaller outputXMLFile = new OmicsDataMarshaller();
             Database database = new Database();
             database.setDescription(originalReader.getDescription());
@@ -107,12 +107,5 @@ public class DDIFile {
             database.setEntries(entries);
             outputXMLFile.marshall(database, outputFile);
         }
-
-
     }
-
-
-
-
-
 }

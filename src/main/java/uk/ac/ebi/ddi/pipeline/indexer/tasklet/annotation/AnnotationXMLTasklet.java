@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -10,7 +12,7 @@ import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.publication.DDIPublicationAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
-import uk.ac.ebi.ddi.pipeline.indexer.annotation.DatasetAnnotationFieldsService;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 
@@ -21,10 +23,11 @@ import java.util.concurrent.ForkJoinPool;
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 19/10/15
  */
+@Getter
+@Setter
+public class AnnotationXMLTasklet extends AbstractTasklet {
 
-public class AnnotationXMLTasklet extends AbstractTasklet{
-
-    public static final Logger logger = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
 
     String databaseName;
 
@@ -49,25 +52,13 @@ public class AnnotationXMLTasklet extends AbstractTasklet{
     private void process(Dataset dataset) {
         try {
             Dataset exitingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
-            exitingDataset = DatasetAnnotationFieldsService.addpublicationDate(exitingDataset);
+            exitingDataset = DatasetAnnotationFieldsUtils.addpublicationDate(exitingDataset);
             exitingDataset = DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
             exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
             datasetAnnotationService.annotateDataset(exitingDataset);
-        } catch (Exception ex){
-            logger.error("Exception occurred when processing dataset {}", dataset.getAccession(), ex);
+        } catch (Exception ex) {
+            LOGGER.error("Exception occurred when processing dataset {}", dataset.getAccession(), ex);
         }
-    }
-
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
-
-    public void setDatasetAnnotationService(DDIDatasetAnnotationService datasetAnnotationService) {
-        this.datasetAnnotationService = datasetAnnotationService;
     }
 
     @Override

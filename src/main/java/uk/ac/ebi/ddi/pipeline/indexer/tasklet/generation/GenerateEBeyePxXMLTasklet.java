@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -23,9 +25,11 @@ import java.util.List;
  * @date 29/09/15
  */
 
-public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
+@Getter
+@Setter
+public class GenerateEBeyePxXMLTasklet extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(GenerateEBeyePxXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GenerateEBeyePxXMLTasklet.class);
 
     private String pxURL;
 
@@ -47,7 +51,8 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
         LocalDate localDate = LocalDate.now();
 
         DDICleanDirectory.cleanDirectory(outputDirectory);
-        IGenerator generator = new GeneratePxOmicsXML(loopGap, endPoint,pxPrefix,pxURL, outputDirectory, databases, dtf.format(localDate));
+        IGenerator generator = new GeneratePxOmicsXML(loopGap, endPoint, pxPrefix, pxURL, outputDirectory, databases,
+                dtf.format(localDate));
         generator.generate();
         return RepeatStatus.FINISHED;
 
@@ -58,56 +63,5 @@ public class GenerateEBeyePxXMLTasklet extends AbstractTasklet{
         Assert.notNull(outputDirectory, "Output directory cannot be null.");
         Assert.notNull(pxURL, "pxURL can't be null.");
         Assert.notNull(pxPrefix, "pxPrefix can't be null.");
-        Assert.notNull(endPoint, "endPoint can't be null.");
-        Assert.notNull(loopGap,"loopGap can't be null.");
-
-    }
-
-    public String getPxURL() {
-        return pxURL;
-    }
-
-    public void setPxURL(String pxURL) {
-        this.pxURL = pxURL;
-    }
-
-    public String getPxPrefix() {
-        return pxPrefix;
-    }
-
-    public void setPxPrefix(String pxPrefix) {
-        this.pxPrefix = pxPrefix;
-    }
-
-    public int getEndPoint() {
-        return endPoint;
-    }
-
-    public void setEndPoint(int endPoint) {
-        this.endPoint = endPoint;
-    }
-
-    public int getLoopGap() {
-        return loopGap;
-    }
-
-    public void setLoopGap(int loopGap) {
-        this.loopGap = loopGap;
-    }
-
-    public String getOutputDirectory() {
-        return outputDirectory;
-    }
-
-    public void setOutputDirectory(String outputDirectory) {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public List<String> getDatabases() {
-        return databases;
-    }
-
-    public void setDatabases(List<String> databases) {
-        this.databases = databases;
     }
 }

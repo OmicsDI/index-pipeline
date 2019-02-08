@@ -27,8 +27,9 @@ public enum CommandOptions {
 
     public static List<String> getValuesName() {
         List<String> values = new ArrayList<>();
-        for (CommandOptions command : values())
+        for (CommandOptions command : values()) {
             values.add(command.getName());
+        }
         return values;
     }
 }

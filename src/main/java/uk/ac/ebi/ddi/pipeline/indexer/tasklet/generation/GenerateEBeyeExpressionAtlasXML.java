@@ -1,5 +1,7 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -29,9 +31,11 @@ import java.util.List;
  *
  * Created by ypriverol (ypriverol@gmail.com) on 26/06/2016.
  */
+@Getter
+@Setter
 public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
 
-    public static final Logger logger = LoggerFactory.getLogger(GenerationArrayExpressXML.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GenerationArrayExpressXML.class);
 
     private String outputFile;
 
@@ -39,15 +43,14 @@ public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
 
     private String geneFileName;
 
-
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-        File omicsDIFile = new File (outputFile);
-        OmicsXMLFile experiments = new OmicsXMLFile(new File (experimentFileName));
-        System.out.println(experiments.getAllEntries().size());
+        File omicsDIFile = new File(outputFile);
+        OmicsXMLFile experiments = new OmicsXMLFile(new File(experimentFileName));
+        LOGGER.info("Total entries: {}", experiments.getAllEntries().size());
         List<Entry> genes = FastOmicsDIReader.getInstance().read(new File(geneFileName));
-        System.out.println(genes.size());
+        LOGGER.info("Total genes: {}", genes.size());
         GenerateExpressionAtlasFile.generate(experiments, genes, omicsDIFile);
         return RepeatStatus.FINISHED;
 
@@ -56,33 +59,7 @@ public class GenerateEBeyeExpressionAtlasXML extends AbstractTasklet {
     @Override
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(outputFile, "Output directory cannot be null.");
-
         Assert.notNull(experimentFileName, "experiment prefix can't be null.");
         Assert.notNull(geneFileName,   "protocolPrefix can't be null.");
-
-    }
-
-    public String getOutputFile() {
-        return outputFile;
-    }
-
-    public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
-    }
-
-    public String getExperimentFileName() {
-        return experimentFileName;
-    }
-
-    public void setExperimentFileName(String experimentFileName) {
-        this.experimentFileName = experimentFileName;
-    }
-
-    public String getGeneFileName() {
-        return geneFileName;
-    }
-
-    public void setGeneFileName(String geneFileName) {
-        this.geneFileName = geneFileName;
     }
 }

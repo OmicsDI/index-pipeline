@@ -19,36 +19,36 @@ import java.util.Map;
  * @date 29/09/15
  */
 public class PipelineJobStatusListener implements JobExecutionListener {
-    private final static Logger logger = LoggerFactory.getLogger(PipelineJobStatusListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PipelineJobStatusListener.class);
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
-        logger.info(Constants.OUTPUT_DIVIDER);
-        logger.info("About to run " + jobExecution.getJobInstance().getJobName());
+        LOGGER.info(Constants.OUTPUT_DIVIDER);
+        LOGGER.info("About to run " + jobExecution.getJobInstance().getJobName());
 
-        logger.info("Input job parameters are: ");
+        LOGGER.info("Input job parameters are: ");
         JobParameters parameters = jobExecution.getJobParameters();
         Map<String, JobParameter> parameterMap = parameters.getParameters();
         for (String s : parameterMap.keySet()) {
-            logger.info(s + " = " + parameterMap.get(s).getValue());
+            LOGGER.info(s + " = " + parameterMap.get(s).getValue());
         }
-        logger.info(Constants.OUTPUT_DIVIDER);
+        LOGGER.info(Constants.OUTPUT_DIVIDER);
     }
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        logger.info(Constants.OUTPUT_DIVIDER);
-        logger.info("Job exit status: " + jobExecution.getExitStatus().getExitCode());
+        LOGGER.info(Constants.OUTPUT_DIVIDER);
+        LOGGER.info("Job exit status: " + jobExecution.getExitStatus().getExitCode());
         List<Throwable> exceptions = jobExecution.getFailureExceptions();
         if (!exceptions.isEmpty()) {
-            logger.error("Number of exceptions " + exceptions.size());
+            LOGGER.error("Number of exceptions " + exceptions.size());
             for (Throwable exception : exceptions) {
                 StackTraceElement[] stackTraceElements = exception.getStackTrace();
                 for (StackTraceElement stackTraceElement : stackTraceElements) {
-                    logger.error(stackTraceElement.toString());
+                    LOGGER.error(stackTraceElement.toString());
                 }
             }
         }
-        logger.info(Constants.OUTPUT_DIVIDER);
+        LOGGER.info(Constants.OUTPUT_DIVIDER);
     }
 }

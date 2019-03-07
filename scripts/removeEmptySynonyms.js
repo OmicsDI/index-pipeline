@@ -1,0 +1,1 @@
+db.enrichment.enrichedDataset.remove({"status":"new","synonyms.pubmed_abstract":[],"synonyms.name":[],"synonyms.description":[],"synonyms.sample_protocol":[],"synonyms.pubmed_title":[],"synonyms.data_protocol":[]}   )

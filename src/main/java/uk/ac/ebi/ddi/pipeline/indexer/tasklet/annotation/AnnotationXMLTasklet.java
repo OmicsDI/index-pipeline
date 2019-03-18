@@ -37,7 +37,7 @@ public class AnnotationXMLTasklet extends AbstractTasklet {
 
     NCBITaxonomyService taxonomyService = NCBITaxonomyService.getInstance();
 
-    private static final int PARALLEL = Math.min(6, Runtime.getRuntime().availableProcessors());
+    private static final int PARALLEL = Math.min(3, Runtime.getRuntime().availableProcessors());
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {

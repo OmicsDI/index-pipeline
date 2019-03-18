@@ -24,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 
+import static uk.ac.ebi.ddi.pipeline.indexer.utils.TimeRanger.START_TIME;
+
 @Setter
 @Getter
 public class DatasetDownloadCountTasklet extends AbstractTasklet {
@@ -77,9 +79,9 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
                     ? Integer.valueOf(dataset.getAdditional().get(Constants.DOWNLOAD_COUNT).iterator().next())
                     : 0;
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             String lastUpdated = DatasetUtils.getFirstAdditionalFieldValue(dataset, Constants.DOWNLOAD_LAST_UPDATED);
-            Date lastUpdatedDate = lastUpdated == null ? TimeRanger.START_TIME : dateFormat.parse(lastUpdated);
+            Date lastUpdatedDate = lastUpdated == null || overwrite ? START_TIME : dateFormat.parse(lastUpdated);
 
             int newDownloadsCount = dsDownloadInfo.entrySet()
                     .stream()

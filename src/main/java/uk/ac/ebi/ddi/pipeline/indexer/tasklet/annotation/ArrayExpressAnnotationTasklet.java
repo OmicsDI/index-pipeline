@@ -7,7 +7,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.taxonomy.NCBITaxonomyService;
-import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
+//import uk.ac.ebi.ddi.pipeline.indexer.utils.DatasetAnnotationFieldsUtils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 
@@ -43,7 +43,7 @@ public class ArrayExpressAnnotationTasklet extends AnnotationXMLTasklet {
             if (dataset.getCurrentStatus().equalsIgnoreCase(DatasetCategory.INSERTED.getType())) {
                 Dataset exitingDataset = datasetAnnotationService.getDataset(
                         dataset.getAccession(), dataset.getDatabase());
-                exitingDataset = DatasetAnnotationFieldsUtils.addpublicationDate(exitingDataset);
+                //exitingDataset = DatasetAnnotationFieldsUtils.addpublicationDate(exitingDataset);
                 DatasetAnnotationEnrichmentService.updatePubMedIds(publicationService, exitingDataset);
                 exitingDataset = taxonomyService.annotateSpecies(exitingDataset);
                 datasetAnnotationService.annotateDataset(exitingDataset);

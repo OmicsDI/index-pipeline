@@ -103,6 +103,10 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
             }
             for (String secondaryAccession : dataset.getAllSecondaryAccessions()) {
                 String database = getDatabase(secondaryAccession).getDatabaseName();
+                if (database.equals(dataset.getDatabase())) {
+                    // Subseries
+                    continue;
+                }
                 Set<String> mirrors = retriever.getDatasetFiles(secondaryAccession, database);
                 if (!mirrors.isEmpty()) {
                     dataset.getFiles().put(secondaryAccession, mirrors);

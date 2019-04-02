@@ -32,9 +32,9 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatasetDownloadCountTasklet.class);
 
-    IDatasetService datasetService;
+    private IDatasetService datasetService;
 
-    ElasticSearchWsClient elasticSearchClient;
+    private ElasticSearchWsClient elasticSearchClient;
 
     List<String> databases;
 

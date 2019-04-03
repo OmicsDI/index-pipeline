@@ -102,6 +102,9 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
                 hasChange = true;
             }
             for (String secondaryAccession : dataset.getAllSecondaryAccessions()) {
+                if (secondaryAccession.contains("~")) {
+                    secondaryAccession = secondaryAccession.split("~")[0];
+                }
                 String database = getDatabase(secondaryAccession).getDatabaseName();
                 if (database.equals(dataset.getDatabase())) {
                     // Subseries

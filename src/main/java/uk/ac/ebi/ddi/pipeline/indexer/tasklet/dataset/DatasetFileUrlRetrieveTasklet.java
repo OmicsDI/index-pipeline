@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static uk.ac.ebi.ddi.annotation.utils.Constants.IS_PRIVATE;
+
 
 @Getter
 @Setter
@@ -91,6 +93,11 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
     private void process(Dataset ds) {
         LOGGER.debug("Processing dataset {}", ds.getAccession());
         Dataset dataset = datasetService.read(ds.getAccession(), ds.getDatabase());
+        if (dataset.getAdditional().get(IS_PRIVATE) != null) {
+            if (dataset.getAdditional().get(IS_PRIVATE).iterator().next().equals("true")) {
+                return;
+            }
+        }
         try {
             Set<String> urls = retriever.getDatasetFiles(dataset.getAccession(), dataset.getDatabase());
             boolean hasChange = false;

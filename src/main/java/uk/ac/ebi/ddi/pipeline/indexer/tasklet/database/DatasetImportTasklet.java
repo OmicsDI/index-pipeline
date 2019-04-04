@@ -77,7 +77,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     LOGGER.debug("Dataset: " + dataEntry.getId() + " " + db + "has been added");
                 }
             } catch (Exception e) {
-                LOGGER.info("Error Reading file : {}, ", file.getAbsolutePath(), e);
+                LOGGER.error("Error Reading file : {}, ", file.getAbsolutePath(), e);
             }
         });
 

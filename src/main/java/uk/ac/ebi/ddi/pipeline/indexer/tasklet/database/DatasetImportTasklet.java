@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Setter
 public class DatasetImportTasklet extends AbstractTasklet {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(AnnotationXMLTasklet.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(DatasetImportTasklet.class);
 
     Resource inputDirectory;
 

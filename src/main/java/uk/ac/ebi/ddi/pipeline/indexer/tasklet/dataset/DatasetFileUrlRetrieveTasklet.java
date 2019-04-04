@@ -19,10 +19,8 @@ import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
 import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 
 import static uk.ac.ebi.ddi.annotation.utils.Constants.IS_PRIVATE;
 
@@ -42,6 +40,8 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatasetFileUrlRetrieveTasklet.class);
 
     private List<String> processed = new ArrayList<>();
+
+    private static final int PARALLEL = Math.min(9, Runtime.getRuntime().availableProcessors());
 
     public DatasetFileUrlRetrieveTasklet() {
 
@@ -73,10 +73,10 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         throw new DatabaseNotFoundException();
     }
 
-    private synchronized void calculatePercentFinished(String accession) {
+    private synchronized void calculatePercentFinished(String accession, int total) {
         processed.add(accession);
         if (processed.size() % 500 == 0) {
-            LOGGER.info("Processed {}", processed.size());
+            LOGGER.info("Processed {}/{}", processed.size(), total);
         }
     }
 
@@ -84,14 +84,18 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         LOGGER.info("Starting....");
         databaseDetails = databaseDetailService.getDatabaseList();
-        databaseDetails.stream().parallel().forEach(x -> {
-            datasetService.readDatasetHashCode(x.getDatabaseName()).forEach(this::process);
+        List<Dataset> datasets = new ArrayList<>();
+        databaseDetails.forEach(x -> {
+            datasets.addAll(datasetService.readDatasetHashCode(x.getDatabaseName()));
         });
+        Collections.shuffle(datasets);
+        ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
+        customThreadPool.submit(() -> datasets.stream().parallel().forEach(x -> process(x, datasets.size()))).get();
         return RepeatStatus.FINISHED;
     }
 
-    private void process(Dataset ds) {
-        LOGGER.debug("Processing dataset {}", ds.getAccession());
+    private void process(Dataset ds, int total) {
+        LOGGER.info("Processing dataset {} - {}", ds.getAccession(), ds.getDatabase());
         Dataset dataset = datasetService.read(ds.getAccession(), ds.getDatabase());
         if (dataset.getAdditional().get(IS_PRIVATE) != null) {
             if (dataset.getAdditional().get(IS_PRIVATE).iterator().next().equals("true")) {
@@ -130,7 +134,7 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
             String identity = dataset.getAccession() + " - " + dataset.getDatabase();
             LOGGER.error("Exception occurred with dataset {}, ", identity, e);
         } finally {
-            calculatePercentFinished(dataset.getAccession());
+            calculatePercentFinished(dataset.getAccession(), total);
         }
     }
 

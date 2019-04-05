@@ -128,7 +128,7 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
                 }
             }
             if (hasChange) {
-                datasetService.update(dataset.getId(), dataset);
+                datasetService.save(dataset);
             }
         } catch (Exception e) {
             String identity = dataset.getAccession() + " - " + dataset.getDatabase();

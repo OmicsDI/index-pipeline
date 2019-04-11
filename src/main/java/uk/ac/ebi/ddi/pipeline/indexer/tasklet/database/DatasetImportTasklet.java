@@ -80,7 +80,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                                         return Stream.of(dt);
                                     }
                                 }
-                        ).distinct().forEach(tr -> dataEntry.addAdditionalField("submitter_keywords",tr));
+                        ).distinct().forEach(tr -> dataEntry.addAdditionalField(Constants.SUBMITTER_KEYWORDS,tr));
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 

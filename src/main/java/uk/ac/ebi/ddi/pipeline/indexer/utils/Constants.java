@@ -47,5 +47,7 @@ public class Constants {
 
     public static final String PEPTIDEATLAS_SRM = "SRM";
     public static final String BIOMODELS_DATABASE = "BioModels";
+    public static final String SUBMITTER_KEYWORDS = "submitter_keywords";
+
 
 }

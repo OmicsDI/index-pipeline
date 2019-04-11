@@ -70,7 +70,9 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if ("".equals(db)) {
                         db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
                     }
-                    if(dataEntry.getAdditionalFields().getField().contains(Constants.SUBMITTER_KEYWORDS)){
+                    long submitterCount = dataEntry.getAdditionalFields().getField().parallelStream().
+                            filter(fld -> fld.getName().equals(Constants.SUBMITTER_KEYWORDS)).count();
+                    if(submitterCount > 0){
                         List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
                         keywordSet.parallelStream().flatMap(dt -> {
                                     if (dt.contains(Constants.SEMI_COLON_TOKEN)){

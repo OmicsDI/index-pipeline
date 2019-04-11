@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
@@ -69,8 +70,8 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if ("".equals(db)) {
                         db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
                     }
-                    if(dataEntry.getAdditionalFields().getField().contains("submitter_keywords")){
-                        List<String> keywordSet = dataEntry.getAdditionalFieldValues("submitter_keywords");
+                    if(dataEntry.getAdditionalFields().getField().contains(Constants.SUBMITTER_KEYWORDS)){
+                        List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
                         keywordSet.parallelStream().flatMap(dt -> {
                                     if (dt.contains(";")){
                                         String[] newKeywords = dt.split(";");

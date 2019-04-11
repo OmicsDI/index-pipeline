@@ -74,7 +74,8 @@ public class DatasetImportTasklet extends AbstractTasklet {
                             filter(fld -> fld.getName().equals(Constants.SUBMITTER_KEYWORDS)).count();
                     if(submitterCount > 0){
                         List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
-                        keywordSet.parallelStream().flatMap(dt -> {
+                        if(keywordSet != null) {
+                            keywordSet.parallelStream().flatMap(dt -> {
                                     if (dt.contains(Constants.SEMI_COLON_TOKEN)){
                                         String[] newKeywords = dt.split(Constants.SEMI_COLON_TOKEN);
                                         return Arrays.stream(newKeywords);
@@ -83,6 +84,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                                     }
                                 }
                         ).distinct().forEach(tr -> dataEntry.addAdditionalField(Constants.SUBMITTER_KEYWORDS,tr));
+                        }
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 

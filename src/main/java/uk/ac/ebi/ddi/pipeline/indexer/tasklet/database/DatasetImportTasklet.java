@@ -73,8 +73,8 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if(dataEntry.getAdditionalFields().getField().contains(Constants.SUBMITTER_KEYWORDS)){
                         List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
                         keywordSet.parallelStream().flatMap(dt -> {
-                                    if (dt.contains(";")){
-                                        String[] newKeywords = dt.split(";");
+                                    if (dt.contains(Constants.SEMI_COLON_TOKEN)){
+                                        String[] newKeywords = dt.split(Constants.SEMI_COLON_TOKEN);
                                         return Arrays.stream(newKeywords);
                                     }else{
                                         return Stream.of(dt);

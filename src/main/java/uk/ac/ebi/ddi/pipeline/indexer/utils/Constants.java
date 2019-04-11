@@ -49,5 +49,7 @@ public class Constants {
     public static final String BIOMODELS_DATABASE = "BioModels";
     public static final String SUBMITTER_KEYWORDS = "submitter_keywords";
 
+    public static final String SEMI_COLON_TOKEN = ";";
+
 
 }

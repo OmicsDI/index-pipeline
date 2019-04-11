@@ -70,20 +70,21 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if ("".equals(db)) {
                         db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
                     }
-                    long submitterCount = dataEntry.getAdditionalFields().getField().parallelStream().
-                            filter(fld -> fld.getName().equals(Constants.SUBMITTER_KEYWORDS)).count();
-                    if(submitterCount > 0){
+                    long submitterCount = dataEntry.getAdditionalFields() != null ?
+                            dataEntry.getAdditionalFields().getField().parallelStream().
+                            filter(fld -> fld.getName().equals(Constants.SUBMITTER_KEYWORDS)).count() : 0;
+                    if (submitterCount > 0) {
                         List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
-                        if(keywordSet != null) {
+                        if (keywordSet != null) {
                             keywordSet.parallelStream().flatMap(dt -> {
-                                    if (dt.contains(Constants.SEMI_COLON_TOKEN)){
+                                    if (dt.contains(Constants.SEMI_COLON_TOKEN)) {
                                         String[] newKeywords = dt.split(Constants.SEMI_COLON_TOKEN);
                                         return Arrays.stream(newKeywords);
-                                    }else{
+                                    } else {
                                         return Stream.of(dt);
                                     }
                                 }
-                        ).distinct().forEach(tr -> dataEntry.addAdditionalField(Constants.SUBMITTER_KEYWORDS,tr));
+                        ).distinct().forEach(tr -> dataEntry.addAdditionalField(Constants.SUBMITTER_KEYWORDS, tr));
                         }
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");

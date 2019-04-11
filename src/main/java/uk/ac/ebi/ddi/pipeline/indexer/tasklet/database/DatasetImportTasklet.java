@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Some considerations, we would have only one provider by database. This must be considered in the future.
@@ -68,7 +69,18 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if ("".equals(db)) {
                         db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
                     }
-
+                    if(dataEntry.getAdditionalFields().getField().contains("submitter_keywords")){
+                        List<String> keywordSet = dataEntry.getAdditionalFieldValues("submitter_keywords");
+                        keywordSet.parallelStream().flatMap(dt -> {
+                                    if (dt.contains(";")){
+                                        String[] newKeywords = dt.split(";");
+                                        return Arrays.stream(newKeywords);
+                                    }else{
+                                        return Stream.of(dt);
+                                    }
+                                }
+                        ).distinct().forEach(tr -> dataEntry.addAdditionalField("submitter_keywords",tr));
+                    }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 
                     datasetAnnotationService.insertDataset(dataEntry, db);

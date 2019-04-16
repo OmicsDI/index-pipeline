@@ -26,7 +26,7 @@
                 <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
                     <bean:property name="datasetService" ref="datasetService" />
                     <bean:property name="databaseDetailService" ref="databaseDetailService" />
-                    <bean:property name="overwrite" value="true" />
+                    <bean:property name="overwrite" value="false" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

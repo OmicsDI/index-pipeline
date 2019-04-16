@@ -43,6 +43,8 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
 
     private static final int PARALLEL = Math.min(9, Runtime.getRuntime().availableProcessors());
 
+    private boolean overwrite;
+
     public DatasetFileUrlRetrieveTasklet() {
 
         // Initializing retrievers
@@ -97,6 +99,9 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
     private void process(Dataset ds, int total) {
         LOGGER.info("Processing dataset {} - {}", ds.getAccession(), ds.getDatabase());
         Dataset dataset = datasetService.read(ds.getAccession(), ds.getDatabase());
+        if (!overwrite && !dataset.getFiles().isEmpty()) {
+            return;
+        }
         if (dataset.getAdditional().get(IS_PRIVATE) != null) {
             if (dataset.getAdditional().get(IS_PRIVATE).iterator().next().equals("true")) {
                 return;

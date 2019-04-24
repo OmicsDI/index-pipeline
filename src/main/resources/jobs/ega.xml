@@ -105,6 +105,17 @@
             </batch:tasklet>
         </batch:step>
 
+        <batch:step id="datasetFileRetrieve" parent="parentStep" next="cleanFolder">
+            <batch:tasklet>
+                <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
+                    <bean:property name="datasetService" ref="datasetService" />
+                    <bean:property name="databaseDetailService" ref="databaseDetailService" />
+                    <bean:property name="overwrite" value="false" />
+                    <bean:property name="databaseName" value="${ddi.common.ega.database.name}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
         <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">

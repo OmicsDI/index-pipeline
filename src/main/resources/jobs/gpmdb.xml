@@ -76,12 +76,23 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="annotationFiles" parent="parentStep">
+        <batch:step id="annotationFiles" parent="parentStep" next="datasetFileRetrieve">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.GPMDBAnnotationTasklet">
                     <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databases" ref="crossDatabases" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="datasetFileRetrieve" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
+                    <bean:property name="datasetService" ref="datasetService" />
+                    <bean:property name="databaseDetailService" ref="databaseDetailService" />
+                    <bean:property name="overwrite" value="false" />
+                    <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

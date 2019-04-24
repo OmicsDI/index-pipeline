@@ -27,6 +27,7 @@
                     <bean:property name="datasetService" ref="datasetService" />
                     <bean:property name="databaseDetailService" ref="databaseDetailService" />
                     <bean:property name="overwrite" value="true" />
+                    <bean:property name="databaseName"             value="ALL" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

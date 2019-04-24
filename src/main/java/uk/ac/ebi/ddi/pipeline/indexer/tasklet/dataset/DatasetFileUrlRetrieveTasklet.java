@@ -33,6 +33,8 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
 
     private DatabaseDetailService databaseDetailService;
 
+    private String databaseName;
+
     private IDatasetFileUrlRetriever retriever = new DefaultDatasetFileUrlRetriever();
 
     private List<DatabaseDetail> databaseDetails;
@@ -87,9 +89,13 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         LOGGER.info("Starting....");
         databaseDetails = databaseDetailService.getDatabaseList();
         List<Dataset> datasets = new ArrayList<>();
-        databaseDetails.forEach(x -> {
-            datasets.addAll(datasetService.readDatasetHashCode(x.getDatabaseName()));
-        });
+        if (!databaseName.equals("ALL")) {
+            datasets.addAll(datasetService.readDatasetHashCode(databaseName));
+        } else {
+            databaseDetails.forEach(x -> {
+                datasets.addAll(datasetService.readDatasetHashCode(x.getDatabaseName()));
+            });
+        }
         Collections.shuffle(datasets);
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
         customThreadPool.submit(() -> datasets.stream().parallel().forEach(x -> process(x, datasets.size()))).get();

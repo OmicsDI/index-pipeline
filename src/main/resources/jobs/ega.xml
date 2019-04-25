@@ -94,7 +94,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="enrichmentStep" parent="parentStep" next="cleanFolder">
+        <batch:step id="enrichmentStep" parent="parentStep" next="datasetFileRetrieve">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
                     <bean:property name="databaseName" value="${ddi.common.ega.database.name}" />

@@ -106,8 +106,7 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
             LOGGER.info("Dataset {}: {} downloads", dataset.getAccession(), totalDownloads);
             dataset.getAdditional().put(Constants.DOWNLOAD_COUNT,
                     Collections.singleton(String.valueOf(totalDownloads)));
-            dataset.getAdditional().put(Constants.DOWNLOAD_LAST_UPDATED,
-                    Collections.singleton(dateFormat.format(toDate)));
+            dataset.getConfigurations().put(Constants.DOWNLOAD_LAST_UPDATED, dateFormat.format(toDate));
             datasetService.save(dataset);
         } catch (Exception e) {
             LOGGER.error("Exception occurred, dataset: {}, ", dt.getAccession(), e);

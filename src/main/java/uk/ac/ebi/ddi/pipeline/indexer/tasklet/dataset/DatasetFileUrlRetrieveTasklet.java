@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 
 import static uk.ac.ebi.ddi.annotation.utils.Constants.IS_PRIVATE;
+import static uk.ac.ebi.ddi.service.db.utils.Constants.IGNORE_DATASET_FILE_RETRIEVER;
 
 
 @Getter
@@ -60,6 +61,8 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         retriever = new MassIVEFileUrlRetriever(retriever);
         retriever = new LincsFileUrlRetriever(retriever);
         retriever = new PeptideAtlasFileUrlRetriever(retriever);
+        retriever = new EVAFileUrlRetriever(retriever);
+        retriever = new MetabolightsFileUrlRetriever(retriever);
     }
 
     private DatabaseDetail getDatabase(String accession) {
@@ -103,7 +106,6 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
     }
 
     private void process(Dataset ds, int total) {
-        LOGGER.info("Processing dataset {} - {}", ds.getAccession(), ds.getDatabase());
         Dataset dataset = datasetService.read(ds.getAccession(), ds.getDatabase());
         if (!overwrite && !dataset.getFiles().isEmpty()) {
             return;
@@ -114,13 +116,21 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
             }
         }
         try {
-            Set<String> urls = retriever.getDatasetFiles(dataset.getAccession(), dataset.getDatabase());
+            Set<String> urls = new HashSet<>();
+            if (!dataset.getConfigurations().containsKey(IGNORE_DATASET_FILE_RETRIEVER) ||
+                    !dataset.getConfigurations().get(IGNORE_DATASET_FILE_RETRIEVER).equals("true")) {
+                urls = retriever.getDatasetFiles(dataset.getAccession(), dataset.getDatabase());
+            }
             boolean hasChange = false;
+            Set<String> originalUrls = dataset.getAdditional().get(Field.DATASET_FILE.getName());
+            originalUrls = originalUrls == null ? new HashSet<>() : originalUrls;
             if (!urls.isEmpty()) {
-                Set<String> originalUrls = dataset.getAdditional().get(Field.DATASET_FILE.getName());
-                originalUrls = originalUrls == null ? new HashSet<>() : originalUrls;
                 urls.addAll(originalUrls);
                 dataset.getFiles().put(dataset.getAccession(), urls);
+                hasChange = true;
+            }
+            if (urls.isEmpty() && !originalUrls.isEmpty()) {
+                dataset.getFiles().put(dataset.getAccession(), originalUrls);
                 hasChange = true;
             }
             for (String secondaryAccession : dataset.getAllSecondaryAccessions()) {
@@ -141,6 +151,8 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
             if (hasChange) {
                 datasetService.save(dataset);
             }
+        } catch (DatabaseNotFoundException e) {
+            LOGGER.info("Database for secondary accession of dataset {} not found", dataset.getAccession());
         } catch (Exception e) {
             String identity = dataset.getAccession() + " - " + dataset.getDatabase();
             LOGGER.error("Exception occurred with dataset {}, ", identity, e);

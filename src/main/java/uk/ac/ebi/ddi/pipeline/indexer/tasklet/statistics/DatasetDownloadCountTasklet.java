@@ -10,7 +10,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
-import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
 import uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsClient;
 import uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsConfigProd;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
@@ -80,7 +79,7 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
                     : 0;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            String lastUpdated = DatasetUtils.getFirstAdditionalFieldValue(dataset, Constants.DOWNLOAD_LAST_UPDATED);
+            String lastUpdated = dataset.getConfigurations().get(Constants.DOWNLOAD_LAST_UPDATED);
             Date lastUpdatedDate = lastUpdated == null || overwrite ? START_TIME : dateFormat.parse(lastUpdated);
 
             int newDownloadsCount = dsDownloadInfo.entrySet()

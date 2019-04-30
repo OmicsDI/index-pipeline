@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.database.DDIDatabaseAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
@@ -72,9 +73,11 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     }
                     long submitterCount = dataEntry.getAdditionalFields() != null ?
                             dataEntry.getAdditionalFields().getField().parallelStream().
-                            filter(fld -> fld.getName().equals(Constants.SUBMITTER_KEYWORDS)).count() : 0;
+                            filter(fld -> fld.getName()
+                                    .equals(DSField.Additional.SUBMITTER_KEYWORDS.key())).count() : 0;
                     if (submitterCount > 0) {
-                        List<String> keywordSet = dataEntry.getAdditionalFieldValues(Constants.SUBMITTER_KEYWORDS);
+                        List<String> keywordSet = dataEntry
+                                .getAdditionalFieldValues(DSField.Additional.SUBMITTER_KEYWORDS.key());
                         if (keywordSet != null) {
                             keywordSet.parallelStream().flatMap(dt -> {
                                     if (dt.contains(Constants.SEMI_COLON_TOKEN)) {
@@ -84,7 +87,8 @@ public class DatasetImportTasklet extends AbstractTasklet {
                                         return Stream.of(dt);
                                     }
                                 }
-                        ).distinct().forEach(tr -> dataEntry.addAdditionalField(Constants.SUBMITTER_KEYWORDS, tr));
+                        ).distinct().forEach(tr -> dataEntry
+                                    .addAdditionalField(DSField.Additional.SUBMITTER_KEYWORDS.key(), tr));
                         }
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");

@@ -3,11 +3,11 @@ package uk.ac.ebi.ddi.pipeline.indexer.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Date;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,13 +45,13 @@ public class DatasetAnnotationFieldsUtils {
         Set<String> toAdd = null;
         if (dataset.getDates() != null && !dataset.getDates().isEmpty()) {
             for (String dateField : dataset.getDates().keySet()) {
-                if (dateField.equalsIgnoreCase(Field.PUBLICATION_UPDATED.getName())) {
+                if (dateField.equalsIgnoreCase(DSField.Date.PUBLICATION_UPDATED.getName())) {
                     toAdd = dataset.getDates().get(dateField);
                 }
             }
         }
         if (toAdd != null) {
-            dataset.getDates().put(Field.PUBLICATION.getName(), toAdd);
+            dataset.getDates().put(DSField.Date.PUBLICATION.getName(), toAdd);
         }
         return dataset;
     }
@@ -59,7 +59,7 @@ public class DatasetAnnotationFieldsUtils {
     private static boolean containsPublicationDate(Map<String, Set<String>> dates) {
         if (dates != null && !dates.isEmpty()) {
             for (String dateField : dates.keySet()) {
-                if (dateField.equalsIgnoreCase(Field.PUBLICATION.getName())) {
+                if (dateField.equalsIgnoreCase(DSField.Date.PUBLICATION.getName())) {
                     return true;
                 }
             }
@@ -70,9 +70,9 @@ public class DatasetAnnotationFieldsUtils {
 
     public static Entry addPublicationDateFromSubmission(Entry dataset) {
         if (dataset.getDates() != null && !dataset.getDates().containsPublicationDate()) {
-            Date date = dataset.getDates().getDateByKey(Field.SUBMISSION_DATE.getName());
+            Date date = dataset.getDates().getDateByKey(DSField.Additional.SUBMISSION_DATE.getName());
             if (date != null) {
-                dataset.addDate(new Date(Field.PUBLICATION.getName(), date.getValue()));
+                dataset.addDate(new Date(DSField.Date.PUBLICATION.getName(), date.getValue()));
             }
         }
         return dataset;
@@ -116,18 +116,18 @@ public class DatasetAnnotationFieldsUtils {
 
     public static Entry replaceMEDLINEPubmed(Entry dataset) {
         if (dataset.getCrossReferences() != null
-                && !dataset.getCrossReferenceFieldValue(Field.MEDLINE.getName()).isEmpty()) {
-            dataset.getCrossReferenceFieldValue(Field.MEDLINE.getName()).stream()
+                && !dataset.getCrossReferenceFieldValue(DSField.CrossRef.MEDLINE.getName()).isEmpty()) {
+            dataset.getCrossReferenceFieldValue(DSField.CrossRef.MEDLINE.getName()).stream()
                     .filter(value -> value != null && !value.isEmpty())
-                    .forEach(value -> dataset.addCrossReferenceValue(Field.PUBMED.getName(), value));
-            dataset.removeCrossReferences(Field.MEDLINE.getName());
+                    .forEach(value -> dataset.addCrossReferenceValue(DSField.CrossRef.PUBMED.getName(), value));
+            dataset.removeCrossReferences(DSField.CrossRef.MEDLINE.getName());
         }
         return dataset;
     }
 
     public static Entry replaceAuthorField(Entry dataset) {
         if (dataset.getAuthors() != null && !dataset.getAuthors().isEmpty()) {
-            dataset.addAdditionalField(Field.SUBMITTER.getName(), dataset.getAuthors());
+            dataset.addAdditionalField(DSField.Additional.SUBMITTER.getName(), dataset.getAuthors());
             dataset.setAuthors(null);
         }
         return dataset;
@@ -135,7 +135,7 @@ public class DatasetAnnotationFieldsUtils {
 
     public static Entry replaceKeywords(Entry dataset) {
         if (dataset.getKeywords() != null && !dataset.getKeywords().isEmpty()) {
-            dataset.addAdditionalField(Field.SUBMITTER_KEYWORDS.getName(), dataset.getKeywords());
+            dataset.addAdditionalField(DSField.Additional.SUBMITTER_KEYWORDS.getName(), dataset.getKeywords());
             dataset.setKeywords(null);
         }
         return dataset;
@@ -170,10 +170,10 @@ public class DatasetAnnotationFieldsUtils {
     }
 
     public static Dataset cleanRepository(Dataset dataset, String database) {
-        if (dataset.getAdditional().containsKey(Field.REPOSITORY.getName())) {
+        if (dataset.getAdditional().containsKey(DSField.Additional.REPOSITORY.getName())) {
             Set<String> databaseSet = new HashSet<>();
             databaseSet.add(database);
-            dataset.addAdditional(Field.REPOSITORY.getName(), databaseSet);
+            dataset.addAdditional(DSField.Additional.REPOSITORY.getName(), databaseSet);
         }
         return dataset;
     }
@@ -185,9 +185,9 @@ public class DatasetAnnotationFieldsUtils {
         if (originalDataset.getDescription() != null && !originalDataset.getDescription().isEmpty()) {
             reanalysisDataset.setDescription(originalDataset.getDescription());
         }
-        if (originalDataset.getAdditional().containsKey(Field.SAMPLE.getName())) {
-            reanalysisDataset.addAdditional(
-                    Field.SAMPLE.getName(), originalDataset.getAdditional().get(Field.SAMPLE.getName()));
+        if (originalDataset.getAdditional().containsKey(DSField.Additional.SAMPLE.getName())) {
+            reanalysisDataset.addAdditional(DSField.Additional.SAMPLE.getName(),
+                    originalDataset.getAdditional().get(DSField.Additional.SAMPLE.getName()));
         }
         if (originalDataset.getCrossReferences() != null) {
             for (Map.Entry entry: originalDataset.getCrossReferences().entrySet()) {
@@ -258,27 +258,27 @@ public class DatasetAnnotationFieldsUtils {
             existingDataset.setCurrentStatus(DatasetCategory.ENRICHED.getType());
         }
         if (existingDataset.getAdditional() != null
-                && existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName()) != null) {
+                && existingDataset.getAdditional().get(DSField.Additional.SUBMITTER_KEYWORDS.getName()) != null) {
             boolean isSRM = false;
-            for (String keyword: existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName())) {
+            for (String keyword: existingDataset.getAdditional().get(DSField.Additional.SUBMITTER_KEYWORDS.getName())) {
                 if (keyword.equalsIgnoreCase(Constants.PEPTIDEATLAS_SRM)) {
                     isSRM = true;
                 }
             }
             if (isSRM) {
-                existingDataset.getAdditional().get(Field.SUBMITTER_KEYWORDS.getName()).add("PASSEL");
+                existingDataset.getAdditional().get(DSField.Additional.SUBMITTER_KEYWORDS.getName()).add("PASSEL");
             }
         }
         if (existingDataset.getAdditional() != null
-                && existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName()) != null) {
+                && existingDataset.getAdditional().get(DSField.Additional.CURATOR_KEYWORDS.getName()) != null) {
             boolean isSRM = false;
-            for (String keyword: existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName())) {
+            for (String keyword: existingDataset.getAdditional().get(DSField.Additional.CURATOR_KEYWORDS.getName())) {
                 if (keyword.equalsIgnoreCase(Constants.PEPTIDEATLAS_SRM)) {
                     isSRM = true;
                 }
             }
             if (isSRM) {
-                existingDataset.getAdditional().get(Field.CURATOR_KEYWORDS.getName()).add("PASSEL");
+                existingDataset.getAdditional().get(DSField.Additional.CURATOR_KEYWORDS.getName()).add("PASSEL");
             }
         }
         return existingDataset;
@@ -294,30 +294,30 @@ public class DatasetAnnotationFieldsUtils {
         if (existingDataset.getAdditional() != null
                 && existingDataset.getAdditional().containsKey("full_study_link")) {
             Set<String> links = existingDataset.getAdditional().remove("full_study_link");
-            existingDataset.getAdditional().put(Field.LINK.getName(), links);
+            existingDataset.getAdditional().put(DSField.Additional.LINK.getName(), links);
         }
         return existingDataset;
 
     }
 
     public static Dataset replaceTextCase(Dataset existingDataset) {
-        if (existingDataset.getAdditional().containsKey(Field.DISEASE_FIELD)) {
-            Set<String> diseases = existingDataset.getAdditional().get(Field.DISEASE_FIELD);
+        if (existingDataset.getAdditional().containsKey(DSField.Additional.DISEASE_FIELD.key())) {
+            Set<String> diseases = existingDataset.getAdditional().get(DSField.Additional.DISEASE_FIELD.key());
             Set<String> updatedDisease =  diseases.parallelStream()
                     .map(Utils::toTitleCase).collect(Collectors.toSet());
-            existingDataset.addAdditional(Field.DISEASE_FIELD.getName(), updatedDisease);
+            existingDataset.addAdditional(DSField.Additional.DISEASE_FIELD.getName(), updatedDisease);
         }
-        if (existingDataset.getAdditional().containsKey(Field.SPECIE_FIELD)) {
-            Set<String> diseases = existingDataset.getAdditional().get(Field.SPECIE_FIELD);
+        if (existingDataset.getAdditional().containsKey(DSField.Additional.SPECIE_FIELD.key())) {
+            Set<String> diseases = existingDataset.getAdditional().get(DSField.Additional.SPECIE_FIELD.key());
             Set<String> updatedSpecies =  diseases.parallelStream()
                     .map(Utils::toTitleCase).collect(Collectors.toSet());
-            existingDataset.addAdditional(Field.SPECIE_FIELD.getName(), updatedSpecies);
+            existingDataset.addAdditional(DSField.Additional.SPECIE_FIELD.getName(), updatedSpecies);
         }
-        if (existingDataset.getAdditional().containsKey(Field.TISSUE_FIELD)) {
-            Set<String> diseases = existingDataset.getAdditional().get(Field.TISSUE_FIELD);
+        if (existingDataset.getAdditional().containsKey(DSField.Additional.TISSUE_FIELD.key())) {
+            Set<String> diseases = existingDataset.getAdditional().get(DSField.Additional.TISSUE_FIELD.key());
             Set<String> updatedTissue =  diseases.parallelStream()
                     .map(Utils::toTitleCase).collect(Collectors.toSet());
-            existingDataset.addAdditional(Field.TISSUE_FIELD.getName(), updatedTissue);
+            existingDataset.addAdditional(DSField.Additional.TISSUE_FIELD.getName(), updatedTissue);
         }
         return existingDataset;
     }

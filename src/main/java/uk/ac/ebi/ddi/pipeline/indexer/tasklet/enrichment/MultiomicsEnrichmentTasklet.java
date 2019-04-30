@@ -9,11 +9,11 @@ import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.Constants;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.model.publication.PublicationDataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetSimilarsType;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ public class MultiomicsEnrichmentTasklet extends AbstractTasklet {
                     Dataset dataset = datasetAnnotationService.getDataset(x.getDatasetID(), x.getDatabase());
                     if (dataset != null) {
                         dataset = DatasetUtils.addAdditionalField(
-                                dataset, Field.OMICS.getName(), Constants.MULTIOMICS_TYPE);
+                                dataset, DSField.Additional.OMICS.getName(), Constants.MULTIOMICS_TYPE);
                         datasetAnnotationService.updateDataset(dataset);
                         datasetAnnotationService.addDatasetSimilars(
                                 dataset, publication.getValue(), DatasetSimilarsType.OTHER_OMICS_DATA.getType());

@@ -8,6 +8,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.pipeline.indexer.exception.DatabaseNotFoundException;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.retriever.DefaultDatasetFileUrlRetriever;
@@ -17,13 +18,9 @@ import uk.ac.ebi.ddi.service.db.model.database.DatabaseDetail;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.service.database.DatabaseDetailService;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
-
-import static uk.ac.ebi.ddi.annotation.utils.Constants.IS_PRIVATE;
-import static uk.ac.ebi.ddi.service.db.utils.Constants.IGNORE_DATASET_FILE_RETRIEVER;
 
 
 @Getter
@@ -110,19 +107,20 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         if (!overwrite && !dataset.getFiles().isEmpty()) {
             return;
         }
-        if (dataset.getAdditional().get(IS_PRIVATE) != null) {
-            if (dataset.getAdditional().get(IS_PRIVATE).iterator().next().equals("true")) {
+        if (dataset.getAdditional().get(DSField.Additional.IS_PRIVATE.key()) != null) {
+            if (dataset.getAdditional().get(DSField.Additional.IS_PRIVATE.key()).iterator().next().equals("true")) {
                 return;
             }
         }
         try {
             Set<String> urls = new HashSet<>();
-            if (!dataset.getConfigurations().containsKey(IGNORE_DATASET_FILE_RETRIEVER) ||
-                    !dataset.getConfigurations().get(IGNORE_DATASET_FILE_RETRIEVER).equals("true")) {
+            if (!dataset.getConfigurations().containsKey(DSField.Configurations.IGNORE_DATASET_FILE_RETRIEVER.key()) ||
+                    !dataset.getConfigurations().get(DSField.Configurations.IGNORE_DATASET_FILE_RETRIEVER.key())
+                            .equals("true")) {
                 urls = retriever.getDatasetFiles(dataset.getAccession(), dataset.getDatabase());
             }
             boolean hasChange = false;
-            Set<String> originalUrls = dataset.getAdditional().get(Field.DATASET_FILE.getName());
+            Set<String> originalUrls = dataset.getAdditional().get(DSField.Additional.DATASET_FILE.getName());
             originalUrls = originalUrls == null ? new HashSet<>() : originalUrls;
             if (!urls.isEmpty()) {
                 urls.addAll(originalUrls);

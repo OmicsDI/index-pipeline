@@ -47,4 +47,5 @@ public class Constants {
 
     public static final String PEPTIDEATLAS_SRM = "SRM";
 
+    public static final String SEMI_COLON_TOKEN = ";";
 }

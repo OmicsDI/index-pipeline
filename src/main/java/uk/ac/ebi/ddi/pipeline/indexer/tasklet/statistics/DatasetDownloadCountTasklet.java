@@ -10,13 +10,13 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsClient;
 import uk.ac.ebi.ddi.downloas.logs.ElasticSearchWsConfigProd;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.TimeRanger;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.service.dataset.IDatasetService;
-import uk.ac.ebi.ddi.service.db.utils.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -74,12 +74,14 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
     private void process(Dataset dt, Map<String, Map<String, Multiset<String>>> dsDownloadInfo, Date toDate) {
         try {
             Dataset dataset = datasetService.read(dt.getAccession(), dt.getDatabase());
-            int downloadCurrValue = dataset.getAdditional().containsKey(Constants.DOWNLOAD_COUNT)
-                    ? Integer.valueOf(dataset.getAdditional().get(Constants.DOWNLOAD_COUNT).iterator().next())
+            int downloadCurrValue = dataset.getAdditional().containsKey(DSField.Additional.DOWNLOAD_COUNT.key())
+                    ? Integer.valueOf(dataset.getAdditional().get(DSField.Additional.DOWNLOAD_COUNT.key())
+                                    .iterator().next())
                     : 0;
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            String lastUpdated = dataset.getConfigurations().get(Constants.DOWNLOAD_LAST_UPDATED);
+            String lastUpdated = dataset.getConfigurations()
+                    .get(DSField.Configurations.IGNORE_DATASET_FILE_RETRIEVER.key());
             Date lastUpdatedDate = lastUpdated == null || overwrite ? START_TIME : dateFormat.parse(lastUpdated);
 
             int newDownloadsCount = dsDownloadInfo.entrySet()
@@ -104,9 +106,10 @@ public class DatasetDownloadCountTasklet extends AbstractTasklet {
             }
 
             LOGGER.info("Dataset {}: {} downloads", dataset.getAccession(), totalDownloads);
-            dataset.getAdditional().put(Constants.DOWNLOAD_COUNT,
+            dataset.getAdditional().put(DSField.Additional.DOWNLOAD_COUNT.key(),
                     Collections.singleton(String.valueOf(totalDownloads)));
-            dataset.getConfigurations().put(Constants.DOWNLOAD_LAST_UPDATED, dateFormat.format(toDate));
+            dataset.getConfigurations().put(DSField.Configurations.IGNORE_DATASET_FILE_RETRIEVER.key(),
+                    dateFormat.format(toDate));
             datasetService.save(dataset);
         } catch (Exception e) {
             LOGGER.error("Exception occurred, dataset: {}, ", dt.getAccession(), e);

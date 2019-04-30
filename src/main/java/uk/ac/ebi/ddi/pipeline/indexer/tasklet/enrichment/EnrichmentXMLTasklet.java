@@ -15,11 +15,12 @@ import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.annotation.service.dataset.DatasetAnnotationEnrichmentService;
 import uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService;
 import uk.ac.ebi.ddi.annotation.utils.DatasetUtils;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
+import uk.ac.ebi.ddi.ddidomaindb.dataset.Field;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.service.db.model.dataset.Database;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.service.db.utils.DatasetCategory;
-import uk.ac.ebi.ddi.xml.validator.utils.Field;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,27 +76,30 @@ public class EnrichmentXMLTasklet extends AbstractTasklet {
         Dataset existingDataset = datasetAnnotationService.getDataset(dataset.getAccession(), dataset.getDatabase());
         try {
             Map<String, String> fields = new HashMap<>();
-            fields.put(Field.NAME.getName(), existingDataset.getName());
-            fields.put(Field.DESCRIPTION.getName(), existingDataset.getDescription());
-            fields.put(Field.DATA.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    existingDataset, Field.DATA.getName()));
-            fields.put(Field.SAMPLE.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    existingDataset, Field.SAMPLE.getName()));
-            fields.put(Field.PUBMED_ABSTRACT.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    existingDataset, Field.PUBMED_ABSTRACT.getName()));
-            fields.put(Field.PUBMED_TITLE.getName(), DatasetUtils.getFirstAdditionalFieldValue(
-                    existingDataset, Field.PUBMED_TITLE.getName()));
+            fields.put(DSField.NAME.getName(), existingDataset.getName());
+            fields.put(DSField.DESCRIPTION.getName(), existingDataset.getDescription());
+            fields.put(DSField.Additional.DATA.getName(), DatasetUtils.getFirstAdditional(
+                    existingDataset, DSField.Additional.DATA.getName()));
+            fields.put(DSField.Additional.SAMPLE.getName(), DatasetUtils.getFirstAdditional(
+                    existingDataset, DSField.Additional.SAMPLE.getName()));
+            fields.put(DSField.Additional.PUBMED_ABSTRACT.getName(), DatasetUtils.getFirstAdditional(
+                    existingDataset, DSField.Additional.PUBMED_ABSTRACT.getName()));
+            fields.put(DSField.Additional.PUBMED_TITLE.getName(), DatasetUtils.getFirstAdditional(
+                    existingDataset, DSField.Additional.PUBMED_TITLE.getName()));
             EnrichedDataset enrichedDataset = annotationService.enrichment(
                     new DatasetTobeEnriched(dataset.getAccession(), dataset.getDatabase(), fields), overwrite);
 
             Map<Field, String> toBeEnriched = new HashMap<>();
             Map<String, String> enrichedAttributes = enrichedDataset.getEnrichedAttributes();
-            toBeEnriched.put(Field.ENRICH_TITLE, enrichedAttributes.get(Field.NAME.getName()));
-            toBeEnriched.put(Field.ENRICH_ABSTRACT, enrichedAttributes.get(Field.DESCRIPTION.getName()));
-            toBeEnriched.put(Field.ENRICH_SAMPLE, enrichedAttributes.get(Field.SAMPLE.getName()));
-            toBeEnriched.put(Field.ENRICH_DATA, enrichedAttributes.get(Field.DATA.getName()));
-            toBeEnriched.put(Field.ENRICHE_PUBMED_TITLE, enrichedAttributes.get(Field.PUBMED_TITLE.getName()));
-            toBeEnriched.put(Field.ENRICH_PUBMED_ABSTRACT, enrichedAttributes.get(Field.PUBMED_ABSTRACT.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICH_TITLE, enrichedAttributes.get(DSField.NAME.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICH_ABSTRACT, enrichedAttributes.get(DSField.DESCRIPTION.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICH_SAMPLE,
+                    enrichedAttributes.get(DSField.Additional.SAMPLE.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICH_DATA, enrichedAttributes.get(DSField.Additional.DATA.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICHE_PUBMED_TITLE,
+                    enrichedAttributes.get(DSField.Additional.PUBMED_TITLE.getName()));
+            toBeEnriched.put(DSField.Additional.ENRICH_PUBMED_ABSTRACT,
+                    enrichedAttributes.get(DSField.Additional.PUBMED_ABSTRACT.getName()));
             DatasetAnnotationEnrichmentService.addEnrichedFields(existingDataset, toBeEnriched);
 
             datasetAnnotationService.enrichedDataset(existingDataset);

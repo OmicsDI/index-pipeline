@@ -9,8 +9,8 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
+import uk.ac.ebi.ddi.ddidomaindb.database.DB;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
-import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
 
 @Setter
 @Getter
@@ -23,7 +23,7 @@ public class PrivateUpdateDatasetsTasklet extends AbstractTasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
-            datasetAnnotationService.updatePrivateDataset(Constants.BIOMODELS_DATABASE);
+            datasetAnnotationService.updatePrivateDataset(DB.BIOMODELS_SHORT.getDBName());
         } catch (Exception ex) {
             LOGGER.error("Exception occurred, ", ex);
         }

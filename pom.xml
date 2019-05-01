@@ -22,7 +22,7 @@
 
         <ddi.px.reader.version>1.1.1-SNAPSHOT</ddi.px.reader.version>
         <ddi.xml.validator.version>1.1.1-SNAPSHOT</ddi.xml.validator.version>
-        <ddi.annotation.version>1.4.1-SNAPSHOT</ddi.annotation.version>
+        <ddi.annotation.version>1.4.2-SNAPSHOT</ddi.annotation.version>
         <ddi.mw.reader.version>1.1.1-SNAPSHOT</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.1.1-SNAPSHOT</ddi.massive.reader.version>
         <ddi.api.readers.version>1.0-SNAPSHOT</ddi.api.readers.version>

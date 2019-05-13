@@ -93,11 +93,9 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         if (!databaseName.equals("ALL")) {
             datasets.addAll(datasetService.readDatasetHashCode(databaseName));
         } else {
-            databaseDetails.forEach(x -> {
-                datasets.addAll(datasetService.readDatasetHashCode(x.getDatabaseName()));
-            });
+            databaseDetails.forEach(x -> datasets.addAll(datasetService.readDatasetHashCode(x.getDatabaseName())));
+            Collections.shuffle(datasets);
         }
-        Collections.shuffle(datasets);
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
         customThreadPool.submit(() -> datasets.stream().parallel().forEach(x -> process(x, datasets.size()))).get();
         return RepeatStatus.FINISHED;

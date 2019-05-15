@@ -61,6 +61,7 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         retriever = new EVAFileUrlRetriever(retriever);
         retriever = new MetabolightsFileUrlRetriever(retriever);
         retriever = new MetabolomicsWorkbenchFileUrlRetriever(retriever);
+        retriever = new ENAFileUrlRetriever(retriever);
     }
 
     private DatabaseDetail getDatabase(String accession) {

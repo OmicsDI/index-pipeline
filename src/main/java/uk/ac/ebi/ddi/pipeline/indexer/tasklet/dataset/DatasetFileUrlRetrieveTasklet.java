@@ -91,6 +91,7 @@ public class DatasetFileUrlRetrieveTasklet extends AbstractTasklet {
         LOGGER.info("Starting....");
         databaseDetails = databaseDetailService.getDatabaseList();
         List<Dataset> datasets = new ArrayList<>();
+        //datasets.add(new Dataset("PRJNA374641", "ENA"));
         if (!databaseName.equals("ALL")) {
             datasets.addAll(datasetService.readDatasetHashCode(databaseName));
         } else {

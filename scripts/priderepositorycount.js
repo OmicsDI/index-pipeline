@@ -1,0 +1,1 @@
+db.datasets.dataset.find({"additional.repository":"Pride"}).count()

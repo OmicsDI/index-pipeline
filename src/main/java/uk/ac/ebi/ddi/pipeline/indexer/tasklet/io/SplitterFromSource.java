@@ -54,13 +54,14 @@ public class SplitterFromSource extends AbstractTasklet {
         try {
             index.getAndIncrement();
             if (!file.getName().contains(originalPrefix)) {
+                LOGGER.info("filename {} is not valid ", file.getName());
                 return;
             }
-
+            LOGGER.info("reading file with name {} ", file.getName());
             OmicsXMLFile reader = new OmicsXMLFile(file);
             for (String id: reader.getEntryIds()) {
 
-                LOGGER.info("The ID: {} will be enriched!!", id);
+                //LOGGER.info("The ID: {} will be enriched!!", id);
                 Entry dataset = reader.getEntryById(id);
 
                 entries.add(dataset);
@@ -71,8 +72,9 @@ public class SplitterFromSource extends AbstractTasklet {
                     counterOutFiles.getAndIncrement();
                 }
             }
-
-            if (index.get() == total && !entries.isEmpty()) {
+            //if (index.get() == total && !entries.isEmpty())
+            if (!entries.isEmpty()) {
+                //LOGGER.info("writing last file {}", index.get());
                 DDIFile.writeList(reader, entries, filePrefix, counterOutFiles.get(), outputDirectory.getFile());
                 entries.clear();
                 counterOutFiles.getAndIncrement();

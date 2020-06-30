@@ -61,7 +61,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
 
         Arrays.asList(files).parallelStream().forEach(file -> {
             try {
-                LOGGER.debug("processing file:" + file);
+                LOGGER.info("processing file:" + file);
 
                 OmicsXMLFile omicsXMLFile = new OmicsXMLFile(file);
 
@@ -95,7 +95,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
 
                     datasetAnnotationService.insertDataset(dataEntry, db);
                     threadSafeList.add(new Pair<>(dataEntry.getId(), db));
-                    LOGGER.debug("Dataset: " + dataEntry.getId() + " " + db + "has been added");
+                    LOGGER.info("Dataset: " + dataEntry.getId() + " " + db + "has been added");
                 }
             } catch (Exception e) {
                 LOGGER.error("Error Reading file : {}, ", file.getAbsolutePath(), e);

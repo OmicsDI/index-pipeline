@@ -32,7 +32,7 @@
                 <bean:property name="port"            value="${ddi.common.biomodels.ftp.port}" />
                 <bean:property name="pattern"         value="${ddi.common.biomodels.ftp.pattern}" />
                 <bean:property name="sourceDirectory" value="${ddi.common.biomodels.ftp.folder}" />
-                <bean:property name="targetDirectory" value="file:${ddi.common.original.directory}/${ddi.common.biomodels.database.index}" />
+                <bean:property name="targetDirectory" value="file:${ddi.common.original.directory}${ddi.common.biomodels.database.index}" />
             </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -40,7 +40,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}${ddi.common.biomodels.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -50,8 +50,8 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}/${ddi.common.biomodels.database.index}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}${ddi.common.biomodels.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.original.pattern}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.biomodels.prefix}" />
@@ -63,7 +63,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationLink">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}${ddi.common.biomodels.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="${ddi.common.biomodels.database.name}" />
@@ -114,7 +114,7 @@
         <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.biomodels.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.biomodels.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -123,7 +123,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.biomodels.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.biomodels.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.biomodels.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
@@ -143,7 +143,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.biomodels.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.biomodels.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -152,7 +152,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.biomodels.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.biomodels.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.biomodels.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />

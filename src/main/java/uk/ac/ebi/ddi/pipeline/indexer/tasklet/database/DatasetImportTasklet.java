@@ -1,6 +1,6 @@
 package uk.ac.ebi.ddi.pipeline.indexer.tasklet.database;
 
-import javafx.util.Pair;
+//import javafx.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -20,9 +20,7 @@ import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +47,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        CopyOnWriteArrayList<javafx.util.Pair<String, String>> threadSafeList = new CopyOnWriteArrayList<>();
+        CopyOnWriteArrayList<Map.Entry<String, String>> threadSafeList = new CopyOnWriteArrayList<>();
 
         LOGGER.info("DataSet import, inputDirectory: {} ", inputDirectory.getURI());
 
@@ -94,7 +92,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 
                     datasetAnnotationService.insertDataset(dataEntry, db);
-                    threadSafeList.add(new Pair<>(dataEntry.getId(), db));
+                    threadSafeList.add(new AbstractMap.SimpleEntry<>(dataEntry.getId(), db));
                     LOGGER.info("Dataset: " + dataEntry.getId() + " " + db + "has been added");
                 }
             } catch (Exception e) {
@@ -113,14 +111,14 @@ public class DatasetImportTasklet extends AbstractTasklet {
         //                                      For now we will consider a dataset
         //Todo: as removed is they are not included in one of the releases.
 
-        Set<String> databases = threadSafeList.parallelStream().map(Pair::getValue).collect(Collectors.toSet());
-        CopyOnWriteArrayList<Pair<List<Dataset>, String>> datasets = new CopyOnWriteArrayList<>();
+        Set<String> databases = threadSafeList.parallelStream().map(Map.Entry::getValue).collect(Collectors.toSet());
+        CopyOnWriteArrayList<Map.Entry<List<Dataset>, String>> datasets = new CopyOnWriteArrayList<>();
         databases.parallelStream().forEach(database -> datasets.add(
-                new Pair<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database)));
+                new AbstractMap.SimpleEntry<>(datasetAnnotationService.getAllDatasetsByDatabase(database), database)));
 
         CopyOnWriteArrayList<Dataset> removed = new CopyOnWriteArrayList<>();
         datasets.parallelStream().forEach(x -> x.getKey().parallelStream().forEach(dataset -> {
-            Pair<String, String> pair = new Pair<>(dataset.getAccession(), dataset.getDatabase());
+            Map.Entry<String, String> pair = new AbstractMap.SimpleEntry<>(dataset.getAccession(), dataset.getDatabase());
             if (!threadSafeList.contains(pair)) {
                 removed.add(dataset);
             }

@@ -22,10 +22,17 @@
 
         <ddi.px.reader.version>1.1.1-SNAPSHOT</ddi.px.reader.version>
         <ddi.xml.validator.version>1.3-SNAPSHOT</ddi.xml.validator.version>
-        <ddi.annotation.version>1.4.4-SNAPSHOT</ddi.annotation.version>
+        <ddi.annotation.version>1.4.5-SNAPSHOT</ddi.annotation.version>
         <ddi.mw.reader.version>1.1.1-SNAPSHOT</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.1.1-SNAPSHOT</ddi.massive.reader.version>
         <ddi.api.readers.version>1.0-SNAPSHOT</ddi.api.readers.version>
+
+        <!--<ddi.px.reader.version>1.1.1-SNAPSHOT</ddi.px.reader.version>
+        <ddi.xml.validator.version>1.3-SNAPSHOT</ddi.xml.validator.version>
+        <ddi.annotation.version>1.4.5-SNAPSHOT</ddi.annotation.version>
+        <ddi.mw.reader.version>1.1.1-SNAPSHOT</ddi.mw.reader.version>
+        <ddi.massive.reader.version>1.1.1-SNAPSHOT</ddi.massive.reader.version>
+        <ddi.api.readers.version>1.0-SNAPSHOT</ddi.api.readers.version>-->
         <maven.checkstyle.version>2.17</maven.checkstyle.version>
         <checkstyle.config.location>checkstyle.xml</checkstyle.config.location>
     </properties>
@@ -34,7 +41,7 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi.api.readers</groupId>
             <artifactId>ddi-api-readers</artifactId>
-            <version>1.1.1-SNAPSHOT</version>
+            <!--<version>1.1.1-SNAPSHOT</version>-->
         </dependency>
 
         <!-- Dependencies to update and index the files from PX -->
@@ -261,6 +268,30 @@
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-domain-db</artifactId>
             <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-xc -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.9.5</version>
         </dependency>
 
     </dependencies>

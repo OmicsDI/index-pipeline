@@ -8,11 +8,17 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
+/*import uk.ac.ebi.ddi.arrayexpress.reader.ExperimentReader;
+import uk.ac.ebi.ddi.arrayexpress.reader.GenerateArrayExpressFile;
+import uk.ac.ebi.ddi.arrayexpress.reader.ProtocolReader;
+import uk.ac.ebi.ddi.arrayexpress.reader.model.experiments.Experiments;
+import uk.ac.ebi.ddi.arrayexpress.reader.model.protocols.Protocols;*/
 import uk.ac.ebi.ddi.arrayexpress.reader.ExperimentReader;
 import uk.ac.ebi.ddi.arrayexpress.reader.GenerateArrayExpressFile;
 import uk.ac.ebi.ddi.arrayexpress.reader.ProtocolReader;
 import uk.ac.ebi.ddi.arrayexpress.reader.model.experiments.Experiments;
 import uk.ac.ebi.ddi.arrayexpress.reader.model.protocols.Protocols;
+import uk.ac.ebi.ddi.arrayexpress.reader.utils.Constants;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 
 import java.io.File;

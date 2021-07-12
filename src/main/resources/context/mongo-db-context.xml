@@ -25,7 +25,7 @@
                               read-preference="PRIMARY_PREFERRED"/>
     </mongo:mongo-client>
 
-    <mongo:db-factory dbname="${ddi.common.mongo.app.db}" port="${ddi.common.mongo.app.port}" mongo-ref="mongoClient" id="mongoDbFactory"/>
+    <mongo:db-factory dbname="${ddi.common.mongo.app.db}" mongo-ref="mongoClient" id="mongoDbFactory"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>

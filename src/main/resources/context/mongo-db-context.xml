@@ -5,35 +5,35 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:mongo="http://www.springframework.org/schema/data/mongo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/context
+	    http://www.springframework.org/schema/context/spring-context.xsd
+	    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	    http://www.springframework.org/schema/data/mongo
+	    http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
     <!-- Maven information an autowired classes -->
 
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
+    <context:property-placeholder location="classpath*:prop/common.properties" />
 
+    <bean id="mongoclienturi" class="com.mongodb.MongoClientURI">
+        <constructor-arg name="uri" value="mongodb://${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port}/${ddi.common.mongo.app.db}?authSource=${ddi.common.mongo.app.authenticationDatabase}&amp;replicaSet=${ddi.common.mongo.app.replicaset}" />
+    </bean>
+    <!-- MongoDbFactory -->
+    <bean id="simpleMongoDbFactoryID" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
+        <constructor-arg ref="mongoclienturi" />
+    </bean>
 
-    <mongo:mongo-client credentials="${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port}">
-        <mongo:client-options connections-per-host="10"
-                              threads-allowed-to-block-for-connection-multiplier="10"
-                              connect-timeout="1000000"
-                              max-wait-time="120000"
-                              socket-keep-alive="true"
-                              socket-timeout="1000000"
-                              write-concern="NORMAL"
-                              read-preference="PRIMARY_PREFERRED"/>
-    </mongo:mongo-client>
-
-    <mongo:db-factory dbname="${ddi.common.mongo.app.db}" mongo-ref="mongoClient" id="mongoDbFactory"/>
-
+    <!-- MongoTemplate -->
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
-        <constructor-arg name="mongoConverter" ref="mongoConverter"/>
+        <constructor-arg ref="simpleMongoDbFactoryID" />
     </bean>
 
     <bean id="mongoConverter" class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">
-        <constructor-arg index="0" ref="mongoDbFactory"/>
+        <constructor-arg index="0" ref="simpleMongoDbFactoryID"/>
         <constructor-arg index="1">
             <bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"/>
         </constructor-arg>

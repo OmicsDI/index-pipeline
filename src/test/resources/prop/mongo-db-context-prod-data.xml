@@ -12,23 +12,26 @@
 
     <mongo:repositories base-package="uk.ac.ebi.ddi.service.db.repo" />
     <context:component-scan base-package="uk.ac.ebi.ddi.service.db.service"/>
+    <context:property-placeholder location="classpath*:prop/common-override.properties" />
+    <bean id="mongoclienturi" class="com.mongodb.MongoClientURI">
+        <constructor-arg name="uri" value="mongodb://${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port}/${ddi.common.mongo.app.db}?authSource=${ddi.common.mongo.app.authenticationDatabase}&amp;replicaSet=${ddi.common.mongo.app.replicaset}" />
+    </bean>    <!-- MongoDbFactory -->
 
-    <mongo:mongo-client credentials="${ddi.common.mongo.app.user}:${ddi.common.mongo.app.password}@${ddi.common.mongo.app.authenticationDatabase}" id="mongoClient" replica-set="${ddi.common.mongo.app.machine.one}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.two}:${ddi.common.mongo.app.port},${ddi.common.mongo.app.machine.three}:${ddi.common.mongo.app.port}">
-        <mongo:client-options connections-per-host="10"
-                              threads-allowed-to-block-for-connection-multiplier="10"
-                              connect-timeout="1000000"
-                              max-wait-time="120000"
-                              socket-keep-alive="true"
-                              socket-timeout="1000000"
-                              write-concern="NORMAL"
-                              read-preference="SECONDARY"/>
-    </mongo:mongo-client>
+    <bean id="simpleMongoDbFactoryID" class="org.springframework.data.mongodb.core.SimpleMongoDbFactory">
+        <constructor-arg ref="mongoclienturi" />
+    </bean>
 
-
-    <mongo:db-factory dbname="${ddi.common.mongo.app.db}" port="${ddi.common.mongo.app.port}" mongo-ref="mongoClient"/>
-
+    <!-- MongoTemplate -->
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+        <constructor-arg ref="simpleMongoDbFactoryID" />
+    </bean>
+
+    <bean id="mongoConverter" class="org.springframework.data.mongodb.core.convert.MappingMongoConverter">
+        <constructor-arg index="0" ref="simpleMongoDbFactoryID"/>
+        <constructor-arg index="1">
+            <bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext"/>
+        </constructor-arg>
+        <property name="mapKeyDotReplacement" value="__"/>
     </bean>
 
 
@@ -60,7 +63,8 @@
     <bean id="ebiPubmedSearchService" class="uk.ac.ebi.ddi.service.db.service.similarity.EBIPubmedSearchService"/>
     <bean id="reanalysisDataService" class="uk.ac.ebi.ddi.service.db.service.similarity.ReanalysisDataService" />
     <bean id="mostAccessedDatasetsService" class="uk.ac.ebi.ddi.service.db.service.dataset.MostAccessedDatasetService"/>
-    <bean id ="datasetCountService" class = "uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService" />
+    <!--<bean id ="datasetCountService" class = "uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService" />-->
     <bean id = "similarityCount" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
-    <bean id="statisticsService" class="uk.ac.ebi.ddi.similarityCalculator.StatisticsService" />
+    <bean id = "bioStudiesService" class="uk.ac.ebi.ddi.biostudies.BioStudiesService"/>
+    <!--<bean id="statisticsService" class="uk.ac.ebi.ddi.similarityCalculator.StatisticsService" />-->
 </beans>

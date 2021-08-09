@@ -163,7 +163,7 @@
     </batch:job>
 
     <batch:job id="ddiEnrichmentJob" xmlns="http://www.springframework.org/schema/batch">
-        <batch:step id="enrihmentStep" parent="parentStep">
+        <batch:step id="enrichmentStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}" />

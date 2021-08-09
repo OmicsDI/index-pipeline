@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Utils;
+
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -57,11 +60,17 @@ public class MostAccessedTaskletTest {
         this.jobLauncherTestUtils.setJob(job);
     }
 
-    @Test
+   /* @Test
     public void testLaunchJobWithJobLauncher() throws Exception {
 
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+    }*/
+
+    @Test
+    public void testCsvFile() throws IOException {
+        Utils.readCsvHashMap();
+
     }
 
 }

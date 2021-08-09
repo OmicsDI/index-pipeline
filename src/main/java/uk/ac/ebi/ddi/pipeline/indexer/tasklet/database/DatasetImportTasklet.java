@@ -15,9 +15,12 @@ import uk.ac.ebi.ddi.annotation.service.dataset.DDIDatasetAnnotationService;
 import uk.ac.ebi.ddi.ddidomaindb.dataset.DSField;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
 import uk.ac.ebi.ddi.pipeline.indexer.utils.Constants;
+import uk.ac.ebi.ddi.pipeline.indexer.utils.Utils;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
+import uk.ac.ebi.ddi.xml.validator.parser.model.AdditionalFields;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
+import uk.ac.ebi.ddi.xml.validator.parser.model.Field;
 
 import java.io.File;
 import java.util.*;
@@ -91,6 +94,29 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
 
+                    HashMap<String, String> omicsVocab = Utils.readCsvHashMap();
+                    if (dataEntry.getAdditionalFieldValue(DSField.Additional.OMICS.key()) != null) {
+                        List omicstype = omicsVocab.entrySet().stream().map(r ->
+                                Utils.processOmics(r, dataEntry.getAdditionalFieldValue(DSField.Additional.OMICS.key()))).filter(r -> r != "").collect(Collectors.toList());
+                        if (omicstype.size() == 0 ) {
+                            Field field = new Field();
+                            field.setName(DSField.Additional.OMICS.key());
+                            field.setValue("Other");
+
+                            Field omicsField = dataEntry.getAdditionalFields().getField().stream().
+                                    filter(r -> r.getName().equals(DSField.Additional.OMICS.key())).collect(Collectors.toList()).get(0);
+                            dataEntry.getAdditionalFields().getField().remove(omicsField);
+                            dataEntry.getAdditionalFields().getField().add(field);
+                            //dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Other");
+                        }
+                        else if(omicstype.size() > 0 && !omicstype.get(0).equals("")){
+                            dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), omicstype.get(0).toString());
+                        }
+
+                    }
+                    else{
+                        dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Unknown");
+                    }
                     datasetAnnotationService.insertDataset(dataEntry, db);
                     threadSafeList.add(new AbstractMap.SimpleEntry<>(dataEntry.getId(), db));
                     LOGGER.info("Dataset: " + dataEntry.getId() + " " + db + "has been added");

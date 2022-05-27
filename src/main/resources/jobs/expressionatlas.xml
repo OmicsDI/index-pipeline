@@ -30,7 +30,7 @@
                 <bean:bean id="generateBaselineXMLStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyeExpressionAtlasXML">
                     <bean:property name="experimentFileName" value="${ddi.common.expressionatlas.baseline.experiment.file}"/>
                     <bean:property name="geneFileName" value="${ddi.common.expressionatlas.baseline.gene.file}"/>
-                    <bean:property name="outputFile"  value="${ddi.common.original.directory}/${ddi.common.expressionatlas.database.index}/${ddi.common.expressionatlas.baseline.original.file}" />
+                    <bean:property name="outputFile"  value="${ddi.common.original.directory}${ddi.common.expressionatlas.database.index}/${ddi.common.expressionatlas.baseline.original.file}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -40,7 +40,7 @@
                 <bean:bean id="generateRelativeXMLStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateEBeyeExpressionAtlasXML">
                     <bean:property name="experimentFileName" value="${ddi.common.expressionatlas.relative.experiment.file}"/>
                     <bean:property name="geneFileName" value="${ddi.common.expressionatlas.relative.gene.file}"/>
-                    <bean:property name="outputFile"  value="${ddi.common.original.directory}/${ddi.common.expressionatlas.database.index}/${ddi.common.expressionatlas.relative.original.file}" />
+                    <bean:property name="outputFile"  value="${ddi.common.original.directory}${ddi.common.expressionatlas.database.index}/${ddi.common.expressionatlas.relative.original.file}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -48,7 +48,7 @@
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}${ddi.common.expressionatlas.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -57,8 +57,8 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}/${ddi.common.expressionatlas.database.index}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}${ddi.common.expressionatlas.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.original.expressionatlas.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.expressionatlas.prefix}" />
@@ -69,7 +69,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}${ddi.common.expressionatlas.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}" />
@@ -111,7 +111,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.expressionatlas.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.expressionatlas.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -120,7 +120,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.expressionatlas.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.expressionatlas.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
@@ -180,7 +180,7 @@
         <batch:step id="cleanStepJob" next="moveToProductionStepJob" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.expressionatlas.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.expressionatlas.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -189,7 +189,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.expressionatlas.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.expressionatlas.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.expressionatlas.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.expressionatlas.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />

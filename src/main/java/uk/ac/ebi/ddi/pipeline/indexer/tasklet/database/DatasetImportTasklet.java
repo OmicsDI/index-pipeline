@@ -23,6 +23,7 @@ import uk.ac.ebi.ddi.xml.validator.parser.model.Entry;
 import uk.ac.ebi.ddi.xml.validator.parser.model.Field;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -72,6 +73,12 @@ public class DatasetImportTasklet extends AbstractTasklet {
                     if ("".equals(db)) {
                         db = dataEntry.getRepository() != null ? dataEntry.getRepository() : "";
                     }
+                    if(db.equals("INSDC Project")){
+                        db = "ENA";
+                        dataEntry.addAdditionalField(DSField.Additional.REPOSITORY.key(),"ENA");
+                        dataEntry.addAdditionalField(DSField.Additional.OMICS.key(),"Genomics");
+                        dataEntry.addAdditionalField(DSField.Additional.LINK.key(),"https://www.ncbi.nlm.nih.gov/bioproject/?term=" + dataEntry.getId());
+                    }
                     long submitterCount = dataEntry.getAdditionalFields() != null ?
                             dataEntry.getAdditionalFields().getField().parallelStream().
                             filter(fld -> fld.getName()
@@ -80,6 +87,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                         List<String> keywordSet = dataEntry
                                 .getAdditionalFieldValues(DSField.Additional.SUBMITTER_KEYWORDS.key());
                         if (keywordSet != null) {
+                            Entry finalDataEntry = dataEntry;
                             keywordSet.parallelStream().flatMap(dt -> {
                                     if (dt.contains(Constants.SEMI_COLON_TOKEN)) {
                                         String[] newKeywords = dt.split(Constants.SEMI_COLON_TOKEN);
@@ -88,35 +96,14 @@ public class DatasetImportTasklet extends AbstractTasklet {
                                         return Stream.of(dt);
                                     }
                                 }
-                        ).distinct().forEach(tr -> dataEntry
+                        ).distinct().forEach(tr -> finalDataEntry
                                     .addAdditionalField(DSField.Additional.SUBMITTER_KEYWORDS.key(), tr));
                         }
                     }
                     LOGGER.debug("inserting: " + dataEntry.getId() + " " + db + "");
-
-                    HashMap<String, String> omicsVocab = Utils.readCsvHashMap();
-                    if (dataEntry.getAdditionalFieldValue(DSField.Additional.OMICS.key()) != null) {
-                        List omicstype = omicsVocab.entrySet().stream().map(r ->
-                                Utils.processOmics(r, dataEntry.getAdditionalFieldValue(DSField.Additional.OMICS.key()))).filter(r -> r != "").collect(Collectors.toList());
-                        if (omicstype.size() == 0 ) {
-                            Field field = new Field();
-                            field.setName(DSField.Additional.OMICS.key());
-                            field.setValue("Other");
-
-                            Field omicsField = dataEntry.getAdditionalFields().getField().stream().
-                                    filter(r -> r.getName().equals(DSField.Additional.OMICS.key())).collect(Collectors.toList()).get(0);
-                            dataEntry.getAdditionalFields().getField().remove(omicsField);
-                            dataEntry.getAdditionalFields().getField().add(field);
-                            //dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Other");
-                        }
-                        else if(omicstype.size() > 0 && !omicstype.get(0).equals("")){
-                            dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), omicstype.get(0).toString());
-                        }
-
-                    }
-                    else{
-                        dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Unknown");
-                    }
+                    LOGGER.info("before update of " + dataEntry.getId() + " omicstype is " + dataEntry.getAdditionalFieldValue("omics_type") + "");
+                    dataEntry = updateOmicsType(dataEntry);
+                    LOGGER.info("after update of " + dataEntry.getId() + " omicstype is " + dataEntry.getAdditionalFieldValue("omics_type") + "");
                     datasetAnnotationService.insertDataset(dataEntry, db);
                     threadSafeList.add(new AbstractMap.SimpleEntry<>(dataEntry.getId(), db));
                     LOGGER.info("Dataset: " + dataEntry.getId() + " " + db + "has been added");
@@ -163,5 +150,39 @@ public class DatasetImportTasklet extends AbstractTasklet {
         Assert.notNull(datasetAnnotationService, "Annotation Service can't be null");
         Assert.notNull(databaseName, "DatabaseName can't be null");
         Assert.notNull(updateStatus, "UpdateStatus can't be null");
+    }
+
+    public Entry updateOmicsType(Entry dataEntry ) throws IOException {
+        HashMap<String, String> omicsVocab = Utils.readCsvHashMap();
+        List<String> omicsValues = dataEntry.getAdditionalFieldValues(DSField.Additional.OMICS.key());
+
+        if ( omicsValues != null && omicsValues.size() >= 1) {
+            for (String omicsValue : omicsValues) {
+                List omicstype = omicsVocab.entrySet().stream().map(r ->
+                        Utils.processOmics(r, omicsValue)).filter(r -> r != "").collect(Collectors.toList());
+                if (omicstype.size() == 0 && !omicsVocab.values().contains(omicsValue)) {
+                    Field omicsField = dataEntry.getAdditionalFields().getField().stream()
+                            .filter(r -> r.getValue().equals(omicsValue)).findFirst().get();
+                    LOGGER.info("Updating dataset id with " + dataEntry.getId() + " with current omicstype " + omicsValue + "with Other");
+                    dataEntry.getAdditionalFields().getField().remove(omicsField);
+                    dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Other");
+                    //dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Other");
+                } else if (omicstype.size() > 0 && !omicstype.get(0).equals("")) {
+                    LOGGER.info("dataset id with " + dataEntry.getId() + " is matched with " + omicstype.get(0) + "with current omics " + dataEntry.getAdditionalFieldValue("omics_type"));
+                    if(!omicsValue.equals(omicstype.get(0))) {
+                        Field omicsField = dataEntry.getAdditionalFields().getField().stream()
+                                .filter(r -> r.getValue().equals(omicsValue)).findFirst().get();
+                        dataEntry.getAdditionalFields().getField().remove(omicsField);
+                        dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), omicstype.get(0).toString());
+                    }
+                }
+
+            }
+        }
+        else{
+                dataEntry.addAdditionalField(DSField.Additional.OMICS.getName(), "Unknown");
+            }
+
+        return dataEntry;
     }
 }

@@ -54,7 +54,6 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">

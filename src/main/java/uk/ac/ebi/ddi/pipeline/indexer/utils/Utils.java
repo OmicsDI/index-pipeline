@@ -32,8 +32,15 @@ public class Utils {
     }
 
     public static HashMap<String, String> readCsvHashMap() throws IOException {
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        String currDir = System.getProperty("user.dir");
+        String path = "/nfs/pride/prod/ddi/pipeline/final/testgeo/omicsdivocab1.csv";
+        if(!currDir.contains("nfs")){
+            path = currDir+"/src/main/resources/prop/omicsdivocab1.csv";
+        }
         BufferedReader br = new BufferedReader(
-                new FileReader("/home/gaur/Downloads/omicsdivocab1.csv"));
+                new FileReader(path));
+                //new FileReader(currDir+"/src/main/resources/prop/omicsdivocab1.csv"));
 
         String line = null;
         HashMap<String, String> map = new HashMap<String, String>();

@@ -82,7 +82,22 @@
             <artifactId>ddi-annotation</artifactId>
             <version>${ddi.annotation.version}</version>
         </dependency>
-
+        <dependency>
+           <groupId>org.springframework.data</groupId>
+           <artifactId>spring-data-mongodb</artifactId>
+           <version>1.9.0.RELEASE</version>
+       </dependency>
+        <!--<dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>2.1.9.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-asm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>-->
         <dependency>
             <groupId>uk.ac.ebi.ddi.api.readers</groupId>
             <artifactId>ddi-gpmdb-reader</artifactId>
@@ -209,19 +224,37 @@
             <artifactId>thymeleaf-spring3</artifactId>
             <version>${thymeleaf.version}</version>
         </dependency>
+        <!-- Spring test -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Spring Core -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>4.2.2.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
 
         <!-- Spring batch support -->
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>4.1.2.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>4.1.2.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -233,7 +266,7 @@
         <dependency>
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-infrastructure</artifactId>
-            <version>4.1.2.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
@@ -275,12 +308,6 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>4.1.2.RELEASE</version>
         </dependency>
 
         <!--email unit testing-->
@@ -470,15 +497,14 @@
     </build>
     <repositories>
     <!-- EBI repo -->
-   <!-- <repository>
-        <id>nexus-ebi-release-repo</id>
+    <repository>
         <id>nexus-ebi-release-repo</id>
         <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
     </repository>
     <repository>
         <id>nexus-ebi-snapshot-repo</id>
         <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
-    </repository>-->
+    </repository>
         <repository>
             <id>maven2</id>
             <name>maven central</name>

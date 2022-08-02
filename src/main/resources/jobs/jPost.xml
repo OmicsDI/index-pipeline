@@ -35,7 +35,7 @@
         <batch:step id="validationXML" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validationXMLTaklet"  scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory"  value="${ddi.common.original.directory}/${ddi.common.jpost.database.index}" />
+                    <bean:property name="directory"  value="${ddi.common.original.directory}${ddi.common.jpost.database.index}" />
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -44,8 +44,8 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}/${ddi.common.jpost.database.index}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.jpost.database.index}"/>
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}${ddi.common.jpost.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}${ddi.common.jpost.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.px.original.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.jpost.prefix}" />
@@ -56,7 +56,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.jpost.database.index}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}${ddi.common.jpost.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="${ddi.common.jpost.database.name}" />
@@ -99,7 +99,7 @@
         <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory"  value="file:${ddi.common.prod.directory}/${ddi.common.jpost.database.index}" />
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.prod.directory}${ddi.common.jpost.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -108,7 +108,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.jpost.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.jpost.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.jpost.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.jpost.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
@@ -128,7 +128,7 @@
         <batch:step id="cleanStepJob" next="moveToProductionStepJob" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.jpost.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.jpost.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
@@ -137,7 +137,7 @@
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.jpost.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.jpost.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}${ddi.common.jpost.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.jpost.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
@@ -181,7 +181,7 @@
         <constructor-arg index="1" value="${ddi.common.px.loop.end}"/>
         <constructor-arg index="2" value="${ddi.common.px.acc.prefix}"/>
         <constructor-arg index="3" value="${ddi.common.px.url}"/>
-        <constructor-arg index="4" value="${ddi.common.original.directory}/${ddi.common.jpost.database.index}"/>
+        <constructor-arg index="4" value="${ddi.common.original.directory}${ddi.common.jpost.database.index}"/>
         <constructor-arg index="5" ref="pxJPOST"/>
         <constructor-arg index="6" value="#{currentDate}"/>
     </bean:bean>

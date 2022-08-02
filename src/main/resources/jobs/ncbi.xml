@@ -15,7 +15,7 @@
 
     <description>
         This job generate the XML for a NCBI to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
-        between different datasets .
+        between different datasets.
     </description>
 
     <import resource="../context/common-context.xml"/>

@@ -51,6 +51,7 @@ public class DatasetAnnotationFieldsUtils {
             }
         }
         if (toAdd != null) {
+
             dataset.getDates().put(DSField.Date.PUBLICATION.getName(), toAdd);
         }
         return dataset;

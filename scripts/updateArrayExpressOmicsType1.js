@@ -1,0 +1,2 @@
+db.datasets.dataset.updateMany({"accession":{"$regex":"E-GEOD-*"},"database":"ArrayExpress"},{"$set": {"additional.omics_type":["Genomics"]}})
+db.datasets.dataset.updateMany({"accession":{"$regex":"E-MTAB-*"},"database":"ArrayExpress"},{"$set": {"additional.omics_type":["Transcriptomics"]}})

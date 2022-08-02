@@ -1,4 +1,4 @@
-package uk.ac.ebi.ddi.pipeline.indexer.tasklet.statistics;
+package uk.ac.ebi.ddi.pipeline.indexer.tasklet.bioprojects;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,18 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.ddi.pipeline.indexer.utils.Utils;
-
-import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by gaur on 08/06/17.
- */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jobs/statistics/ddi-indexer-test-most-accessed.xml"})
-public class MostAccessedTaskletTest {
+@ContextConfiguration(locations = {"classpath:jobs/bioprojects/ddi-indexer-test-bioprojects-import.xml"})
+public class ImportEBeyeBioProjectsXMLTaskletTest {
 
     public static final String INDEXER_PARAMETER = "inderxer.param";
     public static final String TEST_MODE = "test.mode";
@@ -33,7 +27,7 @@ public class MostAccessedTaskletTest {
 
 
     @Autowired
-    @Qualifier("ddiMostAccessedDatasetJob")
+    @Qualifier("ddiImportJob")
     private Job job;
 
 
@@ -60,17 +54,10 @@ public class MostAccessedTaskletTest {
         this.jobLauncherTestUtils.setJob(job);
     }
 
-   /* @Test
+    @Test
     public void testLaunchJobWithJobLauncher() throws Exception {
 
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
         assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-    }*/
-
-    @Test
-    public void testCsvFile() throws IOException {
-        Utils.readCsvHashMap();
-
     }
-
 }

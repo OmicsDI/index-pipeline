@@ -14,8 +14,8 @@
                            http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
     <description>
-        This job generate the XML for a PRIDE to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
-        between different datasets .
+        This job generate the annotation for a EGA to be submitted to OmicsDI system, it does also the enrichment using different ontologies and finally compute the similarities
+        between different datasets.
     </description>
 
     <import resource="../context/common-context.xml"/>

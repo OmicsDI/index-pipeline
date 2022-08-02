@@ -167,9 +167,9 @@
 
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
     <bean:bean id="paxdbWsConfig" class="uk.ac.ebi.ddi.api.readers.paxdb.ws.client.PaxDBClient">
-        <constructor-arg index="0" value="http://pax-db.org/downloads/latest/datasets/paxdb-abundance-files-v4.0.zip"/>
+        <constructor-arg index="0" value="http://pax-db.org/downloads/latest/datasets/paxdb-abundance-files-v4.1.zip"/>
         <constructor-arg index="1" value="http://pax-db.org/downloads/latest/omicsdb_export.tsv"/>
-        <constructor-arg index="2" value="http://pax-db.org/downloads/latest/UniProt_mappings/paxdb-uniprot-links-v4_0.zip"/>
+        <constructor-arg index="2" value="http://pax-db.org/downloads/latest/paxdb-uniprot-links-v4_1.zip"/>
     </bean:bean>
 
     <bean:bean id="paxdbGenerator" class="uk.ac.ebi.ddi.api.readers.paxdb.GeneratePaxDBOmicsXML">
@@ -178,7 +178,7 @@
         <bean:constructor-arg index="2" value="#{currentDate}"/>
     </bean:bean>
     <bean:bean id="similarityCount" class="uk.ac.ebi.ddi.similarityCalculator.SimilarityCounts"/>
-    <bean:bean id="datasetCountService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService"/>
+    <!--<bean:bean id="datasetCountService" class="uk.ac.ebi.ddi.service.db.service.dataset.DatasetCountService"/>-->
     <!--load property files-->
     <context:property-placeholder location="classpath:prop/common.properties" ignore-unresolvable="true" order="1"/>
 

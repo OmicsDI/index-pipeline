@@ -1,0 +1,1 @@
+db.datasets.dataset.aggregate([{"$unwind":"$additional.omics_type"},{"$group":{"_id":"$additional.omics_type"}}])

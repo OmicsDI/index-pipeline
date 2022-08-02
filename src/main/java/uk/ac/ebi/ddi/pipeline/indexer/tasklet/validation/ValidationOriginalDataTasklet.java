@@ -2,11 +2,14 @@ package uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.util.Assert;
 import uk.ac.ebi.ddi.pipeline.indexer.tasklet.AbstractTasklet;
+import uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet;
 import uk.ac.ebi.ddi.xml.validator.parser.OmicsXMLFile;
 import uk.ac.ebi.ddi.xml.validator.utils.Tuple;
 
@@ -27,6 +30,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class ValidationOriginalDataTasklet extends AbstractTasklet {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(ValidationOriginalDataTasklet.class);
 
     private String directory;
 
@@ -55,12 +60,17 @@ public class ValidationOriginalDataTasklet extends AbstractTasklet {
             }
             Map<File, List<Tuple>> errors = new HashMap<>();
             for (File file: files) {
-                List<Tuple> error = OmicsXMLFile.validateSchema(file);
-                error.addAll(OmicsXMLFile.validateSemantic(file));
-                if (errors.containsKey(file)) {
-                    error.addAll(errors.get(file));
+                try {
+                    List<Tuple> error = OmicsXMLFile.validateSchema(file);
+                    error.addAll(OmicsXMLFile.validateSemantic(file));
+                    if (errors.containsKey(file)) {
+                        error.addAll(errors.get(file));
+                    }
+                    errors.put(file, error);
                 }
-                errors.put(file, error);
+                catch (Exception ex){
+                    LOGGER.info("esception occured while validating file ", file.getAbsolutePath());
+                }
             }
             if (!errors.isEmpty()) {
                 PrintStream reportFile = new PrintStream(new File(directory + "/" + reportName));

@@ -61,6 +61,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
             return RepeatStatus.FINISHED;
         }
 
+        for(int i= 0 ; i < files.length; )
         Arrays.asList(files).parallelStream().forEach(file -> {
             try {
                 LOGGER.info("processing file:" + file);
@@ -79,7 +80,7 @@ public class DatasetImportTasklet extends AbstractTasklet {
                         dataEntry.addAdditionalField(DSField.Additional.OMICS.key(),"Genomics");
                         dataEntry.addAdditionalField(DSField.Additional.LINK.key(),"https://www.ncbi.nlm.nih.gov/bioproject/?term=" + dataEntry.getId());
                     }
-                    long submitterCount = dataEntry.getAdditionalFields() != null ?
+                               long submitterCount = dataEntry.getAdditionalFields() != null ?
                             dataEntry.getAdditionalFields().getField().parallelStream().
                             filter(fld -> fld.getName()
                                     .equals(DSField.Additional.SUBMITTER_KEYWORDS.key())).count() : 0;

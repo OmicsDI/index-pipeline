@@ -1,0 +1,1 @@
+db.enrichment_citations.dropIndex("accession_1")

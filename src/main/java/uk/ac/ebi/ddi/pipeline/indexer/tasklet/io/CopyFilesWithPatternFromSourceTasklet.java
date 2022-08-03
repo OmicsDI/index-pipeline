@@ -52,14 +52,13 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet {
             }
         }
 
-        if (sourceFiles.isEmpty()) {
+        if (sourceFiles.isEmpty() && inputDirectory.getFile().isDirectory()) {
             LOGGER.warn("Skipping file copy, since there are no files listed!");
-        } else {
+        } else if(inputDirectory.getFile().isFile()) {
             // there are files to copy, so let's try to get on with the job
+            sourceFiles.add(inputDirectory.getFile());
+        }
             File target = outputDirectory.getFile();
-
-            DDICleanDirectory.cleanDirectory(outputDirectory);
-
             DDICleanDirectory.cleanDirectory(outputDirectory);
 
             for (File sourceFile : sourceFiles) {
@@ -70,7 +69,6 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet {
                     FileUtils.copyFileToDirectory(sourceFile, target);
                 }
             }
-        }
 
         return RepeatStatus.FINISHED;
     }

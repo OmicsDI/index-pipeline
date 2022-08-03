@@ -35,8 +35,11 @@ public class Utils {
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
         String currDir = System.getProperty("user.dir");
         String path = "/nfs/pride/prod/ddi/pipeline/final/testgeo/omicsdivocab1.csv";
+        //String path = "/nfs/production/hhe/pride/omicsdiscript/omicsdivocab1.csv";
         if(!currDir.contains("nfs")){
             path = currDir+"/src/main/resources/prop/omicsdivocab1.csv";
+        } else if(currDir.contains("hhe")){
+            path = "/nfs/production/hhe/pride/omicsdiscript/omicsdivocab1.csv";
         }
         BufferedReader br = new BufferedReader(
                 new FileReader(path));

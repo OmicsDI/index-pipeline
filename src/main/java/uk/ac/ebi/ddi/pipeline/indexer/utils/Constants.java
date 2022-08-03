@@ -1,5 +1,8 @@
 package uk.ac.ebi.ddi.pipeline.indexer.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Yasset Perez-Riverol (ypriverol@gmail.com)
  * @date 30/09/15
@@ -48,4 +51,7 @@ public class Constants {
     public static final String PEPTIDEATLAS_SRM = "SRM";
 
     public static final String SEMI_COLON_TOKEN = ";";
+
+    public static final List<String> MODELEXCHANGELIST = Arrays.asList("FAIRDOMHub", "Physiome Model Repository",
+            "BioModels", "Cell Collective");
 }

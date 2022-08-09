@@ -1,0 +1,2 @@
+db.datasets.dataset.find({"additional.omics_type":"RecurratedModel"})
+db.datasets.dataset.update({"additional.omics_type":"RecurratedModel"},{"$pull":{"additional.omics_type":"RecurratedModel"}},false, true)

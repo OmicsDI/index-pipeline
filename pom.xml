@@ -20,9 +20,9 @@
         <java.mail.version>1.4.4</java.mail.version>
         <subethasmtp.wiser.version>1.2</subethasmtp.wiser.version>
 
-        <ddi.px.reader.version>1.0</ddi.px.reader.version>
+        <ddi.px.reader.version>1.2</ddi.px.reader.version>
         <!--<ddi.xml.validator.version>1.2</ddi.xml.validator.version>-->
-        <ddi.xml.validator.version>1.3-SNAPSHOT</ddi.xml.validator.version>
+        <ddi.xml.validator.version>1.3</ddi.xml.validator.version>
         <ddi.annotation.version>1.4.5-SNAPSHOT</ddi.annotation.version>
         <ddi.mw.reader.version>1.1</ddi.mw.reader.version>
         <ddi.massive.reader.version>1.1-SNAPSHOT</ddi.massive.reader.version>
@@ -328,13 +328,13 @@
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-domain-db</artifactId>
-            <version>1.3</version>
+            <version>1.4.2</version>
         </dependency>
         <dependency>
             <groupId>uk.ac.ebi.ddi</groupId>
             <artifactId>ddi-validator</artifactId>
-            <version>1.3</version>
-            <!--<version>1.1.3-SNAPSHOT</version>-->
+            <!--<version>1.3</version>-->
+            <version>1.3.1-SNAPSHOT</version>
         </dependency>
         <!--<dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

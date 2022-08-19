@@ -1,0 +1,2 @@
+db.datasets.dataset.find({"additional.omics_type":"RecuratedModel"})
+db.datasets.dataset.update({"additional.omics_type":"RecuratedModel"},{"$pull":{"additional.omics_type":"RecuratedModel"}},false, true)

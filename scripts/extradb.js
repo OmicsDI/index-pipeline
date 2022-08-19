@@ -1,0 +1,2 @@
+db.mergeCandidates.remove({"database1":{"$in":["ProteomeXChange","Pride Archive","MetabolomeExpress MetaPhenDB"
+    ,"European Genome-phenome Archive","Expression Atlas","MassIVE","BioModels","ArrayExpress-DELETE"]}})       

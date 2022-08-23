@@ -23,7 +23,7 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="downloadFilesStep" parent="parentStep" next="validateXMLStep">
+        <!--<batch:step id="downloadFilesStep" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
             <bean:bean id="downloadFilesTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.DownloadFilesFromFTPTasklet">
                 <bean:property name="server"          value="${ddi.common.biomodels.ftp.server}" />
@@ -35,8 +35,16 @@
                 <bean:property name="targetDirectory" value="file:${ddi.common.original.directory}${ddi.common.biomodels.database.index}" />
             </bean:bean>
             </batch:tasklet>
+        </batch:step>-->
+        <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
+            <batch:tasklet>
+                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.biomodels.source.directory}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.original.directory}${ddi.common.biomodels.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
         </batch:step>
-
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">

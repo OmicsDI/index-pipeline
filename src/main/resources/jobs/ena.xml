@@ -27,7 +27,7 @@
         <batch:step id="copyFileFromResource" parent="parentStep" next="validateXMLStep">
            <batch:tasklet>
                <bean:bean id="copyFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
-                   <bean:property name="inputDirectory"      value="file:${ddi.common.ena.source.directory}/"/>
+                   <bean:property name="inputDirectory"      value="file:${ddi.common.ena.source.directory}"/>
                    <bean:property name="outputDirectory" value="file:${ddi.common.original.directory}/${ddi.common.ena.database.index}"/>
                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
                </bean:bean>
@@ -42,14 +42,13 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
                     <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.original.pattern}" />
-                    <bean:property name="numberEntries"   value="200"/>
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries.high}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.ena.prefix}" />
                 </bean:bean>
             </batch:tasklet>
@@ -107,46 +106,116 @@
 
         <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}" />
+                <bean:bean id="cleanIPreProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="writeIndexes" parent="parentStep">
+        <batch:step id="writeIndexes" parent="parentStep" next="cleanIProdFolder">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.ena.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.ena.prefix}" />
-                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries.high}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
+        <batch:step id="cleanIProdFolder" next="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanIProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyIPreProdFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
     </batch:job>
-
+    <batch:job id="ddiENAImportJob" xmlns="http://www.springframework.org/schema/batch">
+        <batch:step id="importOnlyDataStep" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
+                    <bean:property name="inputDirectory"            value="file:${ddi.common.data.directory}${ddi.common.ena.database.index}"/>
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
+                    <bean:property name="databaseName"              value="${ddi.common.ena.database.name}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <!--<batch:step id="ddiAnnotationLink" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="annotationLinkTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotateDatasetLinkTaskLet">
+                    <bean:property name="databaseName" value="${ddi.common.ena.database.name}"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>-->
+    </batch:job>
+    <batch:job id="ddiENAImportAnnoJob" xmlns="http://www.springframework.org/schema/batch">
+        <batch:step id="ddiImportOnlyDataStep" parent="parentStep" next="ddiAnnotationLink">
+            <batch:tasklet>
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
+                    <bean:property name="inputDirectory"            value="file:${ddi.common.data.directory}${ddi.common.ena.database.index}"/>
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
+                    <bean:property name="databaseName"              value="${ddi.common.ena.database.name}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+                <batch:step id="ddiAnnotationLink" parent="parentStep">
+                    <batch:tasklet>
+                        <bean:bean id="annotationLinkTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotateDatasetLinkTaskLet">
+                            <bean:property name="databaseName" value="${ddi.common.ena.database.name}"/>
+                            <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                        </bean:bean>
+                    </batch:tasklet>
+                </batch:step>
+    </batch:job>
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+        <batch:step id="cleanGPreProdStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}" />
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="moveToProductionStep" parent="parentStep">
+        <batch:step id="moveToProductionStep" parent="parentStep" next="cleanGProdStep">
             <batch:tasklet>
                 <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.ena.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.ena.prefix}" />
-                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries.high}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="cleanGProdStep" next="copyFiletoProdENA" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanGProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyFiletoProdENA" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyGFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.ena.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

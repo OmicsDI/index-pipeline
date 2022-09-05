@@ -85,7 +85,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="datasetFileRetrieve" parent="parentStep" next="cleanIFolder">
+        <batch:step id="datasetFileRetrieve" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
                     <bean:property name="datasetService" ref="datasetService" />
@@ -96,7 +96,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="cleanIFolder" next="writeIIndexes" parent="parentStep">
+      <!--  <batch:step id="cleanIFolder" next="writeIIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanIPreProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.arrayexpress.database.index}" />
@@ -131,7 +131,7 @@
                     <bean:property name="pattern" value="${ddi.common.original.pattern}" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>
+        </batch:step>-->
         <batch:listeners>
             <batch:listener ref="jobListener"/>
         </batch:listeners>

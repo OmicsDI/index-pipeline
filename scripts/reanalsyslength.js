@@ -1,0 +1,1 @@
+db.datasets.dataset.find({"database":/Biomodels/i,"crossReferences.biomodels__db":{"$exists":true},$where: "this.crossReferences.biomodels__db.length > 1"})

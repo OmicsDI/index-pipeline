@@ -23,7 +23,7 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-       <!-- &lt;!&ndash;EB-eye XML generation for public project &ndash;&gt;
+        <!--EB-eye XML generation for public project -->
         <batch:step id="genEbEyeXmlStep" parent="parentStep" next="validationXML">
             <batch:tasklet>
                 <bean:bean id="genEbEyeXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.generation.GenerateFromAPIOmicsDITasklet">
@@ -39,7 +39,7 @@
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>-->
+        </batch:step>
 
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
@@ -138,6 +138,116 @@
             <batch:listener ref="jobListener"/>
         </batch:listeners>
     </batch:job>
+
+    <batch:job id="ddiMongoJob" xmlns="http://www.springframework.org/schema/batch">
+
+        <batch:step id="validationXMLMongo" parent="parentStep" next="splitterStepMongo">
+            <batch:tasklet>
+                <bean:bean id="validationXMLTaklet"  scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
+                    <bean:property name="directory"  value="${ddi.common.original.directory}${ddi.common.iprox.database.index}" />
+                    <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="splitterStepMongo" parent="parentStep" next="importDataStepMongo">
+            <batch:tasklet>
+                <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.original.directory}${ddi.common.iprox.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}${ddi.common.iprox.database.index}"/>
+                    <bean:property name="originalPrefix"  value="${ddi.common.px.original.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.iprox.prefix}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="importDataStepMongo" parent="parentStep" next="annotationFilesMongo">
+            <batch:tasklet>
+                <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}${ddi.common.iprox.database.index}"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
+                    <bean:property name="databaseName" value="${ddi.common.iprox.database.name}" />
+                    <bean:property name="updateStatus" value="false" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="annotationFilesMongo" parent="parentStep" next="enrichmentStepMongo">
+            <batch:tasklet>
+                <bean:bean id="annotationTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.annotation.AnnotationXMLTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.iprox.database.name}"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="enrichmentStepMongo" parent="parentStep" next="datasetFileRetrieveMongo">
+            <batch:tasklet>
+                <bean:bean id="enrichmentTask" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.enrichment.EnrichmentXMLTasklet">
+                    <bean:property name="databaseName"             value="${ddi.common.iprox.database.name}" />
+                    <bean:property name="annotationService"        ref="annotationService"/>
+                    <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
+                    <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="datasetFileRetrieveMongo" parent="parentStep" next="cleanIPreProdStepMongo">
+            <batch:tasklet>
+                <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
+                    <bean:property name="datasetService" ref="datasetService" />
+                    <bean:property name="databaseDetailService" ref="databaseDetailService" />
+                    <bean:property name="overwrite" value="false" />
+                    <bean:property name="databaseName"             value="${ddi.common.iprox.database.name}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="cleanIPreProdStepMongo" next="moveToProductionStepMongo" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory"  value="file:${ddi.common.preprod.directory}${ddi.common.iprox.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="moveToProductionStepMongo" parent="parentStep" next="cleanIProdFolderMongo">
+            <batch:tasklet>
+                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.iprox.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}${ddi.common.iprox.database.index}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.iprox.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="databaseService" ref="databaseAnnotationService" />
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="cleanIProdFolderMongo" next="copyIFiletoProdMongo" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanIProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.iprox.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="copyIFiletoProdMongo" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyIFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.iprox.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.iprox.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:listeners>
+            <batch:listener ref="jobListener"/>
+        </batch:listeners>
+    </batch:job>
+
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 

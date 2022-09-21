@@ -26,28 +26,28 @@
 
     <batch:job id="ddiImportJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="copyFromSource" parent="parentStep" next="copyFilesToData">
+        <batch:step id="copyFromSource" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="copyFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
                     <bean:property name="sourceDirectory" value="file:${ddi.common.gpmdb.source.directory}"/>
-                    <bean:property name="targetDirectory" value="file:${ddi.common.gpmdb.original.directory}"/>
+                    <bean:property name="targetDirectory" value="file:${ddi.common.original.directory}/${ddi.common.gpmdb.database.index}"/>
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
+        <!--<batch:step id="copyFilesToData" parent="parentStep" next="validateXMLStep">
             <batch:tasklet>
                 <bean:bean id="copyFilesToDataOrigin" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesFromSourceTasklet">
-                    <bean:property name="sourceDirectory" value="file:${ddi.common.gpmdb.original.directory}" />
-                    <bean:property name="targetDirectory" value="file:${ddi.common.gpmdb.data.directory}" />
+                    <bean:property name="sourceDirectory" value="file:${ddi.common.original.directory}" />
+                    <bean:property name="targetDirectory" value="file:${ddi.common.data.directory}" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>
+        </batch:step>-->
 
         <batch:step id="validateXMLStep" parent="parentStep" next="splitterStep">
             <batch:tasklet>
                 <bean:bean id="validateEbEXmlTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.validation.ValidationOriginalDataTasklet">
-                    <bean:property name="directory" value="${ddi.common.gpmdb.data.directory}"/>
+                    <bean:property name="directory" value="${ddi.common.original.directory}/${ddi.common.gpmdb.database.index}"/>
                     <bean:property name="reportName" value="${ddi.common.original.report.name}"/>
                 </bean:bean>
             </batch:tasklet>
@@ -56,8 +56,8 @@
         <batch:step id="splitterStep" parent="parentStep" next="importDataStep">
             <batch:tasklet>
                 <bean:bean id="splitterTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.SplitterFromSource">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.data.directory}"/>
-                    <bean:property name="outputDirectory" value="file:${ddi.common.gpmdb.annotated.directory}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.original.directory}/${ddi.common.gpmdb.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.gpmdb.database.index}"/>
                     <bean:property name="originalPrefix"  value="${ddi.common.gpmdb.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.single.file.number.entries}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.gpmdb.prefix}" />
@@ -68,7 +68,7 @@
         <batch:step id="importDataStep" parent="parentStep" next="annotationFiles">
             <batch:tasklet>
                 <bean:bean id="DataImportTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetImportTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.gpmdb.annotated.directory}"/>
+                    <bean:property name="inputDirectory" value="file:${ddi.common.data.directory}/${ddi.common.gpmdb.database.index}"/>
                     <bean:property name="datasetAnnotationService" ref="datasetAnnotationService" />
                     <bean:property name="databaseAnnotationService" ref="databaseAnnotationService" />
                     <bean:property name="databaseName" value="${ddi.common.gpmdb.database.name}" />
@@ -145,7 +145,7 @@
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+        <batch:step id="cleanIProdStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.gpmdb.database.index}" />

@@ -221,15 +221,15 @@
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="cleanMassiveStepJob" next="moveMassiveToProductionStepJob" parent="parentStep">
+        <batch:step id="cleanGMassiveStepJob" next="moveMassiveToProductionStepJob" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanMassiveJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                <bean:bean id="cleanGMassiveJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.massive.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="moveMassiveToProductionStepJob" parent="parentStep" next="cleanGNPSStepJob">
+        <batch:step id="moveMassiveToProductionStepJob" parent="parentStep" next="cleanGGNPSStepJob">
             <batch:tasklet>
                 <bean:bean id="generateMassiveFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName"    value="${ddi.common.massive.database.name}" />
@@ -242,7 +242,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="cleanGNPSStepJob" next="moveGNPSToProductionStepJob" parent="parentStep">
+        <batch:step id="cleanGGNPSStepJob" next="moveGNPSToProductionStepJob" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanGNPSJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.gnps.database.index}" />

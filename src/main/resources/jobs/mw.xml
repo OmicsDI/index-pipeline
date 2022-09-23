@@ -113,7 +113,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="similarityStep" parent="parentStep" next="cleanStepProd">
+        <batch:step id="similarityStep" parent="parentStep" next="cleanIFolder">
             <batch:tasklet>
                 <bean:bean id="similarityScoreTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.similarity.SimilaryScoreTasklet">
                     <bean:property name="typeOfData" ref="dataTypesMetabolomics" />
@@ -125,20 +125,19 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
-
-        <batch:step id="cleanStepProd" next="moveToProductionStepProd" parent="parentStep">
+        <batch:step id="cleanIFolder" next="writeIIndexes" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}" />
+                <bean:bean id="cleanIPreProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="moveToProductionStepProd" parent="parentStep">
+        <batch:step id="writeIIndexes" next="cleanIProdFolder" parent="parentStep" >
             <batch:tasklet>
-                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                <bean:bean id="generateFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.mw.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.mw.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
@@ -146,27 +145,62 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
+        <batch:step id="cleanIProdFolder" next="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanIProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyIFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+
+
     </batch:job>
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+        <batch:step id="cleanGPreProdFolder" next="writeGIndexes" parent="parentStep">
             <batch:tasklet>
-                <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
-                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}" />
+                <bean:bean id="cleanGPreProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="moveToProductionStep" parent="parentStep">
+        <batch:step id="writeGIndexes" next="cleanGProdFolder" parent="parentStep" >
             <batch:tasklet>
-                <bean:bean id="generateFromSourceTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                <bean:bean id="generateFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
                     <bean:property name="databaseName" value="${ddi.common.mw.database.name}" />
-                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}"/>
                     <bean:property name="filePrefix"      value="${ddi.common.mw.prefix}" />
                     <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
                     <bean:property name="databaseService" ref="databaseAnnotationService" />
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="cleanGProdFolder" next="copyGFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanGProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyGFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyGFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.mw.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
                 </bean:bean>
             </batch:tasklet>
         </batch:step>

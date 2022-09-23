@@ -85,7 +85,7 @@
             </batch:tasklet>
         </batch:step>
 
-        <batch:step id="datasetFileRetrieve" parent="parentStep" next="cleanFolder">
+        <batch:step id="datasetFileRetrieve" parent="parentStep" next="cleanIFolder">
             <batch:tasklet>
                 <bean:bean id="retrieveFileUrlStep" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.dataset.DatasetFileUrlRetrieveTasklet">
                     <bean:property name="datasetService" ref="datasetService" />
@@ -95,8 +95,43 @@
                 </bean:bean>
             </batch:tasklet>
         </batch:step>
+        <batch:step id="cleanIFolder" next="writeIIndexes" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanITasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
 
-        <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
+        <batch:step id="writeIIndexes" next="cleanIProdFolder" parent="parentStep" >
+            <batch:tasklet>
+                <bean:bean id="generateFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.paxdb.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="databaseService" ref="databaseAnnotationService" />
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="cleanIProdFolder" next="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanIProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyIFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyIFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+       <!-- <batch:step id="cleanFolder" next="writeIndexes" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
@@ -115,7 +150,7 @@
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>
+        </batch:step>-->
 
 
         <batch:listeners>
@@ -125,7 +160,44 @@
 
     <batch:job id="generatetionJob" xmlns="http://www.springframework.org/schema/batch">
 
-        <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
+        <batch:step id="cleanGFolder" next="writeGIndexes" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanGTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+        <batch:step id="writeGIndexes" next="cleanGProdFolder" parent="parentStep" >
+            <batch:tasklet>
+                <bean:bean id="generateFromSourceJobTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.database.DatasetExportTasklet">
+                    <bean:property name="databaseName" value="${ddi.common.paxdb.database.name}" />
+                    <bean:property name="outputDirectory" value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="filePrefix"      value="${ddi.common.paxdb.prefix}" />
+                    <bean:property name="numberEntries"   value="${ddi.common.multiple.file.number.entries}" />
+                    <bean:property name="databaseService" ref="databaseAnnotationService" />
+                    <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="cleanGProdFolder" next="copyGFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="cleanGProdTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
+                    <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+        <batch:step id="copyGFiletoProd" parent="parentStep">
+            <batch:tasklet>
+                <bean:bean id="copyGFileToDirectoryTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CopyFilesWithPatternFromSourceTasklet">
+                    <bean:property name="inputDirectory"      value="file:${ddi.common.preprod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="outputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}"/>
+                    <bean:property name="pattern" value="${ddi.common.original.pattern}" />
+                </bean:bean>
+            </batch:tasklet>
+        </batch:step>
+
+       <!-- <batch:step id="cleanStep" next="moveToProductionStep" parent="parentStep">
             <batch:tasklet>
                 <bean:bean id="cleanTasklet" scope="step" class="uk.ac.ebi.ddi.pipeline.indexer.tasklet.io.CleanDirectoryTasklet">
                     <bean:property name="inputDirectory" value="file:${ddi.common.prod.directory}/${ddi.common.paxdb.database.index}" />
@@ -144,7 +216,7 @@
                     <bean:property name="datasetAnnotationService"  ref="datasetAnnotationService" />
                 </bean:bean>
             </batch:tasklet>
-        </batch:step>
+        </batch:step>-->
     </batch:job>
 
     <batch:step id="parentStep" abstract="true">
@@ -167,9 +239,11 @@
 
     <bean:bean id="annotationService" class="uk.ac.ebi.ddi.annotation.service.synonyms.DDIAnnotationService"/>
     <bean:bean id="paxdbWsConfig" class="uk.ac.ebi.ddi.api.readers.paxdb.ws.client.PaxDBClient">
-        <constructor-arg index="0" value="http://pax-db.org/downloads/latest/datasets/paxdb-abundance-files-v4.1.zip"/>
-        <constructor-arg index="1" value="http://pax-db.org/downloads/latest/omicsdb_export.tsv"/>
-        <constructor-arg index="2" value="http://pax-db.org/downloads/latest/paxdb-uniprot-links-v4_1.zip"/>
+        <constructor-arg index="0" value="http://ftp.ebi.ac.uk/pub/databases/omicsdi/paxdb/paxdb-abundance-files-v4.2.zip"/>
+        <!--<constructor-arg index="0" value="http://pax-db.org/downloads/latest/datasets/paxdb-abundance-files-v4.1.zip"/>-->
+        <constructor-arg index="1" value="http://ftp.ebi.ac.uk/pub/databases/omicsdi/paxdb/omicsdb_export.tsv"/>
+        <constructor-arg index="2" value="http://ftp.ebi.ac.uk/pub/databases/omicsdi/paxdb/paxdb-uniprot-links-v4.2.zip"/>
+        <!--<constructor-arg index="2" value="https://pax-db.org/downloads/latest/paxdb-uniprot-links-v4_1.zip"/>-->
     </bean:bean>
 
     <bean:bean id="paxdbGenerator" class="uk.ac.ebi.ddi.api.readers.paxdb.GeneratePaxDBOmicsXML">

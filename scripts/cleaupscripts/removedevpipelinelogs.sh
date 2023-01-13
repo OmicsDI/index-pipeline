@@ -1,0 +1,1 @@
+rm -f /nfs/production/hhe/pride/prod/ddi/pipeline/testDev/index-pipeline-1.1-SNAPSHOT/log/*

@@ -1,0 +1,1 @@
+rm -f /homes/pst_prd/hhepride/prod/ddi/pipeline/final/index-pipeline-1.1-SNAPSHOT/log/*

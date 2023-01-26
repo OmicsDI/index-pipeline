@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.ddi.biostudies.BioStudiesService;
 import uk.ac.ebi.ddi.pipeline.indexer.model.Attributes;
 import uk.ac.ebi.ddi.pipeline.indexer.model.Submissions;
 import uk.ac.ebi.ddi.service.db.model.dataset.Dataset;
@@ -29,9 +32,12 @@ public class StudiesParser {
 
     DatasetService datasetService;
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(StudiesParser.class);
+
     private void parseJson(InputStream is) throws IOException {
 
         List<Submissions> submissionsList = new LinkedList<Submissions>();
+
         // Create and configure an ObjectMapper instance
         ObjectMapper mapper = new ObjectMapper();
         //mapper.registerModule(new JavaTimeModule());
@@ -43,10 +49,10 @@ public class StudiesParser {
             JsonToken jsonToken = jsonParser.nextToken();
 
             while (jsonToken != JsonToken.END_OBJECT) {
-                System.out.println(jsonParser.getCurrentName());
+                LOGGER.debug(jsonParser.getCurrentName());
                 if (jsonToken == JsonToken.FIELD_NAME && SUBMISSIONS.equals(jsonParser.getCurrentName())) {
 
-                    System.out.println("\nYour are in submissions ");
+                    LOGGER.debug("\nYour are in submissions ");
 
                     jsonToken = jsonParser.nextToken();
 
@@ -61,9 +67,9 @@ public class StudiesParser {
                         Dataset dataset = tranformSubmissionDataset(submissions);
                         //datasetService.save(dataset);
                         submissions.toString();
-                        System.out.println("accession number is " + submissions.getAccno());
+                        LOGGER.debug("accession number is " + submissions.getAccno());
                         submissionsList.add(submissions);
-                        System.out.println("list count is " + submissionsList.size());
+                        LOGGER.debug("list count is " + submissionsList.size());
                         jsonToken = jsonParser.nextToken();
                     }
                 }

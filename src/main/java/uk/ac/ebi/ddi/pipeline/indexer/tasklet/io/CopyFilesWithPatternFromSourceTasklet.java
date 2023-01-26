@@ -65,7 +65,7 @@ public class CopyFilesWithPatternFromSourceTasklet extends AbstractTasklet {
                 if (sourceFile.isFile() && sourceFile.getName().contains(pattern)) {
                     Assert.state(sourceFile.isFile() && sourceFile.exists(),
                             "Source must be an existing file: " + sourceFile.getAbsolutePath());
-                    LOGGER.info("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
+                    LOGGER.debug("Copying file " + sourceFile.getAbsolutePath() + " to " + target.getAbsolutePath());
                     FileUtils.copyFileToDirectory(sourceFile, target);
                 }
             }

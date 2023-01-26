@@ -32,7 +32,7 @@ public class Utils {
     }
 
     public static HashMap<String, String> readCsvHashMap() throws IOException {
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        //("Working Directory = " + System.getProperty("user.dir"));
         String currDir = System.getProperty("user.dir");
         String path = "/nfs/pride/prod/ddi/pipeline/final/testgeo/omicsdivocab1.csv";
         //String path = "/nfs/production/hhe/pride/omicsdiscript/omicsdivocab1.csv";
@@ -56,7 +56,7 @@ public class Utils {
                 map.put(arr[0], arr[1]);
             }*/
         }
-        System.out.println(map);
+        //System.out.println(map);
         return map;
     }
 

@@ -10,9 +10,9 @@
         </encoder>
     </appender>
 
-    <logger name="uk.ac.ebi.ddi" level="DEBUG" />
+    <logger name="uk.ac.ebi.ddi" level="ERROR" />
 
-    <logger name="uk.ac.ebi.ddi.annotation" level="DEBUG" />
+    <logger name="uk.ac.ebi.ddi.annotation" level="ERROR" />
     <logger name="uk.ac.ebi.ddi.xml" level="INFO" />
     <logger name="uk.ac.ebi.ddi.extservices" level="INFO" />
     <logger name="uk.ac.ebi.ddi" level="INFO" />

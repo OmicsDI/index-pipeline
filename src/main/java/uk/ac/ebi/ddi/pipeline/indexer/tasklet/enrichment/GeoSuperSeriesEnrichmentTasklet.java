@@ -71,7 +71,7 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        LOGGER.info("Starting");
+        LOGGER.debug("Starting");
         downloadDir = new File(downloadPath, TASK_WORKING_DIR);
         if (!downloadDir.exists()) {
             downloadDir.mkdirs();
@@ -79,7 +79,7 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
         List<Dataset> datasets = datasetService.readDatasetHashCode(DATASET_NAME);
         ForkJoinPool customThreadPool = new ForkJoinPool(PARALLEL);
         customThreadPool.submit(() -> datasets.stream().parallel().forEach(this::process)).get();
-        LOGGER.info("Finished");
+        LOGGER.debug("Finished");
         return RepeatStatus.FINISHED;
     }
 
@@ -90,7 +90,7 @@ public class GeoSuperSeriesEnrichmentTasklet extends AbstractTasklet {
                 return;
             }
             Dataset originalDataset = datasetService.read(dataset.getId());
-            LOGGER.info("Found subseries of dataset {}: {}", dataset.getAccession(), superSerialAccessions);
+            LOGGER.debug("Found subseries of dataset {}: {}", dataset.getAccession(), superSerialAccessions);
             superSerialAccessions.stream()
                     .map(x -> String.format("%s~%s", x, getLink(x)))
                     .forEach(x -> DatasetUtils.addAdditionalField(originalDataset, "additional_accession", x));
